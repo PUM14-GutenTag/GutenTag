@@ -1,14 +1,19 @@
 # Configuring your development environment
 
+JavaScript code shall be developed according to the [AirBnB style guide](https://github.com/airbnb/javascript).
+
+This is enforced using the ESLint linter and Prettier formatter. Below are the steps to configure these in VSCode.
+
 1. Install Visual Studio Code.
-2. Install the following VSCode extensions.
+2. Start VSCode and open up the root folder.
+3. Install the following VSCode extensions.
    - ESLint
    - Prettier
-3. Open the VSCode settings ( CTRL+. ).
-4. Search for "Format On Save" and enable it.
-5. Navigate to "/frontend" in the terminal.
-6. Run "npm install".
-7. Restart VSCode.
+4. Open the VSCode settings ( CTRL+. ).
+5. Search for "Format On Save" and enable it.
+6. Navigate to "/frontend" in the terminal.
+7. Run "npm install".
+8. Restart VSCode.
 
 # Available Scripts
 
