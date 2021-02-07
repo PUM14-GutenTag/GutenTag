@@ -8,14 +8,14 @@ These are enforced using the Flake8 linter and autopep8 formatter. Below are the
 2. Install Python 3.9.1.
 3. Start VSCode and open up the root folder.
 4. Create your virtual environment and install the relevant dependencies.
-   - Run "python -m venv .venv".
+   - Run `python -m venv .venv` if you're on Windows (`python3 -m venv .venv` on Linux/MacOS).
    - Press CTRL+SHIFT+P in VSCode.
    - Select "Python: Select Interpreter".
    - Select "Python 3.9.1 64-bit ('.venv').
    - Open the settings ( CTRL+. ).
    - Enable "Python > terminal: Activate Env in Current Terminal".
    - Your virtual environment should now be activated automatically when you open VSCode.
-   - Run "pip install -r requirements.txt".
+   - Run `pip install -r requirements.txt`.
 5. Install the following VSCode extensions.
    - Python
 6. Switch to the Flake8 linter.

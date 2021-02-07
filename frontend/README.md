@@ -11,8 +11,8 @@ This is enforced using the ESLint linter and Prettier formatter. Below are the s
    - Prettier
 4. Open the VSCode settings ( CTRL+. ).
 5. Search for "Format On Save" and enable it.
-6. Navigate to "/frontend" in the terminal.
-7. Run "npm install".
+6. Navigate to `/frontend` in the terminal.
+7. Run `npm install`.
 8. Restart VSCode.
 
 # Available Scripts
