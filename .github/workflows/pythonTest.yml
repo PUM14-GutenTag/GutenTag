@@ -5,9 +5,9 @@ name: PythonFile CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, CI ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, CI ]
 
 jobs:
   build:
@@ -31,6 +31,19 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: autopep8
+        uses: peter-evans/autopep8@v1
+        with:
+          args: --recursive --in-place --aggressive --aggressive .
+    - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: autopep8 action fixes
+          title: Fixes by autopep8 action
+          body: This is an auto-generated PR with fixes by autopep8.
+          labels: autopep8, automated pr
+          reviewers: peter-evans
+          branch: autopep8-patches
     #- name: Test with pytest
     # run: |
     #    pytest *testFile.py*
