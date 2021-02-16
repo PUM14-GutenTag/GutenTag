@@ -1,3 +1,3 @@
-function sayHi(name){  
-    return 'Result: ' + name
+function sayHi(name) {
+  return "Result: " + name;
 }
