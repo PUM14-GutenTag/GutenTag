@@ -30,5 +30,6 @@ function HelloWorld({
       <em>{greeted}</em>
       {silent ? "." : "!"}
     </div>
-  );
+  )
+  ;
 }
