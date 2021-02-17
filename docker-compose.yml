@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  api:
+    build: ./backend
+    volumes:
+      - ./backend:/usr/src/backend
+    depends_on:
+      - db
+    ports:
+      - 5000:5000
+    environment:
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://admin:admin@db:5432/gutentag
+  
+  db:
+    image: postgres:13.2-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: gutentag
+
+volumes:
+  postgres_data:
