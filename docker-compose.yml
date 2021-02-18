@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  api:
+  backend:
     build: ./backend
     volumes:
       - ./backend:/usr/src/backend
@@ -14,7 +14,7 @@ services:
       PYTHONUNBUFFERED: 1
       FLASK_ENV: development
       DATABASE_URL: postgresql://admin:admin@db:5432/gutentag
-  
+
   db:
     image: postgres:13.2-alpine
     volumes:
