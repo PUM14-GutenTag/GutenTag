@@ -1,0 +1,9 @@
+node_modules
+build
+.dockerignore
+Dockerfile*
+**/.vscode
+#eslint.json
+#.prettierrc
+**/*.[mM][dD]
+.gitignore

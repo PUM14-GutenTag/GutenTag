@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.9.1-alpine
+FROM python:3.9.1-alpine3.13
 
 # set work directory
 WORKDIR /usr/src/backend

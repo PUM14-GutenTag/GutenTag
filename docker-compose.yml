@@ -1,8 +1,18 @@
 version: "3.8"
 
 services:
+  db:
+    image: postgres:13.2-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: gutentag
+
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     volumes:
       - ./backend:/usr/src/backend
     depends_on:
@@ -15,14 +25,18 @@ services:
       FLASK_ENV: development
       DATABASE_URL: postgresql://admin:admin@db:5432/gutentag
 
-  db:
-    image: postgres:13.2-alpine
+  frontend:
+    build:
+      context: ./frontend
+    #stdin_open: true # docker run -i
+    #tty: true # docker run -t
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./frontend:/usr/src/frontend
+      - /usr/src/frontend/node_modules
+    ports:
+      - 3000:3000
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: gutentag
+      CHOKIDAR_USEPOLLING: 1 # hot reloading
 
 volumes:
   postgres_data:
