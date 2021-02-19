@@ -3,12 +3,13 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
-  const [placeholder, setPlaceholder] = useState('Failed');
+  const [placeholder, setPlaceholder] = useState(-1);
 
   useEffect(() => {
-    fetch('http://localhost:5000/').then(res => res.json()).then(data => {
+    fetch('http://localhost:5000/').then(res => res.json())
+    .then(data => {
       setPlaceholder(data.result);
-    });
+    })
   }, []);
 
   return (

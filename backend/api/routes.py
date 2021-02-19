@@ -7,4 +7,4 @@ def hello_world():
     t = Test()
     db.session.add(t)
     db.session.commit()
-    return str(len(Test.query.all()))
+    return {"result": len(Test.query.all())}

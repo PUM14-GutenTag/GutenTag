@@ -18,7 +18,7 @@ services:
     depends_on:
       - db
     ports:
-      - 5000:5000
+      - "5000:5000"
     environment:
       PYTHONDONTWRITEBYTECODE: 1
       PYTHONUNBUFFERED: 1
@@ -34,9 +34,9 @@ services:
       - ./frontend:/usr/src/frontend
       - /usr/src/frontend/node_modules
     ports:
-      - 3000:3000
+      - "3000:3000"
     environment:
-      CHOKIDAR_USEPOLLING: 1 # hot reloading
+      CHOKIDAR_USEPOLLING: 1 # Enable hot reloading
 
 volumes:
   postgres_data:
