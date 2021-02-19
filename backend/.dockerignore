@@ -1,5 +1,14 @@
+# Docker
+Dockerfile*
+.dockerignore
+
+# Git
+*.md
+.gitignore
+
+# VS Code
+**/.vscode
+
+# Python
 **/__pycache__
 **.venv
-**/.vscode
-**/*.[mM][dD]
-.gitignore

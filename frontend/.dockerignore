@@ -1,9 +1,17 @@
+# Docker
+Dockerfile*
+.dockerignore
+
+# Git
+*.md
+.gitignore
+
+# VS Code
+**/.vscode
+
+# JavaScript
 node_modules
 build
 .dockerignore
-Dockerfile*
-**/.vscode
-#eslint.json
-#.prettierrc
-**/*.[mM][dD]
-.gitignore
+.eslintrc.json
+.prettierrc

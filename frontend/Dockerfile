@@ -10,10 +10,10 @@ ENV PATH /usr/src/frontend/node_modules/.bin:$PATH
 # install npm dependencies
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm install --silent
-RUN npm install react-scripts@4.0.2 -g
+# dont install devDependencies.
+RUN npm install --only=prod
 
 # copy project
-COPY . ./
+COPY . .
 
 CMD ["npm", "start"]
