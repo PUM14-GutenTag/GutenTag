@@ -4,13 +4,13 @@
 
 JavaScript code shall be developed according to the [AirBnB style guide](https://github.com/airbnb/javascript).
 
-This is enforced using the ESLint linter and Prettier formatter. Install instructions can be found in [/frontend/README.md](/frontend/README.md).
+This is enforced using the ESLint linter and Prettier formatter. Install instructions can be found in [/README.md](/README.md).
 
 ## Python
 
 Python code shall be developed according to the [PEP8](https://pep8.org/) and [PEP257](https://www.python.org/dev/peps/pep-0257/) specifications.
 
-These are enforced using the Flake8 linter and autopep8 formatter. Install instructions can be found in [/api/README.md](/backend/README.md).
+These are enforced using the Flake8 linter and autopep8 formatter. Install instructions can be found in [/README.md](/README.md).
 
 ## General documentation guidelines
 

@@ -1,0 +1,7 @@
+autopep8==1.5.5
+flake8==3.8.4
+pep8==1.7.1
+mccabe==0.6.1
+pycodestyle==2.6.0
+pyflakes==2.2.0
+toml==0.10.2
