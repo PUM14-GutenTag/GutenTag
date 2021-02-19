@@ -72,3 +72,5 @@ Open the root directory in the terminal and run
 `docker-compose up`
 
 This will launch all of the services in different containers, install their dependencies and configure them to communicate on a local network.
+
+The frontend should now be reachable at [http:localhost:3000/](http:localhost:3000/) and the backend at [http:localhost:5000/](http:localhost:5000/)
