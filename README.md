@@ -29,7 +29,7 @@ All terminal commands are expected to be run from the project's root folder.
    - Run `(cd frontend && npm install --only=dev)`
 10. Add the following settings to your /.vscode/settings.json file. This enables the Flake8 linter as well as format on save for javascript.
 
-```
+```json
 {
     // ...
     // ... other options

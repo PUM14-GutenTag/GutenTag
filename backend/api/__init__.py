@@ -10,4 +10,5 @@ CORS(app)
 db = SQLAlchemy(app)
 
 
-import api.routes # This should NOT be at the top of the file. Build will fail. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
+# This should NOT be at the top of the file. Build will fail. See https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
+import api.routes  # noqa
