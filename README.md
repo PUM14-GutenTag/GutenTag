@@ -67,7 +67,7 @@ Follow the instructions [here](https://docs.docker.com/engine/install/).
 
 ### Running the Docker containers
 
-Open the root directory in the terminal and run
+Launch Docker Desktop. Then open the root directory in the terminal and run
 
 `docker-compose up`
 
