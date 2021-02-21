@@ -13,8 +13,8 @@ services:
   backend:
     build:
       context: ./backend
-    # volumes:
-    #   - ./backend:/usr/src/backend
+    volumes:
+      - ./backend:/usr/src/backend
     depends_on:
       - db
     ports:
@@ -30,13 +30,15 @@ services:
       context: ./frontend
     #stdin_open: true # docker run -i
     #tty: true # docker run -t
-    # volumes:
-    # - ./frontend:/usr/src/frontend
-    # - /usr/src/frontend/node_modules
+    volumes:
+      - ./frontend/src:/usr/src/frontend/src
+      # - /usr/src/frontend/node_modules
+    depends_on:
+      - backend
     ports:
       - "3000:3000"
     environment:
-      CHOKIDAR_USEPOLLING: 1 # Enable hot reloading
+      CHOKIDAR_USEPOLLING: "true" # Enable hot reloading
 
 volumes:
   postgres_data:

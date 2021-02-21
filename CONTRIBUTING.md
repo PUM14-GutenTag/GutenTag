@@ -12,6 +12,12 @@ Python code shall be developed according to the [PEP8](https://pep8.org/) and [P
 
 These are enforced using the Flake8 linter and autopep8 formatter. Install instructions can be found in [/README.md](/README.md).
 
+## CSS
+
+CSS selectors shall adhere to the [BEM naming convention](http://getbem.com/naming/).
+
+Commonly used styles can be put in the global stylesheet. Page specific styles are to be put in their own stylesheet.
+
 ## General documentation guidelines
 
 The general documentation philosophy is to contextualize the code without explaining obvious concepts or being needlessly verbose.
