@@ -42,9 +42,9 @@ All terminal commands are expected to be run from the project's root folder.
     },
     "eslint.validate": ["javascript"],
 }
+```
 
 11. Restart VSCode.
-```
 
 ## Starting the application for debugging
 
