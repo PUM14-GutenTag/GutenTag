@@ -4,13 +4,19 @@
 
 JavaScript code shall be developed according to the [AirBnB style guide](https://github.com/airbnb/javascript).
 
-This is enforced using the ESLint linter and Prettier formatter. Install instructions can be found in [/frontend/README.md](/frontend/README.md).
+This is enforced using the ESLint linter and Prettier formatter. Install instructions can be found in [/README.md](/README.md).
 
 ## Python
 
 Python code shall be developed according to the [PEP8](https://pep8.org/) and [PEP257](https://www.python.org/dev/peps/pep-0257/) specifications.
 
-These are enforced using the Flake8 linter and autopep8 formatter. Install instructions can be found in [/backend/README.md](/backend/README.md).
+These are enforced using the Flake8 linter and autopep8 formatter. Install instructions can be found in [/README.md](/README.md).
+
+## CSS
+
+CSS selectors shall adhere to the [BEM naming convention](http://getbem.com/naming/).
+
+Commonly used styles can be put in the global stylesheet. Page specific styles are to be put in their own stylesheet.
 
 ## General documentation guidelines
 

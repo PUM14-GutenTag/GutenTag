@@ -1,0 +1,17 @@
+# Docker
+Dockerfile*
+.dockerignore
+
+# Git
+*.md
+.gitignore
+
+# VS Code
+**/.vscode
+
+# JavaScript
+node_modules
+build
+.dockerignore
+.eslintrc.json
+.prettierrc
