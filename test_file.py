@@ -2,4 +2,4 @@ import dosomething
 
 
 def test_function():
-    assert function(1) == 7
+    assert dosomething.function(1) == 7
