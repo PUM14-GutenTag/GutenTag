@@ -10,6 +10,6 @@ jobs:
         with:
           node-version: '15.x'
       - name: Install dependencies
-        run: npm install --only=dev
+        run: npm install -g --only=dev
       - name: Run ESLint
         run: npx eslint . --ext .js,.jsx,.ts,.tsx
