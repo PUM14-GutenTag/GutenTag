@@ -10,6 +10,6 @@ jobs:
         with:
           node-version: '15.x'
       - name: Install dependencies
-        run: npm install -g --only=dev
+        run: npm install -g eslint eslint-config-airbnb eslint-config-prettier eslint-plugin-import eslint-plugin-jsx-ally eslint-plugin-prettier eslint-plugin-react eslint-plugin-react-hooks
       - name: Run ESLint
         run: npx eslint . --ext .js,.jsx,.ts,.tsx
