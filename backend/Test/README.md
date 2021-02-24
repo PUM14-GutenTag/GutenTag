@@ -1,3 +1,11 @@
+# Testing
+
+## Adding test
+
+After you are done writing a function that needs automatic testing you should include it in test*file.py. Add tests that you seem are appropiate for the function and really challenge the code in it, such as edge cases. When naming the tests the should follow the namein convention of test*_function name_.py or else pytest won't find it.
+
+There are a test example in the test file. Basically you give the function you want to test some input and together with the `assert` statement you make sure that the input matches the expected output.
+
 ## Run automatic test before pushing
 
 All terminal commands are expected to be run from the project's root folder. The first steps might be unnecessary if the packages are already installed.
