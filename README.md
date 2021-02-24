@@ -25,8 +25,8 @@ All terminal commands are expected to be run from the project's root folder.
    - Your virtual environment should now be activated automatically when you open VSCode.
 8. Install the Python **dev** dependencies.
    - Run `pip install -r ./backend/requirements_dev.txt`
-9. Install the Javascript **dev** dependencies.
-   - Run `(cd frontend && npm install --only=dev)`
+9. Install the JavaScript dependencies.
+   - Run `(cd frontend && npm install)`
 10. Add the following settings to your /.vscode/settings.json file. This enables the Flake8 linter as well as format on save for javascript.
 
 ```
@@ -67,7 +67,7 @@ Follow the instructions [here](https://docs.docker.com/engine/install/).
 
 ### Running the Docker containers
 
-Launch Docker Desktop. Then open the root directory in the terminal and run
+**Launch Docker Desktop**. Then open the root directory in the terminal and run
 
 `docker-compose up`
 
