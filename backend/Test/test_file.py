@@ -10,8 +10,5 @@ def function(x):
     return x + y
 
 
-
-
-
 def test_function():
     assert function(1) == 7, "Test failed"

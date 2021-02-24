@@ -27,4 +27,4 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest backend\Test\test_file.py
+          pytest backend/Test/test_file.py
