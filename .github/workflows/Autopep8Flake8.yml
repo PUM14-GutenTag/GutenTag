@@ -1,0 +1,30 @@
+name: Python CI autopep8 Flake8
+
+on:
+  push:
+    branches: [main, CI-new]
+  pull_request:
+    branches: [main, CI-new]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 --upgrade pycodestyle
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Check code with pycodestyle
+        run: |
+         pycodestyle backend 
+      - name: Lint with flake8
+        run: |
+          flake8 backend
