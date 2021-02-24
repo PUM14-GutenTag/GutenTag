@@ -1,4 +1,4 @@
-##Run automatic test before pushing
+## Run automatic test before pushing
 
 All terminal commands are expected to be run from the project's root folder. The first steps might be unnecessary if the packages are already installed.
 
