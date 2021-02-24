@@ -54,7 +54,7 @@ Docker is run through Docker Desktop on Windows & MacOS while Linux distribution
 
 **Windows**
 
-1. Follow the instructions [here](https://docs.docker.com/docker-for-windows/install/).
+1. Follow the instructions for either Windows [Home Edition](https://docs.docker.com/docker-for-windows/install-windows-home/) or [Pro/Educational Edition](https://docs.docker.com/docker-for-windows/install/).
 2. It is recommended that you run Docker using Windows Subsystem for Linux (WSL). Instructions can be found [here](https://docs.docker.com/docker-for-windows/wsl/).
 
 **MacOS**
