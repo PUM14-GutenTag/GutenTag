@@ -1,7 +1,7 @@
 name: CI ESLint Prettier
 on:
   push:
-    branches: [ main ]
+    branches: [ main, ci-js ]
   pull_request:
     branches: [ main ]
 
