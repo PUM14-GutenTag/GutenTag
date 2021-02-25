@@ -30,4 +30,4 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run ESLint
-        run: ./node_modules/.bin/prettier . --ext .js,.jsx --no-error-on-unmatched-pattern
+        run: ./node_modules/.bin/prettier --check **/*.{js,jsx}
