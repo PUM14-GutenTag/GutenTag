@@ -1,4 +1,4 @@
-name: CI ESLint
+name: CI ESLint Prettier
 on: push
 
 defaults:
@@ -6,7 +6,7 @@ defaults:
     working-directory: ./frontend
 
 jobs:
-  build:
+  build-ESLint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,3 +18,16 @@ jobs:
         run: npm ci
       - name: Run ESLint
         run: ./node_modules/.bin/eslint . --ext .js,.jsx --no-error-on-unmatched-pattern
+
+  build-Prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "15.x"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run ESLint
+        run: ./node_modules/.bin/prettier . --ext .js,.jsx --no-error-on-unmatched-pattern
