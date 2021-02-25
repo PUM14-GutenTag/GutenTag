@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install backend/requirements_dev.txt
+          pip install -r backend/requirements_dev.txt
 
       - name: Check code with pycodestyle
         run: |
@@ -37,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install backend/requirements_dev.txt
+          pip install -r backend/requirements_dev.txt
 
       - name: Lint with Flake8
         run: |

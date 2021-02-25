@@ -12,6 +12,6 @@ All terminal commands are expected to be run from the project's root folder.
 
 Write the following command in the terminal:
 
-1. `pytest backend/Test/test_file.py`
+1. `pytest backend/test/test_file.py`
 
 It will run all the tests in test_file.py.
