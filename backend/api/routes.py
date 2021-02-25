@@ -2,15 +2,6 @@ from api import app, rest, db
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
-"""
-class HelloWorld(Resource):
-    def get(self):
-        t = Test()
-        db.session.add(t)
-        db.session.commit()
-        return {"result": len(Test.query.all())}
-"""
-
 
 class register(Resource):
     def __init__(self):
@@ -119,7 +110,7 @@ class remove_label(Resource):
         self.reqparse.add_argument('project_id', type=int, required=True)
         self.reqparse.add_argument('data_id', type=str, required=True)
 
-    def post(self):
+    def delete(self):
         return jsonify({"message": "Remove label not implemented in API"})
 
 
@@ -134,14 +125,14 @@ class get_export_data(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        print(args, )
+        print(args)
         return jsonify({"message": "Get export data not implemented in API"})
 
 
 rest.add_resource(register, '/register')
 rest.add_resource(login, '/login')
-rest.add_resource(authorize, '/authorize_user')
-rest.add_resource(deauthorize, '/deauthorize_user')
+rest.add_resource(authorize, '/authorize-user')
+rest.add_resource(deauthorize, '/deauthorize-user')
 rest.add_resource(create_project, '/create-project')
 rest.add_resource(delete_project, '/delete-project')
 rest.add_resource(get_data, '/get-data')

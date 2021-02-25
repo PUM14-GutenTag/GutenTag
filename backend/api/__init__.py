@@ -7,6 +7,7 @@ from flask_restful import Api
 
 app = Flask(__name__)
 app.config.from_object("api.config.Config")
+app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app)
 rest = Api(app)
 db = SQLAlchemy(app)
