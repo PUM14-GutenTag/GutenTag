@@ -2,7 +2,7 @@
 
 ## Adding test
 
-After you are done writing a function that needs automatic testing you should include it in test*file.py. Add tests that you seem are appropiate for the function and really challenge the code in it, such as edge cases. When naming the tests they should follow the naming convention of test*_function name_.py or else pytest won't find it.
+After you are done writing a function that needs automatic testing you should include it in test\_file.py. Add tests that you seem are appropiate for the function and really challenge the code in it, such as edge cases. When naming the tests they should follow the naming convention of test\*function name\*.py or else pytest won't find it.
 
 There are a test example in the test file. Basically you give the function you want to test some input and together with the `assert` statement you make sure that the input matches the expected output.
 
