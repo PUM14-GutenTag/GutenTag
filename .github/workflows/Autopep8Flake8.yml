@@ -2,7 +2,7 @@ name: Python CI autopep8 Flake8
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix-CI]
   pull_request:
     branches: [main]
 
@@ -41,4 +41,4 @@ jobs:
 
       - name: Lint with Flake8
         run: |
-          flake8 backend
+          flake8 --ignore=E266 backend
