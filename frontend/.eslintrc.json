@@ -6,14 +6,12 @@
     "jest": true,
     "node": true
   },
+  "ignorePatterns": ["**/nodes_modules/*"],
   "rules": {
-    "prettier/prettier": ["warn"],
     "jsx-a11y/href-no-hash": ["off"],
-    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
-    "no-console": "off",
-    "no-unused-vars": "off",
+    "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
     "max-len": [
-      "warn",
+      "error",
       {
         "code": 100,
         "tabWidth": 2,
