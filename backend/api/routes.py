@@ -1,4 +1,4 @@
-from api import app, rest, db
+from api import rest, db
 from api.models import Test, User
 from flask_restful import Resource
 
@@ -9,7 +9,8 @@ class TestModels(Resource):
         db.session.add(t)
         db.session.commit()
 
-        user = User("Oscars", "Lonnqvist", "oscar@mail.com" + str(len(Test.query.all())))
+        user = User("Oscars", "Lonnqvist", "oscar@mail.com" +
+                    str(len(Test.query.all())))
         db.session.add(user)
         db.session.commit()
 
