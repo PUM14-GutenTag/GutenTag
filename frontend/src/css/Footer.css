@@ -1,0 +1,15 @@
+.main-footer {
+  color: white;
+  background-color: #282c34;
+  padding-top: 3em;
+  padding-left: 3em;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.logo-position {
+  object-fit: contain;
+  object-position: center;
+}
