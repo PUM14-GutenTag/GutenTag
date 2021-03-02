@@ -34,23 +34,20 @@ class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    firstname = db.Column(db.String(128), nullable=False)
-    lastname = db.Column(db.String(128), nullable=False)
-    email = db.Column(db.String(128), unique=True, nullable=False)
-    admin = db.Column(db.Integer, nullable=False)  # 0=user, 1=admin
+    first_name = db.Column(db.Text, nullable=False)
+    last_name = db.Column(db.Text, nullable=False)
+    email = db.Column(db.Text, unique=True, nullable=False)
+    access_level = db.Column(db.Integer, nullable=False,
+                             default=0)  # 0=user, 1=admin
 
     projects = db.relationship(
         "Project", secondary=access_control_table, back_populates="users")
 
-    def __init__(self, firstname, lastname, email):
-        self.firstname = firstname
-        self.lastname = lastname
-        self.email = email
-
     def __repr__(self):
-        return f"< User(firstname={self.firstname},\
-                        lastname={self.lastname} ,\
-                        email = {self.email}) >"
+        return (
+            f"<User(first_name={self.first_name}, last_name={self.last_name}, "
+            f"email={self.email}, access_level={self.access_level})>"
+        )
 
 
 class Project(db.Model):
@@ -61,18 +58,18 @@ class Project(db.Model):
     __tablename__ = "project"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), unique=True, nullable=False)
-    project_type = db.Column(db.String(128), nullable=False)
+    name = db.Column(db.Text, unique=True, nullable=False)
+    project_type = db.Column(db.Text(), nullable=False)
     created = db.Column(db.DateTime, default=datetime.datetime.now())
 
     users = db.relationship(
         "User", secondary=access_control_table, back_populates="projects")
 
     def __repr__(self):
-        return f"<Projectname={self.name}, Associated users={self.users1}>"
+        return f"<Projectname={self.name}, Associated users={self.users}>"
 
 
-class Project_data(db.Model):
+class ProjectData(db.Model):
     """
     Project_data contains information about what project it is related to and
     what data it is.
@@ -82,8 +79,8 @@ class Project_data(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     data = db.Column(db.Text)
-    prelabel = db.Column(db.String(128))
-    project_type = db.Column(db.String(128), nullable=False)
+    prelabel = db.Column(db.Text)
+    project_type = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, default=datetime.datetime.now())
 
 
@@ -94,9 +91,8 @@ class Label(db.Model):
     __tablename__ = "labels"
 
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     data_id = db.Column(db.Integer, db.ForeignKey('project_data.id'))
-    label = db.Column(db.String(128), nullable=False)
+    label = db.Column(db.Text, nullable=False)
     updated = db.Column(db.DateTime, default=datetime.datetime.now())
     created = db.Column(db.DateTime, default=datetime.datetime.now())
