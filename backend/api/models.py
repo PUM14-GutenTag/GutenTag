@@ -59,7 +59,7 @@ class Project(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, unique=True, nullable=False)
-    project_type = db.Column(db.Text(), nullable=False)
+    project_type = db.Column(db.Integer, nullable=False)
     created = db.Column(db.DateTime, default=datetime.datetime.now())
 
     users = db.relationship(

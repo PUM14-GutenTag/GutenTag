@@ -2,7 +2,7 @@
 This file contains all functions for the database handler.
 """
 from api.models import User, Project, ProjectData, Label
-from api import db, SQLAlchemy
+from api import db, SQLAlchemy, ProjectType
 
 
 def check_type(val, t):
@@ -13,20 +13,34 @@ def try_add(object):
     try:
         db.session.add(object)
         db.session.commit()
-        return f"{type(object).__name__} '{object}' created."
+        msg = f"{type(object).__name__} '{object}' created."
+        print("try")
     except Exception as e:
         db.session.rollback()
-        return f"Could not create {type(object).__name__}: {e}"
+        msg = f"Could not create {type(object).__name__}: {e}"
+        print("except")
+    finally:
+        print(msg)
+        return {
+            "id": object.id,
+            "message": msg
+        }
 
 
 def try_delete(object):
     try:
         db.session.delete(object)
         db.session.commit()
-        return f"{type(object).__name__} '{object}' deleted."
+        msg = f"{type(object).__name__} '{object}' deleted."
     except Exception as e:
         db.session.rollback()
-        return f"Could not delete {type(object).__name__}: {e}"
+        msg = f"Could not delete {type(object).__name__}: {e}"
+    finally:
+        print(msg)
+        return {
+            "id": object.id,
+            "message": msg
+        }
 
 
 def create_user(first_name, last_name, email, isAdmin=False):
@@ -44,18 +58,14 @@ def create_user(first_name, last_name, email, isAdmin=False):
 
     user = User(first_name=first_name, last_name=last_name, email=email,
                 access_level=int(isAdmin))
-    msg = try_add(user)
-    return {
-        "id": user.id,
-        "message": msg
-    }
+    return try_add(user)
 
 
 def create_project(project_name, project_type):
     """
     Function creates a project in the database and returns a message.
     """
-    for arg, t in [(project_name, str), (project_type, str)]:
+    for arg, t in [(project_name, str), (project_type, int)]:
         if not check_type(arg, t):
             return f"Could not create project: arg '{arg}' is not a '{type}'"
     project = Project(name=project_name, project_type=project_type)
@@ -66,7 +76,7 @@ def add_data(project_id, data, project_type):
     """
     Function adds data to an existing project and returns a message.
     """
-    for arg, t in [(project_id, int), (data, str), (project_type, str)]:
+    for arg, t in [(project_id, int), (data, str), (project_type, int)]:
         if not check_type(arg, t):
             return f"Could not add data: arg '{arg}' is not a '{t}'."
     project_data = ProjectData(project_id=project_id,

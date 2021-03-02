@@ -3,6 +3,18 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_restful import Api
+from enum import IntEnum
+
+
+class ProjectType(IntEnum):
+    DOCUMENT_CLASSIFICATION = 1
+    IMAGE_CLASSIFICATION = 2
+    SEQUENCE_2_SEQUENCE = 3
+    SEQUENCE_LABELING = 4
+
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_
 
 
 app = Flask(__name__)
