@@ -7,9 +7,11 @@ from api import db
 
 # The association table between user and project.
 access_control_table = db.Table("access_control", db.Model.metadata,
-    db.Column('project_id', db.Integer, db.ForeignKey('project.id')),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
-)
+                                db.Column('project_id', db.Integer,
+                                          db.ForeignKey('project.id')),
+                                db.Column('user_id', db.Integer,
+                                          db.ForeignKey('users.id'))
+                                )
 
 
 class Test(db.Model):
@@ -35,8 +37,10 @@ class User(db.Model):
     firstname = db.Column(db.String(128), nullable=False)
     lastname = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
+    admin = db.Column(db.Integer, nullable=False)  # 0=user, 1=admin
 
-    projects = db.relationship("Project", secondary=access_control_table, back_populates="users1")
+    projects = db.relationship(
+        "Project", secondary=access_control_table, back_populates="users")
 
     def __init__(self, firstname, lastname, email):
         self.firstname = firstname
@@ -44,23 +48,25 @@ class User(db.Model):
         self.email = email
 
     def __repr__(self):
-        return f"<User(firstname={self.firstname}, lastname={self.lastname}, email={self.email})>"
+        return f"< User(firstname={self.firstname},\
+                        lastname={self.lastname} ,\
+                        email = {self.email}) >"
 
 
 class Project(db.Model):
     """
     Project contain information about what users are related to this project
-    and what type of project it is.
+    and what type of project it is .
     """
     __tablename__ = "project"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), unique=True, nullable=False)
     project_type = db.Column(db.String(128), nullable=False)
-    updated = db.Column(db.DateTime, default=datetime.datetime.now()) # Make timestap relative to computer timezone.
     created = db.Column(db.DateTime, default=datetime.datetime.now())
 
-    users1 = db.relationship("User", secondary=access_control_table, back_populates="projects")
+    users = db.relationship(
+        "User", secondary=access_control_table, back_populates="projects")
 
     def __repr__(self):
         return f"<Projectname={self.name}, Associated users={self.users1}>"
@@ -75,10 +81,9 @@ class Project_data(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    data = db.Column(db.String(128)) # Unsure about the string length
+    data = db.Column(db.Text)
     prelabel = db.Column(db.String(128))
     project_type = db.Column(db.String(128), nullable=False)
-    updated = db.Column(db.DateTime, default=datetime.datetime.now())
     created = db.Column(db.DateTime, default=datetime.datetime.now())
 
 
@@ -93,3 +98,5 @@ class Label(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     data_id = db.Column(db.Integer, db.ForeignKey('project_data.id'))
     label = db.Column(db.String(128), nullable=False)
+    updated = db.Column(db.DateTime, default=datetime.datetime.now())
+    created = db.Column(db.DateTime, default=datetime.datetime.now())
