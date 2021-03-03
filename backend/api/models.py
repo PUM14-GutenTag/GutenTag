@@ -6,12 +6,14 @@ from api import db
 
 
 # The association table between user and project.
-access_control_table = db.Table("access_control", db.Model.metadata,
-                                db.Column('project_id', db.Integer,
-                                          db.ForeignKey('project.id')),
-                                db.Column('user_id', db.Integer,
-                                          db.ForeignKey('users.id'))
-                                )
+access_control = db.Table("access_control", db.Model.metadata,
+                          db.Column('project_id',
+                                    db.Integer,
+                                    db.ForeignKey('project.id')),
+                          db.Column('user_id',
+                                    db.Integer,
+                                    db.ForeignKey('users.id'))
+                          )
 
 
 class Test(db.Model):
@@ -41,7 +43,7 @@ class User(db.Model):
                              default=0)  # 0=user, 1=admin
 
     projects = db.relationship(
-        "Project", secondary=access_control_table, back_populates="users")
+        "Project", secondary=access_control, back_populates="users")
 
     def __repr__(self):
         return (
@@ -63,7 +65,7 @@ class Project(db.Model):
     created = db.Column(db.DateTime, default=datetime.datetime.now())
 
     users = db.relationship(
-        "User", secondary=access_control_table, back_populates="projects")
+        "User", secondary=access_control, back_populates="projects")
 
     def __repr__(self):
         return f"<Projectname={self.name}, Associated users={self.users}>"
