@@ -5,24 +5,44 @@ name: Python CI Test
 
 on:
   push:
-    branches: [main]
+    branches: [main, ci-pytest-docker] # FIXME remove
   pull_request:
     branches: [main]
 
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Set up Python 3.9
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: 3.9
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r backend/requirements_dev.txt
+#       - name: Test with pytest
+#         run: |
+#           pytest backend/Test/test_file.py
+
 jobs:
-  build:
+  test:
+    name: Run test suite
     runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: ./docker-compose.yml
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements_dev.txt
-      - name: Test with pytest
-        run: |
-          pytest backend/Test/test_file.py
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # - name: Login to DockerHub
+      #   run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+
+      - name: Build docker images
+        run: docker-compose up --build
+
+      - name: Run tests
+        run: docker-compose exec backend python -m pytest ./test/ -s
