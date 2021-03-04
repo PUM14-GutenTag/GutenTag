@@ -46,5 +46,5 @@ jobs:
 
       - name: Run tests
         run: |
-          ls
-          docker-compose run backend python -m pytest .backend/test/ -s
+          docker-compose run backend ls
+          docker-compose run backend python -m pytest ./backend/test/ -s
