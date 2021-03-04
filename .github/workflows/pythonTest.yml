@@ -42,7 +42,7 @@ jobs:
       #   run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
       - name: Build docker images
-        run: docker-compose up --build
+        run: docker-compose up --build -d
 
       - name: Run tests
         run: docker-compose exec backend python -m pytest ./test/ -s
