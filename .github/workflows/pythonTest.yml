@@ -5,7 +5,7 @@ name: Python CI Test
 
 on:
   push:
-    branches: [main, ci-pytest-docker] # FIXME remove
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -22,6 +22,4 @@ jobs:
         run: docker-compose build -f docker-compose-backend.test.yml
 
       - name: Run tests
-        run: |
-          docker-compose run backend ls
-          docker-compose run backend python -m pytest ./Test/ -s
+        run: docker-compose run backend python -m pytest ./Test/ -s
