@@ -10,14 +10,14 @@ import '../css/global.css';
 
 // Default page layout. The content is sandwiches by a header and footer.
 const Layout = ({ children }) => (
-  <div>
+  <>
     <Helmet>
       <title>GutenTag</title>
     </Helmet>
     <Header />
     {children}
     <Footer />
-  </div>
+  </>
 );
 
 Layout.propTypes = {

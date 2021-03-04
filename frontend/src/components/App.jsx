@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Switch, Route} from 'react-router-dom';
-import Alert from 'react-bootstrap/Alert';
 import Home from '../pages/Home';
 import Settings from '../pages/Settings';
 import Projects from '../pages/Projects';
 
 import '../css/App.css';
 
-import logo from '../res/logo.svg';
 
-const axios = require('axios');
+//const axios = require('axios');
 
 // Placeholder content from create-react-app script.
 function App() {
-  const [placeholder, setPlaceholder] = useState(-1);
-
-  
+  //const [placeholder, setPlaceholder] = useState(-1); 
 
   return (
     <div className="page-container">

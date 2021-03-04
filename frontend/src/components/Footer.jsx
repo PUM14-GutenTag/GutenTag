@@ -11,6 +11,9 @@ const Footer = () => {
     return (
         <div className="main-footer">
             <div className="footer-container">
+                
+                
+                
                 <div className="row">
                     {/* Column 1 */}
                     <div className="col">
@@ -23,7 +26,7 @@ const Footer = () => {
                     </div>
                     {/* Column 2 */}
                     <div className="col">
-                        <h5>Challenges left</h5>
+                        <h5>Stories</h5>
                         <ul className="list-unstyled">
                         <li>Here we could add some challenges left</li>
                         <li>to do. For example:</li>
@@ -39,19 +42,25 @@ const Footer = () => {
                     <div className="col">
                         <h5>GitHub</h5>
                         <Navbar.Brand href="https://github.com/">
-                        <img className="logo-position" src={githublogo} style={{ width: 100, height: 100 }} />
+                        <img className="github-logo" alt="Github logo" src={githublogo} style={{ width: 100, height: 100 }} />
                         </Navbar.Brand>
                     </div>
                 </div>
 
+
+
                 <hr />
 
+            
                 <div className="row">
+                    
                 <p className="col-small">
-                    &copy; Copyright {new Date().getFullYear()} GutenTag | All rights reserved | Terms of Service | Privacy
+                &copy; Copyright {new Date().getFullYear()} GutenTag | All rights reserved | Terms of Service | Privacy
                 </p>
+
                 </div>
-            </div>
+            </div>    
+            
         </div>
     );
 }
