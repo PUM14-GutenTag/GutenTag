@@ -1,7 +1,7 @@
 """
 This file contains all functions for the database handler.
 """
-from api.models import User, Project, Label, ProjectType, AccessLevel
+from api.models import User, Project, Label, ProjectData, AccessLevel
 from api import db
 
 

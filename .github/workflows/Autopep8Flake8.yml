@@ -23,7 +23,7 @@ jobs:
 
       - name: Check code with pycodestyle
         run: |
-          pycodestyle --ignore=E266 backend
+          pycodestyle --ignore=E266,W503 backend
 
   build_flake8:
     runs-on: ubuntu-latest
