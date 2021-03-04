@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 """
 This file contains the routes to the database.
 """
 from api import app, rest, db
 from api.models import Test, User, Project
 from api.database_handler import create_user, reset_db
+=======
+from api import rest, db
+from api.models import Test
+>>>>>>> main
 from flask_restful import Resource
 
 

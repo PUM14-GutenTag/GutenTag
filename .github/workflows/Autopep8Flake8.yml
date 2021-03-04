@@ -23,7 +23,7 @@ jobs:
 
       - name: Check code with pycodestyle
         run: |
-          pycodestyle backend
+          pycodestyle --ignore=E266 backend
 
   build_flake8:
     runs-on: ubuntu-latest
@@ -41,4 +41,4 @@ jobs:
 
       - name: Lint with Flake8
         run: |
-          flake8 backend
+          flake8 --ignore=E266 backend
