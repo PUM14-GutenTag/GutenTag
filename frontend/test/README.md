@@ -28,10 +28,9 @@ in test.js module.exports.
 
 ## Run automatic test before pushing
 
-All terminal commands are expected to be run from the project's frontend folder.
+All terminal commands are expected to be run from the project's root folder.
 
-Write the following command in the terminal:
-
-1. `npx jest`
+1. Make sure that you are running the Docker containers beforehand.
+2. Run `docker-compose run frontend jest` in your terminal.
 
 It will run all the tests in file.test.js.
