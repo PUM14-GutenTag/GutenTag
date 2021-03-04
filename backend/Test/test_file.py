@@ -1,30 +1,10 @@
 
-""" This test file contains all the tests that will be
-executed everytime someone makes a pull request or
-pushes to the main branch.
+"""
+This test file contains all the integration tests and
+system tests that will be executed every time
+someone makes a pull request or pushes to the main branch.
 """
 
+########### Add integration tests here ######
 
-def function(x):
-    y = 6
-    return x + y
-
-
-""" Example test: function(1) == 7 is correct so this
- test_function will pass.
-"""
-
-
-def test_function():
-    assert function(1) == 7, "Test failed"
-
-
-""" Add unit tests here
-Name it test_*function name*.py or pytest won't find it.
-"""
-
-
-########## Add integration tests here ###########
-
-
-########## Add system tests here ###########
+########### Add system tests here ###########
