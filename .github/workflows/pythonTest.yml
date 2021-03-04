@@ -22,10 +22,4 @@ jobs:
         run: docker-compose build
 
       - name: Run tests
-<<<<<<< HEAD
-        run: docker-compose run backend python -m pytest ./test/ -s
-=======
-        run: |
-          docker-compose run backend ls
-          docker-compose run backend python -m pytest ./backend/test/ -s
->>>>>>> parent of 94418f2... test
+        run: docker-compose run backend python -m pytest ./backend/test/ -s
