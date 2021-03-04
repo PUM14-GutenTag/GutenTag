@@ -2,7 +2,34 @@
 This file contains all database models.
 """
 import datetime
+from enum import IntEnum
 from api import db
+
+
+class ProjectType(IntEnum):
+    """
+    Enum for the project types.
+    """
+    DOCUMENT_CLASSIFICATION = 1
+    IMAGE_CLASSIFICATION = 2
+    SEQUENCE_2_SEQUENCE = 3
+    SEQUENCE_LABELING = 4
+
+    @classmethod
+    def has_value(cls, value):
+        """
+        Returns true if value is one of the project types.
+        """
+        return value in cls._value2member_map_
+
+
+class AccessLevel(IntEnum):
+    """
+    Available access levels for users. Future-proofed so that intermediate
+    levels can be put between USER and ADMIN.
+    """
+    USER = 0
+    ADMIN = 5
 
 
 # The association table between user and project.
@@ -40,7 +67,7 @@ class User(db.Model):
     last_name = db.Column(db.Text, nullable=False)
     email = db.Column(db.Text, unique=True, nullable=False)
     access_level = db.Column(db.Integer, nullable=False,
-                             default=0)  # 0=user, 1=admin
+                             default=0)
 
     projects = db.relationship(
         "Project", secondary=access_control, back_populates="users")
