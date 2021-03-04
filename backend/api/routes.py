@@ -1,10 +1,10 @@
+from api import rest, db
+from api.models import Test, User
+from api.database_handler import create_user, reset_db
+from flask_restful import Resource
 """
 This file contains the routes to the database.
 """
-from api import app, rest, db
-from api.models import Test, User, Project
-from api.database_handler import create_user, reset_db
-from flask_restful import Resource
 
 
 class TestModels(Resource):
@@ -16,11 +16,11 @@ class TestModels(Resource):
         t = Test()
         db.session.add(t)
 
-        x = create_user("Oscar",
-                        "Lonnqvist",
-                        "oscar@mail.com" + str(len(User.query.all())),
-                        False
-                        )
+        create_user("Oscar",
+                    "Lonnqvist",
+                    "oscar@mail.com" + str(len(User.query.all())),
+                    False
+                    )
 
         db.session.commit()
         return {"result": len(User.query.all())}

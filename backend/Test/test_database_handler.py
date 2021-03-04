@@ -1,15 +1,13 @@
 
 """
 This test file contains all the tests related to
-database_handler.py that will beexecuted every time
+database_handler.py that will be executed every time
 someone makes a pull request or pushes to the main branch.
 """
 from api.database_handler import (create_user, reset_db, create_project,
                                   add_data, delete_project, authorize_user,
                                   deauthorize_user, label_data)
-from api import db
-from api.models import (User, Project, ProjectData, Label, access_control,
-                        ProjectType)
+from api.models import (User, Project, ProjectData, Label, ProjectType)
 
 
 """
@@ -57,183 +55,7 @@ def test_create_project():
 def test_add_data():
     reset_db()
 
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
-    ret = create_project("Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is not None
-
-    # Test duplicate project name.
-    ret = create_project("Project", ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-    # Test incorrect project name.
-    ret = create_project({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
-    assert Project.query.get(ret["id"]) is None
-
-
-def test_add_data():
-    reset_db()
-
-    user_ret = create_user("first", "last", "user@gmail.com", True)
+    create_user("first", "last", "user@gmail.com", True)
     project_ret = create_project(
         "Project", ProjectType.DOCUMENT_CLASSIFICATION)
     project_id = project_ret["id"]
