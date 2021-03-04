@@ -5,20 +5,34 @@ on:
   pull_request:
     branches: [ main ]
 
-defaults:
-  run:
-    working-directory: ./frontend
+#defaults:
+#  run:
+#   working-directory: ./frontend
 
 jobs:
-  build:
+  test:
+    name: Run test suite
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "15.x"
-      - name: Install dependencies
-        run: npm ci
-      - name: Test with Jest
-        run: ./node_modules/.bin/jest
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build docker images
+        run: docker-compose build
+
+      - name: Run tests
+        run: docker-compose run frontend jest
+#jobs:
+ # build:
+  #  runs-on: ubuntu-latest
+   # steps:
+    #  - uses: actions/checkout@v2
+     # - name: Use Node.js
+      #  uses: actions/setup-node@v1
+       # with:
+        #  node-version: "15.x"
+    #  - name: Install dependencies
+     #   run: npm ci
+     # - name: Test with Jest
+      #  run: ./node_modules/.bin/jest

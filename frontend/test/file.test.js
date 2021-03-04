@@ -1,7 +1,13 @@
 /* This test file contains all the unit tests that will be
-executed everytime someone makes a pull request or
+executed every time someone makes a pull request or
 pushes to the main branch.
 */
+
+const testing = require('../src/components/testing');
+
+test('subtract 2-1 to equal 1', () => {
+  expect(testing.diff(2, 1)).toBe(1);
+});
 
 function sum(a, b) {
   return a + b;
