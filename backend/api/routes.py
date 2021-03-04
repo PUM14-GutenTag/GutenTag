@@ -1,8 +1,6 @@
 """
 This file contains the routes to the database.
 """
-
-
 from api import app, rest, db
 from api.models import Test, User, Project
 from api.database_handler import create_user, reset_db
@@ -20,19 +18,12 @@ class TestModels(Resource):
 
         x = create_user("Oscar",
                         "Lonnqvist",
-                        "oscar@mail.com",
-                        True
+                        "oscar@mail.com" + str(len(User.query.all())),
+                        False
                         )
-        print(x)
-
-        # project = Project(name=str(len(Test.query.all())),
-        #   project_type="Phrase")
-        # db.session.add(project)
-
-        # user.projects.append(project)
 
         db.session.commit()
-        return {"result": repr(User.query.all())}
+        return {"result": len(User.query.all())}
 
 
 class Reset(Resource):
