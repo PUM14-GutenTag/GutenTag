@@ -1,9 +1,8 @@
 """
 This file contains all functions for the database handler.
 """
-from api.models import (User, Project, ProjectData, Label, ProjectType,
-                        AccessLevel)
-from api import db, SQLAlchemy
+from api.models import User, Project, Label, ProjectType, AccessLevel
+from api import db
 
 
 def try_add(object):
@@ -151,8 +150,8 @@ def deauthorize_user(project_id, user_id):
         project = Project.query.get(project_id)
         user = User.query.get(user_id)
 
-        if (user not in project.users and
-                user.access_level != AccessLevel.ADMIN):
+        if (user not in project.users
+                and user.access_level != AccessLevel.ADMIN):
             return (f"Could not deauthorize user. {user} is not authorized "
                     f"for {project}.")
 
