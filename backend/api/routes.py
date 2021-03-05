@@ -1,6 +1,10 @@
 from api import app, rest, db
 from flask import jsonify
 from flask_restful import Resource, reqparse
+from api import rest, db
+from api.models import Test, User
+from api.database_handler import (create_user, create_project, add_data, delete_project,
+                                  authorize_user, deauthorize_user, label_data, remove_label, reset_db)
 
 
 class register(Resource):
@@ -161,6 +165,40 @@ class get_export_data(Resource):
         return jsonify({"message": "Get export data not implemented in API"})
 
 
+"""
+This file contains the routes to the database.
+"""
+
+
+class TestModels(Resource):
+    """
+    This is a test class used to test the functionality of the database models.
+    """
+
+    def get(self):
+        t = Test()
+        db.session.add(t)
+
+        create_user("Oscar",
+                    "Lonnqvist",
+                    "oscar@mail.com" + str(len(User.query.all())),
+                    False
+                    )
+
+        db.session.commit()
+        return {"result": len(User.query.all())}
+
+
+class Reset(Resource):
+    """
+    Reset defines an endpoint used to reset the database for use during
+    development.
+    """
+
+    def get(self):
+        reset_db()
+
+
 rest.add_resource(register, '/register')
 rest.add_resource(login, '/login')
 rest.add_resource(authorize, '/authorize-user')
@@ -172,3 +210,5 @@ rest.add_resource(label_text, '/label-text')
 rest.add_resource(label_image, '/label-image')
 rest.add_resource(remove_label, '/remove-label')
 rest.add_resource(get_export_data, '/get-export-data')
+rest.add_resource(TestModels, '/')
+rest.add_resource(Reset, '/reset')
