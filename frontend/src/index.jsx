@@ -6,7 +6,6 @@ import './css/index.css';
 import Layout from './components/Layout';
 import App from './components/App';
 
-
 ReactDOM.render(
   <React.StrictMode>
     <Layout>

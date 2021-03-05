@@ -4,7 +4,6 @@ import '../css/Header.css';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 
-import { NavLink } from 'react-router-dom';
 import ProgressBar from './ProgressBar';
 import logo from '../res/hat_dark.svg';
 /**
