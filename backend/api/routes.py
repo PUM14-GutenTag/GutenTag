@@ -1,27 +1,39 @@
 from api import rest, db
 from api.models import Test, User
+from api.database_handler import create_user, reset_db
 from flask_restful import Resource
+"""
+This file contains the routes to the database.
+"""
 
 
 class TestModels(Resource):
+    """
+    This is a test class used to test the functionality of the database models.
+    """
+
     def get(self):
         t = Test()
         db.session.add(t)
-        db.session.commit()
 
-        user = User("Oscars", "Lonnqvist", "oscar@mail.com" +
-                    str(len(Test.query.all())))
-        db.session.add(user)
-        db.session.commit()
+        create_user("Oscar",
+                    "Lonnqvist",
+                    "oscar@mail.com" + str(len(User.query.all())),
+                    False
+                    )
 
-        return {"result": repr(User.query.all())}
+        db.session.commit()
+        return {"result": len(User.query.all())}
 
 
 class Reset(Resource):
+    """
+    Reset defines an endpoint used to reset the database for use during
+    development.
+    """
+
     def get(self):
-        db.drop_all()
-        db.create_all()
-        db.session.commit()
+        reset_db()
 
 
 rest.add_resource(TestModels, '/')
