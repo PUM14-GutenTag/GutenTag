@@ -8,7 +8,10 @@ def import_document_classification_data(project_id, json_data):
     [
         {
             "text": "Excellent customer service.",
-            "labels": ["positive"]
+            "labels": [
+                "positive",
+                "negative"
+                ]
         },
     ]
     """
@@ -22,7 +25,7 @@ def import_image_classification_data(project_id, json_data, image_data):
         {
             "labels": [
                 [[442, 420], [530, 540], "car"],
-                [[700, 520], [800, 640], "bus"],
+                [[700, 520], [800, 640], "bus"]
             ]
         }
     ]
@@ -35,7 +38,11 @@ def import_sequence_labeling_data(project_id, json_data):
     [
         {
             "text": "Alex is going to Los Angeles in California",
-            "labels": [[0, 3, PER], [16, 27, LOC], [31, 41, LOC]]
+            "labels": [
+                [0, 3, PER],
+                [16, 27, LOC],
+                [31, 41, LOC]
+                ]
         },
     ]
     """
