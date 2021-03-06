@@ -1,9 +1,6 @@
 import React from 'react';
 
-const ProgressBar = (props) => {
-  // eslint-disable-next-line react/prop-types
-  const { bgcolor, completed } = props;
-
+const ProgressBar = ({ bgcolor, completed }) => {
   const containerStyles = {
     height: 20,
     width: '100%',

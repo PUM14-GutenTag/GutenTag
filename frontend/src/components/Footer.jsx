@@ -5,7 +5,6 @@ import githublogo from '../res/github-logo.png';
 
 /**
  * Footer to be used across all pages.
- * TODO: Add content!
  */
 const Footer = () => {
   return (

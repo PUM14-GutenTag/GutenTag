@@ -8,7 +8,6 @@ import ProgressBar from './ProgressBar';
 import logo from '../res/hat_dark.svg';
 /**
  * Header to be used across all pages.
- * TODO: Add content!
  */
 
 function Header() {

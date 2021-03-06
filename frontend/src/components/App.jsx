@@ -6,7 +6,8 @@ import Projects from '../pages/Projects';
 
 import '../css/App.css';
 
-// const axios = require('axios');
+// eslint-disable-next-line no-unused-vars
+const axios = require('axios');
 
 // Placeholder content from create-react-app script.
 function App() {
