@@ -13,7 +13,7 @@ const Footer = () => {
         <div className="row">
           {/* Column 1 */}
           <div className="col">
-            <h5>GutenTag</h5>
+            <h1>GutenTag</h1>
             <ul className="list-unstyled">
               <li>Striving to improve the user</li>
               <li>experience through making data</li>
@@ -22,7 +22,7 @@ const Footer = () => {
           </div>
           {/* Column 2 */}
           <div className="col">
-            <h5>Stories</h5>
+            <h1>Stories</h1>
             <ul className="list-unstyled">
               <li>Here we could add some challenges left</li>
               <li>to do. For example:</li>
@@ -36,14 +36,9 @@ const Footer = () => {
           </div>
           {/* Column 3 */}
           <div className="col">
-            <h5>GitHub</h5>
+            <h1>GitHub</h1>
             <Navbar.Brand href="https://github.com/">
-              <img
-                className="github-logo"
-                alt="Github logo"
-                src={githublogo}
-                style={{ width: 100, height: 100 }}
-              />
+              <img className="github-logo" alt="Github logo" src={githublogo} />
             </Navbar.Brand>
           </div>
         </div>

@@ -9,3 +9,7 @@
 .basic-navbar-nav {
   max-width: 100%;
 }
+.logo {
+  width: 100px;
+  height: 100px;
+}

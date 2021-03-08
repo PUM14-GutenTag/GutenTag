@@ -1,33 +1,17 @@
 import React from 'react';
+import '../css/ProgressBar.css';
 
 // eslint-disable-next-line react/prop-types
 const ProgressBar = ({ bgcolor, completed }) => {
-  const containerStyles = {
-    height: 20,
-    width: '100%',
-    backgroundColor: '#e0e0de',
-    borderRadius: 2,
-    margin: 50,
-  };
-
   const fillerStyles = {
-    height: '100%',
     width: `${completed}%`,
     backgroundColor: bgcolor,
-    borderRadius: 'inherit',
-    textAlign: 'right',
-  };
-
-  const labelStyles = {
-    padding: 5,
-    color: 'black',
-    fontWeight: 'bold',
   };
 
   return (
-    <div style={containerStyles} lg="6" className="d-none d-lg-block">
-      <div style={fillerStyles} />
-      <span style={labelStyles}>{`${completed}%`}</span>
+    <div lg="6" className="container d-none d-lg-block">
+      <div style={fillerStyles} className="filler" />
+      <span className="label">{`${completed}%`}</span>
     </div>
   );
 };
