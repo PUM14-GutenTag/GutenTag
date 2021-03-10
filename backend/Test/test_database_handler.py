@@ -119,7 +119,7 @@ def test_authorize_user():
     user = User.query.get(550)
     assert user not in project.users
 
-    # Test authorizing user for non-existent project
+    # Test authorizing user for non-existent project.
     user_ret = create_user("nameer", "lastname", "mailer@gmail.com", False)
     user = User.query.get(user_ret["id"])
     assert len(user.projects) == 0
@@ -147,7 +147,7 @@ def test_deauthorize_user():
     deauthorize_user(project_id, 490)
     assert user not in project.users
 
-    # Test deauthorizing user from a project he isn't authorized to
+    # Test deauthorizing user from a project he isn't authorized to.
     user_ret = create_user("firstname", "lastname", "user57@gmail.com")
     project_ret = create_project(
         "Projecttest", ProjectType.DOCUMENT_CLASSIFICATION)

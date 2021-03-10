@@ -5,6 +5,6 @@ system tests that will be executed every time
 someone makes a pull request or pushes to the main branch.
 """
 
-########### Add integration tests here ######
+########## Add integration tests here #######
 
 ########### Add system tests here ###########
