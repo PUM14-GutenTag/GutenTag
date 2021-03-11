@@ -1,9 +1,17 @@
 from api import app, rest, db
 from flask import jsonify
-from flask_restful import Resource, reqparse
 from api.models import Test, User
+from flask_restful import Resource, reqparse
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt_identity,
+)
+
 from api.database_handler import (
     create_user,
+    login_user,
     create_project,
     add_data,
     delete_project,
@@ -12,6 +20,7 @@ from api.database_handler import (
     label_data,
     remove_label,
     reset_db,
+    get_user_by
 )
 
 
@@ -25,14 +34,13 @@ class register(Resource):
         self.reqparse.add_argument('first_name', type=str, required=True)
         self.reqparse.add_argument('last_name', type=str, required=True)
         self.reqparse.add_argument('email', type=str, required=True)
-        # self.reqparse.add_argument('password', type=str, required=True)
+        self.reqparse.add_argument('password', type=str, required=True)
 
     def post(self):
         args = self.reqparse.parse_args()
-        print(args)
-        # return jsonify(create_user(args.first_name, args.last_name,
-        # args.email))
-        return jsonify({"message": "Register not implemented in API"})
+
+        return jsonify(create_user(args.first_name, args.last_name,
+                                   args.email, args.password))
 
 
 class login(Resource):
@@ -42,13 +50,24 @@ class login(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type=str, required=True)
+        self.reqparse.add_argument('email', type=str, required=True)
         self.reqparse.add_argument('password', type=str, required=True)
 
     def get(self):
-        # args = self.reqparse.parse_args()
-        # return jsonify(db_handler.authorize_user(args.username, args.password))
-        return jsonify({"message": "Login not implemented in API"})
+        args = self.reqparse.parse_args()
+        return login_user(args.email, args.password)
+
+
+class refresh_token(Resource):
+    """
+    Endpoint for refreshing JWT-tokens
+    """
+    @jwt_required(refresh=True)
+    def post(self):
+        current_user = get_jwt_identity()
+        access_token = create_access_token(identity=current_user)
+
+        return {'access_token': access_token}
 
 
 class authorize(Resource):
@@ -200,6 +219,7 @@ class Reset(Resource):
 
 rest.add_resource(register, '/register')
 rest.add_resource(login, '/login')
+rest.add_resource(refresh_token, '/refresh-token')
 rest.add_resource(authorize, '/authorize-user')
 rest.add_resource(deauthorize, '/deauthorize-user')
 rest.add_resource(new_project, '/create-project')

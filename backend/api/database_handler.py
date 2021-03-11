@@ -3,6 +3,10 @@ This file contains all functions for the database handler.
 """
 from api.models import User, Project, Label, ProjectData, AccessLevel
 from api import db
+from flask_jwt_extended import create_access_token, create_refresh_token
+
+
+import sys
 
 
 def try_add(object):
@@ -17,6 +21,7 @@ def try_add(object):
     except Exception as e:
         db.session.rollback()
         msg = f"Could not create {type(object).__name__}: {e}"
+        print(e, sys.stdout)
     finally:
         return {
             "id": object.id,
@@ -45,13 +50,13 @@ def try_delete(object):
         }
 
 
-def create_user(first_name, last_name, email, isAdmin=False):
+def create_user(first_name, last_name, email, password, isAdmin=False):
     """
     Function creates a user in the database.
     Returns user id and a status message.
     """
     for arg, t in [(first_name, str), (last_name, str), (email, str),
-                   (isAdmin, bool)]:
+                   (password, str), (isAdmin, bool)]:
         if not isinstance(arg, t):
             return {
                 "id": None,
@@ -60,9 +65,49 @@ def create_user(first_name, last_name, email, isAdmin=False):
             }
 
     access = AccessLevel.ADMIN if isAdmin else AccessLevel.USER
-    user = User(first_name=first_name, last_name=last_name, email=email,
-                access_level=access)
+    user = User(first_name=first_name, last_name=last_name,
+                email=email, password=password, access_level=access)
     return try_add(user)
+
+
+def login_user(email, password):
+    """
+    Tries to login an user. If successful, returns
+    an access token and a refresh token.
+    """
+    user = get_user_by("email", email)
+
+    if not user:
+        return {"message": "Invalid login credentials"}, 401
+
+    if(user.check_password(password)):
+        access_token = create_access_token(identity=user.email)
+        refresh_token = create_refresh_token(identity=user.email)
+
+        return {
+            "message": "Logged in as {}".format(
+                user.first_name + ' ' + user.last_name),
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }, 200
+
+    return {"message": "Invalid login credentials"}, 401
+
+
+def get_user_by(column, identifier):
+    """
+    Function retrieves user from database matching column
+    and identifier. Returns None if no user is found
+    For internal backend use only
+    """
+
+    columns = ["id", "email", "first_name", "last_name"]
+
+    if column in columns and isinstance(identifier, str):
+        return db.session.query(User).filter(
+            getattr(User, column).ilike(identifier)).first()
+
+    return None
 
 
 def create_project(project_name, project_type):
