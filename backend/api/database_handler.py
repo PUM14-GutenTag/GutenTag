@@ -1,7 +1,8 @@
 """
 This file contains all functions for the database handler.
 """
-from api.models import User, Project, Label, ProjectData, AccessLevel
+from api.models import (User, Project, ProjectType, Label,
+                        ProjectTextData, ProjectImageData, AccessLevel)
 from api import db
 
 
@@ -81,21 +82,53 @@ def create_project(project_name, project_type):
     return try_add(project)
 
 
-def add_data(project_id, data, project_type):
+def add_text_data(project_id, text, project_type, prelabel=None):
     """
-    Function adds data to an existing project.
+    Function adds text data to an existing project.
     Returns data id and a status message.
     """
-    for arg, t in [(project_id, int), (data, str), (project_type, int)]:
+    for arg, t in [(project_id, int), (text, str), (project_type, int)]:
         if not isinstance(arg, t):
             return {
                 "id": None,
                 "message": ("Could not add data:"
                             f"arg '{arg}' is not a '{type}'.")
             }
-    project_data = ProjectData(project_id=project_id,
-                               data=data,
-                               project_type=project_type)
+    if project_type == ProjectType.IMAGE_CLASSIFICATION:
+        return {
+            "id": None,
+            "message": "Could not add data: incorrect project type."
+        }
+
+    project_data = ProjectTextData(project_id=project_id,
+                                   text_data=text,
+                                   project_type=project_type,
+                                   prelabel=prelabel)
+    return try_add(project_data)
+
+
+def add_image_data(project_id, image):
+    """
+    Function adds image data to an existing project.
+    Returns data id and a status message.
+    """
+    # FIXME Is data an instance of str?
+    for arg, t in [(project_id, int), (image["data"], str),
+                   (image["file_name"], str), (image["file_type", str])]:
+        if not isinstance(arg, t):
+            return {
+                "id": None,
+                "message": ("Could not add data:"
+                            f"arg '{arg}' is not a '{type}'.")
+            }
+
+    project_data = ProjectImageData(
+        project_id=project_id,
+        file_name=image["file_name"],
+        file_type=image["file_type"],
+        image_data=image["data"],
+        project_type=ProjectType.IMAGE_CLASSIFICATION
+    )
     return try_add(project_data)
 
 
