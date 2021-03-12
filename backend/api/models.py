@@ -1,9 +1,10 @@
 """
-This file contains all database models.
+This file contains all database models and associated methods.
 """
 import datetime
 from enum import IntEnum
 from api import db
+from api.database_handler import try_add, try_delete, check_types
 
 
 class ProjectType(IntEnum):
@@ -78,6 +79,20 @@ class User(db.Model):
             f"email={self.email}, access_level={self.access_level})>"
         )
 
+    @staticmethod
+    def create(first_name, last_name, email, isAdmin=False):
+        """
+        Function creates a user in the database.
+        """
+        check_types([(first_name, str), (last_name, str), (email, str),
+                     (isAdmin, bool)])
+
+        access = AccessLevel.ADMIN if isAdmin else AccessLevel.USER
+        user = User(first_name=first_name, last_name=last_name, email=email,
+                    access_level=access)
+
+        return try_add(user)
+
 
 class Project(db.Model):
     """
@@ -91,11 +106,105 @@ class Project(db.Model):
     project_type = db.Column(db.Integer, nullable=False)
     created = db.Column(db.DateTime, default=datetime.datetime.now())
 
+    data = db.relationship("ProjectData", back_populates="project",
+                           cascade="all, delete", passive_deletes=True)
     users = db.relationship(
         "User", secondary=access_control, back_populates="projects")
 
-    def __repr__(self):
-        return f"<Projectname={self.name}, Associated users={self.users}>"
+    # def __repr__(self):
+    #     return f"<Projectname={self.name}, Associated users={self.users}>"
+
+    @staticmethod
+    def create(project_name, project_type):
+        """
+        Function creates a project in the database
+        """
+        check_types([(project_name, str), (project_type, int)])
+        project = Project(name=project_name, project_type=project_type)
+        return try_add(project)
+
+    def delete(self):
+        """
+        Function deletes an existing project from the database.
+        """
+        return try_delete(self)
+
+    def add_text_data(self, text, prelabel=None):
+        """
+        Function adds text data to an existing project.
+        """
+        if (self.project_type == ProjectType.IMAGE_CLASSIFICATION):
+            raise ValueError("Could not add text data:"
+                             "project type is IMAGE_CLASSIFICATION.")
+
+        args = [(text, str)]
+        if prelabel is not None:
+            args.append((prelabel, str))
+        check_types(args)
+
+        project_data = ProjectTextData(project_id=self.id,
+                                       text_data=text,
+                                       prelabel=prelabel)
+        return try_add(project_data)
+
+    def add_image_data(self, image):
+        """
+        Function adds image data to an existing project. 'image' is a
+        dictionary containing a 'file_name', 'file_type' and 'data'.
+        """
+        if (self.project_type != ProjectType.IMAGE_CLASSIFICATION):
+            raise ValueError("Could not add image data:"
+                             "project type is not IMAGE_CLASSIFICATION.")
+
+        # FIXME Is data an instance of str?
+        check_types([(image["data"], str), (image["file_name"], str),
+                     (image["file_type", str])])
+
+        project_data = ProjectImageData(
+            project_id=self.id,
+            file_name=image["file_name"],
+            file_type=image["file_type"],
+            image_data=image["data"],
+        )
+        return try_add(project_data)
+
+    def authorize_user(self, user_id):
+        """
+        Function adds an existing user to an existing project.
+        """
+        check_types([(user_id, int)])
+        try:
+            user = User.query.get(user_id)
+            if user is None:
+                raise ValueError("User does not exist.")
+            elif user in self.users or user.access_level == AccessLevel.ADMIN:
+                raise ValueError(f"{user} is already authorized for {self}.")
+
+            self.users.append(user)
+            db.session.commit()
+        except Exception:
+            db.session.rollback
+            raise
+
+    def deauthorize_user(self, user_id):
+        """
+        Function removes an existing user from an existing project.
+        """
+        check_types([(user_id, int)])
+        try:
+            user = User.query.get(user_id)
+
+            if user is None:
+                raise ValueError("User does not exist.")
+            elif (user not in self.users
+                    and user.access_level != AccessLevel.ADMIN):
+                raise ValueError(f"{user} is not authorized for {self}.")
+
+            self.users.remove(user)
+            db.session.commit()
+        except Exception:
+            db.session.rollback
+            raise
 
 
 class ProjectData(db.Model):
@@ -106,16 +215,30 @@ class ProjectData(db.Model):
     __tablename__ = "project_data"
 
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id',
+                                                     ondelete="CASCADE"))
+    project = db.relationship("Project", back_populates="data")
+    labels = db.relationship("Label", back_populates="data",
+                             cascade="all, delete", passive_deletes=True)
     prelabel = db.Column(db.Text)
-    project_type = db.Column(db.Integer, nullable=False)
+    type = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, default=datetime.datetime.now())
     polymorphic_type = db.Column(db.Text)
 
     __mapper_args__ = {
         "polymorphic_identity": "base",
-        "polymorphic_on": project_type
+        "polymorphic_on": type
     }
+
+    def label_data(self, user_id, label):
+        """
+        Function adds a label to a data object.
+        """
+        check_types([(user_id, int), (label, str)])
+        label_data = Label(data_id=self.id,
+                           user_id=user_id,
+                           label=label)
+        return try_add(label_data)
 
 
 class ProjectTextData(ProjectData):
@@ -124,7 +247,8 @@ class ProjectTextData(ProjectData):
     """
     __tablename__ = "project_text_data"
 
-    id = db.Column(db.Integer, db.ForeignKey("project_data.id"),
+    id = db.Column(db.Integer,
+                   db.ForeignKey("project_data.id", ondelete="CASCADE"),
                    primary_key=True)
     text_data = db.Column(db.Text)
 
@@ -140,7 +264,8 @@ class ProjectImageData(ProjectData):
     """
     __tablename__ = "project_image_data"
 
-    id = db.Column(db.Integer, db.ForeignKey("project_data.id"),
+    id = db.Column(db.Integer,
+                   db.ForeignKey("project_data.id", ondelete="CASCADE"),
                    primary_key=True)
     file_name = db.Column(db.Text)
     file_type = db.Column(db.Text)
@@ -160,7 +285,9 @@ class Label(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    data_id = db.Column(db.Integer, db.ForeignKey('project_data.id'))
+    data_id = db.Column(db.Integer, db.ForeignKey('project_data.id',
+                                                  ondelete="CASCADE"))
+    data = db.relationship("ProjectData", back_populates="labels")
     label = db.Column(db.Text, nullable=False)
     updated = db.Column(db.DateTime, default=datetime.datetime.now())
     created = db.Column(db.DateTime, default=datetime.datetime.now())
@@ -170,6 +297,12 @@ class Label(db.Model):
         "polymorphic_identity": ProjectType.DOCUMENT_CLASSIFICATION,
         "polymorphic_on": project_type
     }
+
+    def delete(self):
+        """
+        Function removes an existing label from the databse.
+        """
+        return try_delete(self)
 
 
 class SequenceLabel(Label):
