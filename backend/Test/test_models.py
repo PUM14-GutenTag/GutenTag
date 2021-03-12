@@ -5,7 +5,6 @@ models.py and database_handler that will be executed every time
 someone makes a pull request or pushes to the main branch.
 """
 from pytest import raises
-# from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from api.database_handler import reset_db
 from api.models import (User, Project, ProjectData, Label, ProjectType)

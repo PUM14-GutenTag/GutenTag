@@ -1,6 +1,7 @@
 """
 This file contains general functions for the database handler.
 """
+from sqlalchemy.engine.reflection import Inspector
 from api import db
 
 
@@ -55,17 +56,14 @@ def drop_all_cascade():
     Workaround for SQLAlchemy not doing DROP ## CASCADE for drop_all()
     (https://github.com/pallets/flask-sqlalchemy/issues/722)
     """
-    from sqlalchemy.engine.reflection import Inspector
-    from sqlalchemy.schema import DropConstraint, DropTable, MetaData, Table
-
     con = db.engine.connect()
     trans = con.begin()
     inspector = Inspector.from_engine(db.engine)
 
-    # We need to re-create a minimal metadata with only the required things to
+    # We need to re-create a minimal MetaData with only the required things to
     # successfully emit drop constraints and tables commands for postgres
     # (based on the actual schema of the running instance)
-    meta = MetaData()
+    meta = db.MetaData()
     tables = []
     all_fkeys = []
 
@@ -78,13 +76,13 @@ def drop_all_cascade():
 
             fkeys.append(db.ForeignKeyConstraint((), (), name=fkey["name"]))
 
-        tables.append(Table(table_name, meta, *fkeys))
+        tables.append(db.Table(table_name, meta, *fkeys))
         all_fkeys.extend(fkeys)
 
     for fkey in all_fkeys:
-        con.execute(DropConstraint(fkey))
+        con.execute(db.DropConstraint(fkey))
 
     for table in tables:
-        con.execute(DropTable(table))
+        con.execute(db.DropTable(table))
 
     trans.commit()

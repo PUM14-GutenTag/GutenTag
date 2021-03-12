@@ -111,9 +111,6 @@ class Project(db.Model):
     users = db.relationship(
         "User", secondary=access_control, back_populates="projects")
 
-    # def __repr__(self):
-    #     return f"<Projectname={self.name}, Associated users={self.users}>"
-
     @staticmethod
     def create(project_name, project_type):
         """
