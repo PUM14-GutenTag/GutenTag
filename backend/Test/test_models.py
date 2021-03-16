@@ -4,16 +4,22 @@ This test file contains all the tests related to
 models.py and database_handler that will be executed every time
 someone makes a pull request or pushes to the main branch.
 """
+import os
 from pytest import raises
 from sqlalchemy.exc import IntegrityError
 from api.database_handler import reset_db
-from api.models import (User, Project, ProjectData, Label, ProjectType)
+from api.models import (User, Project, ProjectData, Label, ProjectType,
+                        DocumentClassificationLabel, SequenceLabel,
+                        SequenceToSequenceLabel, ImageClassificationLabel)
 
 
 """
 Add unit tests here
 Name it test_*function name*.py or pytest won't find it.
 """
+
+
+PATH = os.path.dirname(__file__)
 
 
 def test_create_user():
@@ -54,25 +60,6 @@ def test_create_project():
     with raises(TypeError):
         project = Project.create({"Project"}, ProjectType.IMAGE_CLASSIFICATION)
         assert project is None
-
-
-def test_add_data():
-    reset_db()
-
-    User.create("first", "last", "user@gmail.com", True)
-    project = Project.create(
-        "Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    in_data = "Test"
-
-    # Test correctly adding data to a project.
-    project_data = project.add_text_data(in_data)
-    assert project_data is not None
-    assert project_data.text_data == in_data
-
-    # Test adding image data to text project type.
-    with raises(ValueError):
-        project_data = project.add_image_data(in_data)
-        assert not ProjectType.has_value(project_data)
 
 
 def test_authorize_user():
@@ -124,24 +111,108 @@ def test_deauthorize_user():
         project.deauthorize_user(user.id)
 
 
-def test_label_data():
+# def test_add_text_data():
+#     reset_db()
+
+#     project = Project.create(
+#         "Project", ProjectType.DOCUMENT_CLASSIFICATION)
+
+#     text_file = os.path.join(PATH, "res/text/original_rt_snippets.txt")
+#     # Add all lines in the text file as project_data columns.
+#     with open(text_file) as file:
+#         project.add_text_bulk(file.readlines())
+#     assert len(project.data) == 10605
+
+
+def test_add_image_data():
+    reset_db()
+
+    project = Project.create(
+        "Project", ProjectType.IMAGE_CLASSIFICATION)
+
+    # Test adding all images in the directory to a project.
+    image_dir = os.path.join(PATH, "res/images")
+    with os.scandir(image_dir) as dir:
+        for entry in dir:
+            if (entry.is_file()):
+                image_path = os.path.join(image_dir, entry.name)
+                with open(image_path, "rb") as file:
+                    project.add_image_data(entry.name, file.read())
+    assert len(project.data) == 10
+
+
+def test_document_classification_label():
     reset_db()
 
     user = User.create("firsttest", "lasttest", "usertest@gmail.com")
     project = Project.create(
         "Project", ProjectType.DOCUMENT_CLASSIFICATION)
-    in_data = "Test"
     label_str = "Positive"
-    data = project.add_text_data(in_data)
+    data = project.add_text_data("This is so exciting!")
 
     # Test label valid data.
-    label = data.label_data(user.id, label_str)
+    label = DocumentClassificationLabel.create(data.id, user.id, label_str)
     assert label is not None
+    assert label in data.labels
 
     # Test label existing data as a non-existing user.
     with raises(IntegrityError):
-        label = data.label_data(100, label_str)
+        label = DocumentClassificationLabel.create(data.id, 100, label_str)
         assert label is None
+
+
+def test_sequence_label():
+    reset_db()
+
+    user = User.create("firsttest", "lasttest", "usertest@gmail.com")
+    project = Project.create(
+        "Project", ProjectType.SEQUENCE_LABELING)
+    data = project.add_text_data("Alex is going to Los Angeles in California")
+
+    # Test label valid data.
+    for lab in [(0, 3, "PER"), (16, 27, "LOC"), (31, 41, "LOC")]:
+        label = SequenceLabel.create(data.id, user.id, lab[2], lab[0], lab[1])
+        assert label is not None
+        assert label in data.labels
+
+
+def test_sequence_to_sequence_label():
+    reset_db()
+
+    user = User.create("firsttest", "lasttest", "usertest@gmail.com")
+    project = Project.create(
+        "Project", ProjectType.SEQUENCE_TO_SEQUENCE)
+    data = project.add_text_data(
+        "John saw the man on the mountain with a telescope.")
+    from_type = "english"
+
+    # Test label valid data.
+    for lab in ["John såg mannen på berget med hjälp av ett teleskop.",
+                "John såg mannen med ett teleskop på berget."]:
+        label = SequenceToSequenceLabel.create(data.id, user.id, lab, from_type,
+                                               "swedish")
+        assert label is not None
+        assert label in data.labels
+
+
+def test_image_classification_label():
+    reset_db()
+
+    user = User.create("firsttest", "lasttest", "usertest@gmail.com")
+    project = Project.create(
+        "Project", ProjectType.IMAGE_CLASSIFICATION)
+
+    image_file = os.path.join(PATH, "res/images/ILSVRC2012_val_00000001.JPEG")
+    with open(image_file, "rb") as file:
+        data = project.add_image_data(file.name, file.read())
+
+    # Test label valid data.
+    coord1 = (10, 40)
+    coord2 = (50, 100)
+    label = ImageClassificationLabel.create(
+        data.id, user.id, "snake", coord1, coord2)
+    assert label is not None
+    assert label in data.labels
 
 
 def test_delete_label():
@@ -153,7 +224,7 @@ def test_delete_label():
     in_data = "Test"
     label_str = "Positive"
     data = project.add_text_data(in_data)
-    label = data.label_data(user.id, label_str)
+    label = DocumentClassificationLabel.create(data.id, user.id, label_str)
     assert label is not None
     assert label in data.labels
 
@@ -171,7 +242,7 @@ def test_delete_project():
     data_id = data.id
     user = User.create("name", "surname", "email@email.com")
     label_str = "Negative"
-    label = data.label_data(user.id, label_str)
+    label = DocumentClassificationLabel.create(data.id, user.id, label_str)
     label_id = label.id
     assert ProjectData.query.get(data.id) is not None
     assert Label.query.get(label.id) is not None

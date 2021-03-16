@@ -2,6 +2,7 @@
 This file contains general functions for the database handler.
 """
 from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.schema import DropConstraint, DropTable, MetaData, Table
 from api import db
 
 
@@ -14,6 +15,20 @@ def try_add(object):
         db.session.add(object)
         db.session.commit()
         return object
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+def try_add_list(objects):
+    """
+    Try to add each column in 'objects' to its table in the database and then
+    commit.
+    """
+    try:
+        for object in objects:
+            db.session.add(object)
+        db.session.commit()
     except Exception:
         db.session.rollback()
         raise
@@ -60,10 +75,10 @@ def drop_all_cascade():
     trans = con.begin()
     inspector = Inspector.from_engine(db.engine)
 
-    # We need to re-create a minimal MetaData with only the required things to
+    # We need to re-create a minimal metadata with only the required things to
     # successfully emit drop constraints and tables commands for postgres
     # (based on the actual schema of the running instance)
-    meta = db.MetaData()
+    meta = MetaData()
     tables = []
     all_fkeys = []
 
@@ -76,13 +91,13 @@ def drop_all_cascade():
 
             fkeys.append(db.ForeignKeyConstraint((), (), name=fkey["name"]))
 
-        tables.append(db.Table(table_name, meta, *fkeys))
+        tables.append(Table(table_name, meta, *fkeys))
         all_fkeys.extend(fkeys)
 
     for fkey in all_fkeys:
-        con.execute(db.DropConstraint(fkey))
+        con.execute(DropConstraint(fkey))
 
     for table in tables:
-        con.execute(db.DropTable(table))
+        con.execute(DropTable(table))
 
     trans.commit()
