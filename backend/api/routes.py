@@ -1,10 +1,9 @@
-from api import app, rest, db
+from api import rest
 from flask import jsonify
-from api.models import Test, User
-from flask_restful import Resource, reqparse
+from api.models import AccessLevel
+from flask_restful import Resource, reqparse, inputs
 from flask_jwt_extended import (
     create_access_token,
-    create_refresh_token,
     jwt_required,
     get_jwt_identity,
 )
@@ -13,6 +12,7 @@ from api.database_handler import (
     create_user,
     login_user,
     create_project,
+    get_data,
     add_data,
     delete_project,
     authorize_user,
@@ -20,7 +20,10 @@ from api.database_handler import (
     label_data,
     remove_label,
     reset_db,
-    get_user_by
+    get_user_by,
+    is_authorized,
+    get_project_data_by_id,
+    get_label_by_id
 )
 
 
@@ -35,12 +38,14 @@ class register(Resource):
         self.reqparse.add_argument('last_name', type=str, required=True)
         self.reqparse.add_argument('email', type=str, required=True)
         self.reqparse.add_argument('password', type=str, required=True)
+        self.reqparse.add_argument('admin', type=inputs.boolean,
+                                   required=False, default=False)
 
     def post(self):
         args = self.reqparse.parse_args()
 
         return jsonify(create_user(args.first_name, args.last_name,
-                                   args.email, args.password))
+                                   args.email, args.password, args.admin))
 
 
 class login(Resource):
@@ -77,14 +82,18 @@ class authorize(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('user_id', type=int, required=True)
         self.reqparse.add_argument('project_id', type=int, required=True)
+        self.reqparse.add_argument('email', type=str, required=True)
 
+    @jwt_required()
     def post(self):
-        # args = self.reqparse.parse_args()
-        # return jsonify(db_handler.authorize_user(args.project_id,
-        #  args.user_id))
-        return jsonify({"message": "Authorize not implemented in API"})
+        args = self.reqparse.parse_args()
+        current_user = get_user_by("email", get_jwt_identity())
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            return authorize_user(args.project_id, current_user.id)
+
+        return {"message": "User is not authorized to authorize other users"}
 
 
 class deauthorize(Resource):
@@ -94,14 +103,18 @@ class deauthorize(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('user_id', type=int, required=True)
+        self.reqparse.add_argument('email', type=str, required=True)
         self.reqparse.add_argument('project_id', type=int, required=True)
 
+    @jwt_required()
     def post(self):
-        # args = self.reqparse.parse_args()
-        # return jsonify(db_handler.deauthorize_user(args.project_id, user_id))
-        return jsonify({"message": "Deauthorize not implemented in API"})
-        # return db_handler.authorize_user(args.project_id)
+        args = self.reqparse.parse_args()
+        current_user = get_user_by("email", get_jwt_identity())
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            return deauthorize_user(args.project_id, current_user.id)
+
+        return {"message": "User is not authorized to authorize other users"}
 
 
 class new_project(Resource):
@@ -111,15 +124,18 @@ class new_project(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('user_id', type=int, required=True)
         self.reqparse.add_argument('project_name', type=str, required=True)
-        self.reqparse.add_argument('project_type', type=str, required=True)
+        self.reqparse.add_argument('project_type', type=int, required=True)
 
+    @jwt_required()
     def post(self):
-        # args = self.reqparse.parse_args()
-        # return jsonify(db_handler.create_project(args.user_id, args.project_name,
-        # args.project_type))
-        return jsonify({"message": "Create project not implemented in API"})
+        args = self.reqparse.parse_args()
+        current_user = get_user_by("email", get_jwt_identity())
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            return create_project(args.project_name, args.project_type)
+
+        return jsonify({"message": "User unauthorized to create a project."})
 
 
 class remove_project(Resource):
@@ -129,29 +145,60 @@ class remove_project(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('user_id', type=int, required=True)
         self.reqparse.add_argument('project_id', type=int, required=True)
 
+    @jwt_required()
     def delete(self):
-        # args = self.reqparse.parse_args()
-        # return jsonify(db_handler.create_project(args.user_id, args.project_id))
-        return jsonify({"message": "Delete project not implemented in API"})
+        args = self.reqparse.parse_args()
+        current_user = get_user_by("email", get_jwt_identity())
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            return delete_project(args.project_id)
+
+        return jsonify({"message": "User unauthorized to delete a project."})
 
 
-class get_data(Resource):
+class add_new_data(Resource):
+    """
+    Endpoint to add a single data point
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project_id', type=int, required=True)
+        self.reqparse.add_argument('project_type', type=int, required=True)
+        self.reqparse.add_argument('data', type=str, required=True)
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        current_user = get_user_by("email", get_jwt_identity())
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            return add_data(args.project_id, args.data, args.project_type)
+
+        return jsonify({"message": "User unauthorized to add data"})
+
+
+class get_new_data(Resource):
     """
     Endpoint to retrieve data to be labeled
     """
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('user_id', type=int, required=True)
         self.reqparse.add_argument('project_id', type=int, required=True)
         self.reqparse.add_argument('amount', type=int, required=True)
 
+    @jwt_required()
     def get(self):
-        # args = self.reqparse.parse_args()
-        return jsonify({"message": "Get data not implemented in API"})
+        args = self.reqparse.parse_args()
+        current_user = get_user_by("email", get_jwt_identity())
+
+        if is_authorized(args.project_id, current_user):
+            return get_data(args.project_id, args.amount, current_user.id)
+
+        return jsonify({"message": "User not authorized"})
 
 
 class create_label(Resource):
@@ -162,14 +209,20 @@ class create_label(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('data_id', type=int, required=True)
-        self.reqparse.add_argument('user_id', type=int, required=True)
         self.reqparse.add_argument('label', type=str, required=True)
 
+    @jwt_required()
     def post(self):
-        # args = self.reqparse.parse_args()
-        # return jsonify(db_handler.label_data(args.data_id, args.user_id,
-        # args.label))
-        return jsonify({"message": "Label data not implemented in API"})
+        args = self.reqparse.parse_args()
+        current_user = get_user_by("email", get_jwt_identity())
+
+        project_data = get_project_data_by_id(args.data_id)
+        project_id = project_data.project_id
+
+        if is_authorized(project_id, current_user):
+            return label_data(args.data_id, current_user.id, args.label)
+
+        return jsonify({"message": "User not authorized"})
 
 
 class delete_label(Resource):
@@ -180,14 +233,18 @@ class delete_label(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('label_id', type=int, required=True)
-        # self.reqparse.add_argument('user_id', type=int, required=True)
-        # self.reqparse.add_argument('project_id', type=int, required=True)
-        # self.reqparse.add_argument('data_id', type=str, required=True)
 
+    @jwt_required()
     def delete(self):
-        # args = self.reqparse.parse_args()
-        # return jsonify(db_handler.remove_label(args.label_id))
-        return jsonify({"message": "Remove label not implemented in API"})
+        args = self.reqparse.parse_args()
+        current_user = get_user_by("email", get_jwt_identity())
+        label = get_label_by_id(args.label_id)
+
+        if label.user_id == current_user.id or \
+                (current_user.access_level >= AccessLevel.ADMIN):
+            return remove_label(label)
+
+        return jsonify({"message": "User unauthorized to remove this label"})
 
 
 class get_export_data(Resource):
@@ -202,8 +259,8 @@ class get_export_data(Resource):
         self.reqparse.add_argument(
             'filter', type=str, required=False, action='append')
 
+    @jwt_required()
     def get(self):
-        # args = self.reqparse.parse_args()
         return jsonify({"message": "Get export data not implemented in API"})
 
 
@@ -224,7 +281,8 @@ rest.add_resource(authorize, '/authorize-user')
 rest.add_resource(deauthorize, '/deauthorize-user')
 rest.add_resource(new_project, '/create-project')
 rest.add_resource(remove_project, '/delete-project')
-rest.add_resource(get_data, '/get-data')
+rest.add_resource(add_new_data, '/add-data')
+rest.add_resource(get_new_data, '/get-data')
 rest.add_resource(create_label, '/label-data')
 rest.add_resource(delete_label, '/remove-label')
 rest.add_resource(get_export_data, '/get-export-data')
