@@ -1,0 +1,15 @@
+.navbar-container {
+  max-width: 100%;
+}
+
+.navbar-collapse {
+  text-align: center;
+}
+
+.basic-navbar-nav {
+  max-width: 100%;
+}
+.logo {
+  width: 100px;
+  height: 100px;
+}
