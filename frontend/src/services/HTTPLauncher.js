@@ -104,11 +104,6 @@ class HTTPLauncher {
     });
   }
 
-  // Send HTTP-request to upload a file
-  static sendUploadFile(projectID, path) {
-    return 'Not implemented in HTTPLauncher';
-  }
-
   // Send HTTP-request to get data to be exported
   static sendGetExportData(projectID, filters) {
     const params = new URLSearchParams();

@@ -143,6 +143,3 @@ class Label(db.Model):
     label = db.Column(db.Text, nullable=False)
     updated = db.Column(db.DateTime, default=datetime.datetime.now())
     created = db.Column(db.DateTime, default=datetime.datetime.now())
-
-    def __repr__(self):
-        return f"<Label id={self.id}, user_id={self.user_id}, Data id={self.data_id}>"

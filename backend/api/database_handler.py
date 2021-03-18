@@ -282,7 +282,7 @@ def deauthorize_user(project_id, user_id):
 
             if (user not in project.users
                     and user.access_level != AccessLevel.ADMIN):
-                return (f"Could not deauthorize user. {user} is not authorized "
+                return (f"Could not deauthorize user. {user} is not authorized"
                         f"for {project}.")
 
             user.projects.remove(project)
