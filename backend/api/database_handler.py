@@ -63,11 +63,6 @@ def validate_input(input):
     variables are the expected types.
     """
 
-    if not isinstance(input, list) and all(
-        isinstance(pair, tuple) for pair in input
-    ):
-        return False
-
     try:
         for arg, t in input:
             if not isinstance(arg, t):
@@ -142,25 +137,6 @@ def get_user_by(column, identifier):
             getattr(User, column).ilike(identifier)).first()
 
     return None
-
-
-def get_project_data_by_id(data_id):
-    """
-    Internal helper function to find parent project
-    to a datapoint.
-    """
-    return db.session.query(ProjectData).filter(
-        ProjectData.id == data_id
-    ).first()
-
-
-def get_label_by_id(label_id):
-    """
-    Internal helper function to find label object by id
-    """
-    return db.session.query(Label).filter(
-        Label.id == label_id
-    ).first()
 
 
 def create_project(project_name, project_type):

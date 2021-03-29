@@ -1,6 +1,6 @@
 from api import rest
 from flask import jsonify
-from api.models import AccessLevel
+from api.models import AccessLevel, ProjectData, Label
 from flask_restful import Resource, reqparse, inputs
 from flask_jwt_extended import (
     create_access_token,
@@ -22,14 +22,12 @@ from api.database_handler import (
     reset_db,
     get_user_by,
     is_authorized,
-    get_project_data_by_id,
-    get_label_by_id
 )
 
 
-class register(Resource):
+class Register(Resource):
     """
-    Endpoint for registering an user
+    Endpoint for registering an user.
     """
 
     def __init__(self):
@@ -48,9 +46,9 @@ class register(Resource):
                                    args.email, args.password, args.admin))
 
 
-class login(Resource):
+class Login(Resource):
     """
-    Endpoint for logging in an user
+    Endpoint for logging in an user.
     """
 
     def __init__(self):
@@ -63,9 +61,9 @@ class login(Resource):
         return login_user(args.email, args.password)
 
 
-class refresh_token(Resource):
+class RefreshToken(Resource):
     """
-    Endpoint for refreshing JWT-tokens
+    Endpoint for refreshing JWT-tokens.
     """
     @jwt_required(refresh=True)
     def post(self):
@@ -75,9 +73,9 @@ class refresh_token(Resource):
         return {'access_token': access_token}
 
 
-class authorize(Resource):
+class Authorize(Resource):
     """
-    Endpoint for authorizing an user to a project
+    Endpoint for authorizing an user to a project.
     """
 
     def __init__(self):
@@ -96,9 +94,9 @@ class authorize(Resource):
         return {"message": "User is not authorized to authorize other users"}
 
 
-class deauthorize(Resource):
+class Deauthorize(Resource):
     """
-    Endpoint for deauthorizing an user from a project
+    Endpoint for deauthorizing an user from a project.
     """
 
     def __init__(self):
@@ -117,9 +115,9 @@ class deauthorize(Resource):
         return {"message": "User is not authorized to authorize other users"}
 
 
-class new_project(Resource):
+class NewProject(Resource):
     """
-    Endpoint for creating a project
+    Endpoint for creating a project.
     """
 
     def __init__(self):
@@ -138,9 +136,9 @@ class new_project(Resource):
         return jsonify({"message": "User unauthorized to create a project."})
 
 
-class remove_project(Resource):
+class RemoveProject(Resource):
     """
-    Endpoint for removing a project
+    Endpoint for removing a project.
     """
 
     def __init__(self):
@@ -158,9 +156,9 @@ class remove_project(Resource):
         return jsonify({"message": "User unauthorized to delete a project."})
 
 
-class add_new_data(Resource):
+class AddNewData(Resource):
     """
-    Endpoint to add a single data point
+    Endpoint to add a single data point.
     """
 
     def __init__(self):
@@ -180,9 +178,9 @@ class add_new_data(Resource):
         return jsonify({"message": "User unauthorized to add data"})
 
 
-class get_new_data(Resource):
+class GetNewData(Resource):
     """
-    Endpoint to retrieve data to be labeled
+    Endpoint to retrieve data to be labeled.
     """
 
     def __init__(self):
@@ -201,9 +199,9 @@ class get_new_data(Resource):
         return jsonify({"message": "User not authorized"})
 
 
-class create_label(Resource):
+class CreateLabel(Resource):
     """
-    Endpoint for creating a label
+    Endpoint for creating a label.
     """
 
     def __init__(self):
@@ -216,7 +214,7 @@ class create_label(Resource):
         args = self.reqparse.parse_args()
         current_user = get_user_by("email", get_jwt_identity())
 
-        project_data = get_project_data_by_id(args.data_id)
+        project_data = ProjectData.query.get(args.data_id)
         project_id = project_data.project_id
 
         if is_authorized(project_id, current_user):
@@ -225,9 +223,9 @@ class create_label(Resource):
         return jsonify({"message": "User not authorized"})
 
 
-class delete_label(Resource):
+class DeleteLabel(Resource):
     """
-    Endpoint for deleting a label
+    Endpoint for deleting a label.
     """
 
     def __init__(self):
@@ -238,7 +236,7 @@ class delete_label(Resource):
     def delete(self):
         args = self.reqparse.parse_args()
         current_user = get_user_by("email", get_jwt_identity())
-        label = get_label_by_id(args.label_id)
+        label = Label.query.get(args.label_id)
 
         if label.user_id == current_user.id or \
                 (current_user.access_level >= AccessLevel.ADMIN):
@@ -247,9 +245,9 @@ class delete_label(Resource):
         return jsonify({"message": "User unauthorized to remove this label"})
 
 
-class get_export_data(Resource):
+class GetExportData(Resource):
     """
-    Endpoint for exporting data from project according to filters
+    Endpoint for exporting data from project according to filters.
     """
 
     def __init__(self):
@@ -274,16 +272,16 @@ class Reset(Resource):
         reset_db()
 
 
-rest.add_resource(register, '/register')
-rest.add_resource(login, '/login')
-rest.add_resource(refresh_token, '/refresh-token')
-rest.add_resource(authorize, '/authorize-user')
-rest.add_resource(deauthorize, '/deauthorize-user')
-rest.add_resource(new_project, '/create-project')
-rest.add_resource(remove_project, '/delete-project')
-rest.add_resource(add_new_data, '/add-data')
-rest.add_resource(get_new_data, '/get-data')
-rest.add_resource(create_label, '/label-data')
-rest.add_resource(delete_label, '/remove-label')
-rest.add_resource(get_export_data, '/get-export-data')
+rest.add_resource(Register, '/register')
+rest.add_resource(Login, '/login')
+rest.add_resource(RefreshToken, '/refresh-token')
+rest.add_resource(Authorize, '/authorize-user')
+rest.add_resource(Deauthorize, '/deauthorize-user')
+rest.add_resource(NewProject, '/create-project')
+rest.add_resource(RemoveProject, '/delete-project')
+rest.add_resource(AddNewData, '/add-data')
+rest.add_resource(GetNewData, '/get-data')
+rest.add_resource(CreateLabel, '/label-data')
+rest.add_resource(DeleteLabel, '/remove-label')
+rest.add_resource(GetExportData, '/get-export-data')
 rest.add_resource(Reset, '/reset')
