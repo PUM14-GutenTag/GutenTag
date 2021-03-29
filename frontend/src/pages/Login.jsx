@@ -1,22 +1,26 @@
 import React from 'react';
 import '../css/Login.css';
 
+import Form from 'react-bootstrap/Form';
+
+import logo from '../res/hat_dark.svg';
+
 function Login() {
     return(
         <div className="login-wrapper">
-          <h1>Please Log In</h1>
+          <img src={logo} alt="logo" className="login-logo" />
           <form>
-            <label>
-              <p>Username</p>
-              <input className="input-box" type="text" />
-            </label>
-            <label>
-              <p>Password</p>
-              <input className="input-box" type="password" />
-            </label>
-            <div>
-              <button type="submit">Submit</button>
-            </div>
+            <Form.Group controlId="formBasicName">
+              <Form.Label className="text-label" >Name</Form.Label>
+              <Form.Control className="input-box" type="text" placeholder="Enter name" />
+            </Form.Group>
+            <Form.Group controlId="formBasicPassword">
+              <Form.Label className="text-label">Password</Form.Label>
+              <Form.Control className="input-box" type="password" placeholder="Enter password" />
+            </Form.Group> 
+            <Form.Group controlId="formBasicCheckbox">
+              <Form.Check style={{fontSize: '20px'}} className="text-label" type="checkbox" label="Check me out" />
+            </Form.Group>
           </form>
         </div>
       )
