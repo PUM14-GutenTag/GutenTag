@@ -1,7 +1,7 @@
 import React from 'react';
 import '../css/Login.css';
 
-import Form from 'react-bootstrap/Form';
+import { Col, Row, Form} from 'react-bootstrap';
 
 import logo from '../res/hat_dark.svg';
 
@@ -9,19 +9,29 @@ function Login() {
     return(
         <div className="login-wrapper">
           <img src={logo} alt="logo" className="login-logo" />
-          <form>
-            <Form.Group controlId="formBasicName">
-              <Form.Label className="text-label" >Name</Form.Label>
-              <Form.Control className="input-box" type="text" placeholder="Enter name" />
+          <Form>
+            <Form.Group as={Row} className="text-right" controlId="formBasicName">
+              <Form.Label column="lg" lg={3} className="text-label-big">
+                Name
+              </Form.Label>
+              <Col>
+                <Form.Control size="lg" className="input-box" type="text" placeholder="Enter name" />
+              </Col>
             </Form.Group>
-            <Form.Group controlId="formBasicPassword">
-              <Form.Label className="text-label">Password</Form.Label>
-              <Form.Control className="input-box" type="password" placeholder="Enter password" />
-            </Form.Group> 
-            <Form.Group controlId="formBasicCheckbox">
-              <Form.Check style={{fontSize: '20px'}} className="text-label" type="checkbox" label="Check me out" />
+            <Form.Group as={Row} className="text-right" controlId="formBasicPassword">
+              <Form.Label column="lg" lg={4} className="text-label-big">
+                Password
+              </Form.Label>
+              <Col>
+                <Form.Control size="lg" className="input-box" type="password" placeholder="Enter password" />
+              </Col>
             </Form.Group>
-          </form>
+            <Form.Group as={Row} controlId="formHorizontalCheck">
+              <Col sm={{ span: 10, offset: 3 }}>
+                <Form.Check className="text-label-small" label="Stay logged in" />
+              </Col>
+            </Form.Group>
+          </Form>
         </div>
       )
     }

@@ -8,6 +8,8 @@ import Projects from '../pages/Projects';
 import Login from '../pages/Login';
 import NotFoundPage from '../pages/404';
 
+//Styles
+import '../css/index.css';
 import '../css/App.css';
 
 // Placeholder content from create-react-app script.
