@@ -18,7 +18,7 @@ jobs:
         run: docker-compose build
 
       - name: Build react app
-        run: docker-compose npm run build
+        run: docker-compose run frontend build
 
       - name: Run tests
         run: docker-compose run frontend jest
