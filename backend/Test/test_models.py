@@ -1,7 +1,7 @@
 
 """
 This test file contains all the tests related to
-models.py and database_handler that will be executed every time
+models.py and database_handler.py that will be executed every time
 someone makes a pull request or pushes to the main branch.
 """
 import os
@@ -11,12 +11,6 @@ from api.database_handler import reset_db
 from api.models import (User, Project, ProjectData, Label, ProjectType,
                         DocumentClassificationLabel, SequenceLabel,
                         SequenceToSequenceLabel, ImageClassificationLabel)
-
-
-"""
-Add unit tests here
-Name it test_*function name*.py or pytest won't find it.
-"""
 
 
 PATH = os.path.dirname(__file__)
@@ -111,17 +105,17 @@ def test_deauthorize_user():
         project.deauthorize_user(user.id)
 
 
-# def test_add_text_data():
-#     reset_db()
+def test_add_text_data():
+    reset_db()
 
-#     project = Project.create(
-#         "Project", ProjectType.DOCUMENT_CLASSIFICATION)
+    project = Project.create(
+        "Project", ProjectType.DOCUMENT_CLASSIFICATION)
 
-#     text_file = os.path.join(PATH, "res/text/original_rt_snippets.txt")
-#     # Add all lines in the text file as project_data columns.
-#     with open(text_file) as file:
-#         project.add_text_bulk(file.readlines())
-#     assert len(project.data) == 10605
+    text_file = os.path.join(PATH, "res/text/original_rt_snippets.txt")
+    # Add all lines in the text file as project_data columns.
+    with open(text_file) as file:
+        project.add_text_bulk(file.readlines())
+    assert len(project.data) == 10605
 
 
 def test_add_image_data():
