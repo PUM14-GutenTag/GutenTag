@@ -1,7 +1,8 @@
 """
-This file contains all functions for the database handler.
+This file contains general functions for the database handler.
 """
-from api.models import User, Project, Label, ProjectData, AccessLevel
+from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.schema import DropConstraint, DropTable, MetaData, Table
 from api import db
 
 
@@ -13,189 +14,43 @@ def try_add(object):
     try:
         db.session.add(object)
         db.session.commit()
-        msg = f"{type(object).__name__} '{object}' created."
-    except Exception as e:
+        return object
+    except Exception:
         db.session.rollback()
-        msg = f"Could not create {type(object).__name__}: {e}"
-    finally:
-        return {
-            "id": object.id,
-            "message": msg
-        }
+        raise
+
+
+def try_add_list(objects):
+    """
+    Try to add each column in 'objects' to its table in the database and then
+    commit.
+    """
+    try:
+        for object in objects:
+            db.session.add(object)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def try_delete(object):
     """
-    Try to delete the column 'object' to its table in the database.
+    Try to delete the column 'object' from its table in the database.
     Returns its ID and a status message.
     """
     try:
         db.session.delete(object)
         db.session.commit()
-        msg = f"{type(object).__name__} '{object}' deleted."
-        id = object.id
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        msg = f"Could not delete {type(object).__name__}: {e}"
-        id = None
-    finally:
-        return {
-            "id": id,
-            "message": msg
-        }
+        raise
 
 
-def create_user(first_name, last_name, email, isAdmin=False):
-    """
-    Function creates a user in the database.
-    Returns user id and a status message.
-    """
-    for arg, t in [(first_name, str), (last_name, str), (email, str),
-                   (isAdmin, bool)]:
+def check_types(arg_types):
+    for arg, t in arg_types:
         if not isinstance(arg, t):
-            return {
-                "id": None,
-                "message": ("Could not create user:"
-                            f"arg '{arg}' is not a '{t}'.")
-            }
-
-    access = AccessLevel.ADMIN if isAdmin else AccessLevel.USER
-    user = User(first_name=first_name, last_name=last_name, email=email,
-                access_level=access)
-    return try_add(user)
-
-
-def create_project(project_name, project_type):
-    """
-    Function creates a project in the database
-    Returns project id and a status message.
-    """
-    for arg, t in [(project_name, str), (project_type, int)]:
-        if not isinstance(arg, t):
-            return {
-                "id": None,
-                "message": ("Could not create project:"
-                            f"arg '{arg}' is not a '{type}'.")
-            }
-    project = Project(name=project_name, project_type=project_type)
-    return try_add(project)
-
-
-def add_data(project_id, data, project_type):
-    """
-    Function adds data to an existing project.
-    Returns data id and a status message.
-    """
-    for arg, t in [(project_id, int), (data, str), (project_type, int)]:
-        if not isinstance(arg, t):
-            return {
-                "id": None,
-                "message": ("Could not add data:"
-                            f"arg '{arg}' is not a '{type}'.")
-            }
-    project_data = ProjectData(project_id=project_id,
-                               data=data,
-                               project_type=project_type)
-    return try_add(project_data)
-
-
-def delete_project(project_id):
-    """
-    Function deletes an existing project from the database.
-    Returns project id and a status message.
-    """
-    for arg, t in [(project_id, int)]:
-        if not isinstance(arg, t):
-            return {
-                "id": None,
-                "message": ("Could not delete project:"
-                            f"arg '{arg}' is not a '{type}'.")
-            }
-    project = Project.query.get(project_id)
-    return try_delete(project)
-
-
-def authorize_user(project_id, user_id):
-    """
-    Function adds an existing user to an existing project and returns a
-    message.
-    """
-    for arg, t in [(project_id, int), (user_id, int)]:
-        if not isinstance(arg, t):
-            return(f"Could not authorize : arg '{arg}' is not a '{type}'.")
-    try:
-        project = Project.query.get(project_id)
-        user = User.query.get(user_id)
-
-        if user in project.users or user.access_level == AccessLevel.ADMIN:
-            return f"{user} is already authorized for {project}."
-
-        user.projects.append(project)
-        db.session.commit()
-        return f"{user} added to {project}."
-    except Exception as e:
-        db.session.rollback
-        return f"Could not authorize user {user}: {e}"
-
-
-def deauthorize_user(project_id, user_id):
-    """
-    Function removes an existing user from an existing project and returns a
-    message.
-    """
-    for arg, t in [(project_id, int), (user_id, int)]:
-        if not isinstance(arg, t):
-            return f"Could not deauthorize user: arg '{arg}' is not a '{t}'."
-    try:
-        project = Project.query.get(project_id)
-        user = User.query.get(user_id)
-
-        if (user not in project.users
-                and user.access_level != AccessLevel.ADMIN):
-            return (f"Could not deauthorize user. {user} is not authorized "
-                    f"for {project}.")
-
-        user.projects.remove(project)
-        db.session.commit()
-        return f"{user} remove from {project}."
-    except Exception as e:
-        db.session.rollback
-        return f"Could not deauthorize user {user}: {e}"
-
-
-def label_data(data_id, user_id, label):
-    """
-    Function adds a label to a data object.
-    Returns label id and a status message.
-    """
-    for arg, t in [(data_id, int), (user_id, int),
-                   (label, str)]:
-        if not isinstance(arg, t):
-            return {
-                "id": None,
-                "message": ("Could not create label_data:"
-                            f"arg '{arg}' is not a '{type}'.")
-            }
-    label_data = Label(data_id=data_id,
-                       user_id=user_id,
-                       label=label)
-    return try_add(label_data)
-
-
-def remove_label(label_id):
-    """
-    Function removes an existing label from the databse.
-    Returns user id and a status message.
-    """
-    for arg, t in [(label_id, int)]:
-        if not isinstance(arg, t):
-            return {
-                "id": None,
-                "message": ("Could not remove label:"
-                            f"arg '{arg}' is not a '{type}'.")
-            }
-    label = Project.query.get(label_id)
-    return try_delete(label)
+            raise TypeError(f"arg '{arg}' is not a '{t}'.")
 
 
 def reset_db():
@@ -205,6 +60,44 @@ def reset_db():
     according to models.py.
     """
     db.session.close()
-    db.drop_all()
+    drop_all_cascade()
     db.create_all()
     db.session.commit()
+
+
+def drop_all_cascade():
+    """(On a live db) drops all foreign key constraints before dropping all
+    tables.
+    Workaround for SQLAlchemy not doing DROP ## CASCADE for drop_all()
+    (https://github.com/pallets/flask-sqlalchemy/issues/722)
+    """
+    con = db.engine.connect()
+    trans = con.begin()
+    inspector = Inspector.from_engine(db.engine)
+
+    # We need to re-create a minimal metadata with only the required things to
+    # successfully emit drop constraints and tables commands for postgres
+    # (based on the actual schema of the running instance)
+    meta = MetaData()
+    tables = []
+    all_fkeys = []
+
+    for table_name in inspector.get_table_names():
+        fkeys = []
+
+        for fkey in inspector.get_foreign_keys(table_name):
+            if not fkey["name"]:
+                continue
+
+            fkeys.append(db.ForeignKeyConstraint((), (), name=fkey["name"]))
+
+        tables.append(Table(table_name, meta, *fkeys))
+        all_fkeys.extend(fkeys)
+
+    for fkey in all_fkeys:
+        con.execute(DropConstraint(fkey))
+
+    for table in tables:
+        con.execute(DropTable(table))
+
+    trans.commit()
