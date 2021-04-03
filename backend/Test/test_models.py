@@ -5,15 +5,24 @@ models.py and database_handler.py that will be executed every time
 someone makes a pull request or pushes to the main branch.
 """
 import os
+import pathlib
 from pytest import raises
 from sqlalchemy.exc import IntegrityError
 from api.database_handler import reset_db
 from api.models import (User, Project, ProjectData, Label, ProjectType,
                         DocumentClassificationLabel, SequenceLabel,
                         SequenceToSequenceLabel, ImageClassificationLabel)
+from api.parser import (export_document_classification_data,
+                        export_image_classification_data,
+                        export_sequence_labeling_data,
+                        export_sequence_to_sequence_data)
 
 
 PATH = os.path.dirname(__file__)
+OUT_PATH = PATH + "/out/"
+
+path = pathlib.Path(OUT_PATH)
+path.mkdir(exist_ok=True)
 
 
 def test_create_user():
@@ -105,36 +114,6 @@ def test_deauthorize_user():
         project.deauthorize_user(user.id)
 
 
-def test_add_text_data():
-    reset_db()
-
-    project = Project.create(
-        "Project", ProjectType.DOCUMENT_CLASSIFICATION)
-
-    text_file = os.path.join(PATH, "res/text/original_rt_snippets.txt")
-    # Add all lines in the text file as project_data columns.
-    with open(text_file) as file:
-        project.add_text_bulk(file.readlines())
-    assert len(project.data) == 10605
-
-
-def test_add_image_data():
-    reset_db()
-
-    project = Project.create(
-        "Project", ProjectType.IMAGE_CLASSIFICATION)
-
-    # Test adding all images in the directory to a project.
-    image_dir = os.path.join(PATH, "res/images")
-    with os.scandir(image_dir) as dir:
-        for entry in dir:
-            if (entry.is_file()):
-                image_path = os.path.join(image_dir, entry.name)
-                with open(image_path, "rb") as file:
-                    project.add_image_data(entry.name, file.read())
-    assert len(project.data) == 10
-
-
 def test_document_classification_label():
     reset_db()
 
@@ -154,6 +133,10 @@ def test_document_classification_label():
         label = DocumentClassificationLabel.create(data.id, 100, label_str)
         assert label is None
 
+    out_file = os.path.join(OUT_PATH, "document_classification_label.json")
+    with open(out_file, "w") as file:
+        file.write(export_document_classification_data(project.id))
+
 
 def test_sequence_label():
     reset_db()
@@ -169,6 +152,10 @@ def test_sequence_label():
         assert label is not None
         assert label in data.labels
 
+    out_file = os.path.join(OUT_PATH, "sequence_label.json")
+    with open(out_file, "w") as file:
+        file.write(export_sequence_labeling_data(project.id))
+
 
 def test_sequence_to_sequence_label():
     reset_db()
@@ -183,10 +170,14 @@ def test_sequence_to_sequence_label():
     # Test label valid data.
     for lab in ["John såg mannen på berget med hjälp av ett teleskop.",
                 "John såg mannen med ett teleskop på berget."]:
-        label = SequenceToSequenceLabel.create(data.id, user.id, lab, from_type,
-                                               "swedish")
+        label = SequenceToSequenceLabel.create(data.id, user.id, lab,
+                                               from_type, "swedish")
         assert label is not None
         assert label in data.labels
+
+    out_file = os.path.join(OUT_PATH, "sequence_to_sequence_label.json")
+    with open(out_file, "w") as file:
+        file.write(export_sequence_to_sequence_data(project.id))
 
 
 def test_image_classification_label():
@@ -207,6 +198,10 @@ def test_image_classification_label():
         data.id, user.id, "snake", coord1, coord2)
     assert label is not None
     assert label in data.labels
+
+    out_file = os.path.join(OUT_PATH, "image_classification_label.json")
+    with open(out_file, "w") as file:
+        file.write(export_image_classification_data(project.id))
 
 
 def test_delete_label():
@@ -251,3 +246,37 @@ def test_delete_project():
 
     # Test that labels have been deleted by cascade
     assert Label.query.get(label_id) is None
+
+
+def test_add_text_data():
+    reset_db()
+
+    project = Project.create(
+        "Project", ProjectType.DOCUMENT_CLASSIFICATION)
+
+    text_file = os.path.join(PATH, "res/text/original_rt_snippets.txt")
+    # Add all lines in the text file as project_data columns.
+    with open(text_file) as file:
+        project.add_text_bulk(file.readlines())
+    assert len(project.data) == 10605
+
+    out_file = os.path.join(OUT_PATH, "add_text_data.json")
+    with open(out_file, "w") as file:
+        file.write(export_document_classification_data(project.id))
+
+
+def test_add_image_data():
+    reset_db()
+
+    project = Project.create(
+        "Project", ProjectType.IMAGE_CLASSIFICATION)
+
+    # Test adding all images in the directory to a project.
+    image_dir = os.path.join(PATH, "res/images")
+    with os.scandir(image_dir) as dir:
+        for entry in dir:
+            if (entry.is_file()):
+                image_path = os.path.join(image_dir, entry.name)
+                with open(image_path, "rb") as file:
+                    project.add_image_data(entry.name, file.read())
+    assert len(project.data) == 10

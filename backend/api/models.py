@@ -252,6 +252,13 @@ class ProjectTextData(ProjectData):
         "polymorphic_identity": "text",
     }
 
+    def __init__(self, **kwargs):
+        """
+        Init and strip trailing/leading whitespace from text_dat.
+        """
+        super(ProjectTextData, self).__init__(**kwargs)
+        self.text_data = kwargs["text_data"].strip()
+
 
 class ProjectImageData(ProjectData):
     """
@@ -364,7 +371,6 @@ class SequenceToSequenceLabel(Label):
 
     id = db.Column(db.Integer, db.ForeignKey("label.id", ondelete="CASCADE"),
                    primary_key=True)
-    # FIXME: from_type really belong in data
     from_type = db.Column(db.Text, nullable=False)
     to_type = db.Column(db.Text, nullable=False)
 
