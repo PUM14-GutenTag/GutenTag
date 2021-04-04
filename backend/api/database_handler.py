@@ -26,8 +26,7 @@ def try_add_list(objects):
     commit.
     """
     try:
-        for object in objects:
-            db.session.add(object)
+        db.session.add_all(objects)
         db.session.commit()
     except Exception:
         db.session.rollback()
@@ -48,6 +47,10 @@ def try_delete(object):
 
 
 def check_types(arg_types):
+    """
+    Check each (arg, type) tuple in the list arg_types to see that every arg is
+    an instance of type. Raise a TypeError if any check fails.
+    """
     for arg, t in arg_types:
         if not isinstance(arg, t):
             raise TypeError(f"arg '{arg}' is not a '{t}'.")

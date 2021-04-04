@@ -73,26 +73,20 @@ class User(db.Model):
     projects = db.relationship(
         "Project", secondary=access_control, back_populates="users")
 
+    def __init__(self, first_name, last_name, email, isAdmin=False):
+        check_types([(first_name, str), (last_name, str), (email, str),
+                     (isAdmin, bool)])
+
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.access_level = AccessLevel.ADMIN if isAdmin else AccessLevel.USER
+
     def __repr__(self):
         return (
             f"<User(first_name={self.first_name}, last_name={self.last_name}, "
             f"email={self.email}, access_level={self.access_level})>"
         )
-
-    @staticmethod
-    def create(first_name, last_name, email, isAdmin=False):
-        """
-        Function creates a user in the database.
-        """
-        check_types([(first_name, str), (last_name, str), (email, str),
-                     (isAdmin, bool)])
-
-        access = AccessLevel.ADMIN if isAdmin else AccessLevel.USER
-        user = User(first_name=first_name, last_name=last_name, email=email,
-                    access_level=access)
-
-        return try_add(user)
-
 
 class Project(db.Model):
     """
@@ -112,66 +106,11 @@ class Project(db.Model):
     users = db.relationship(
         "User", secondary=access_control, back_populates="projects")
 
-    @staticmethod
-    def create(project_name, project_type):
-        """
-        Function creates a project in the database
-        """
+    def __init__(self, project_name, project_type):
         check_types([(project_name, str), (project_type, int)])
-        project = Project(name=project_name, project_type=project_type)
-        return try_add(project)
 
-    def delete(self):
-        """
-        Function deletes an existing project from the database.
-        """
-        return try_delete(self)
-
-    def add_text_data(self, text, prelabel=None):
-        """
-        Function adds text data to an existing project.
-        """
-        if (self.project_type == ProjectType.IMAGE_CLASSIFICATION):
-            raise ValueError("Could not add text data:"
-                             "project type is IMAGE_CLASSIFICATION.")
-
-        args = [(text, str)]
-        if prelabel is not None:
-            args.append((prelabel, str))
-        check_types(args)
-
-        project_data = ProjectTextData(project_id=self.id,
-                                       text_data=text,
-                                       prelabel=prelabel)
-        return try_add(project_data)
-
-    def add_text_bulk(self, texts):
-        """
-        Function adds a list of text data to an existing project.
-        """
-        data_list = map(lambda t: ProjectTextData(project_id=self.id,
-                                                  text_data=t),
-                        texts)
-        try_add_list(data_list)
-
-    def add_image_data(self, image_name, image_data):
-        """
-        Function adds image data to an existing project. 'image' is a
-        dictionary containing a 'file_name', 'file_type' and 'data'.
-        """
-        if (self.project_type != ProjectType.IMAGE_CLASSIFICATION):
-            raise ValueError("Could not add image data:"
-                             "project type is not IMAGE_CLASSIFICATION.")
-
-        # FIXME Is data an instance of str?
-        check_types([(image_name, str), (image_data, bytes)])
-
-        project_data = ProjectImageData(
-            project_id=self.id,
-            file_name=image_name,
-            image_data=image_data,
-        )
-        return try_add(project_data)
+        self.name = project_name
+        self.project_type = project_type
 
     def authorize_user(self, user_id):
         """
@@ -221,11 +160,11 @@ class ProjectData(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id',
-                                                     ondelete="CASCADE"))
+                                                     ondelete="CASCADE"),
+                                        nullable=False)
     project = db.relationship("Project", back_populates="data")
     labels = db.relationship("Label", back_populates="data",
                              cascade="all, delete", passive_deletes=True)
-    prelabel = db.Column(db.Text)
     type = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, nullable=False,
                         default=datetime.datetime.now())
@@ -246,18 +185,15 @@ class ProjectTextData(ProjectData):
     id = db.Column(db.Integer,
                    db.ForeignKey("project_data.id", ondelete="CASCADE"),
                    primary_key=True)
-    text_data = db.Column(db.Text)
+    text_data = db.Column(db.Text, nullable=False)
 
     __mapper_args__ = {
         "polymorphic_identity": "text",
     }
 
-    def __init__(self, **kwargs):
-        """
-        Init and strip trailing/leading whitespace from text_dat.
-        """
-        super(ProjectTextData, self).__init__(**kwargs)
-        self.text_data = kwargs["text_data"].strip()
+    def __init__(self, project_id, text):
+        self.project_id = project_id
+        self.text_data = text.strip()
 
 
 class ProjectImageData(ProjectData):
@@ -270,12 +206,17 @@ class ProjectImageData(ProjectData):
     id = db.Column(db.Integer,
                    db.ForeignKey("project_data.id", ondelete="CASCADE"),
                    primary_key=True)
-    file_name = db.Column(db.Text)
-    image_data = db.Column(db.LargeBinary)
+    file_name = db.Column(db.Text, nullable=False)
+    image_data = db.Column(db.LargeBinary, nullable=False)
 
     __mapper_args__ = {
         "polymorphic_identity": "image",
     }
+
+    def __init__(self, project_id, file_name, image_data):
+        self.project_id = project_id
+        self.file_name = file_name
+        self.image_data = image_data
 
 
 class Label(db.Model):
@@ -291,6 +232,7 @@ class Label(db.Model):
                                                   ondelete="CASCADE"))
     data = db.relationship("ProjectData", back_populates="labels")
     label = db.Column(db.Text, nullable=False)
+    is_prelabel = db.Column(db.Boolean)
     updated = db.Column(db.DateTime, nullable=False,
                         default=datetime.datetime.now())
     created = db.Column(db.DateTime, nullable=False,
@@ -301,12 +243,6 @@ class Label(db.Model):
         "polymorphic_identity": 0,
         "polymorphic_on": project_type
     }
-
-    def delete(self):
-        """
-        Function removes an existing label from the databse.
-        """
-        return try_delete(self)
 
 
 class DocumentClassificationLabel(Label):
@@ -322,16 +258,15 @@ class DocumentClassificationLabel(Label):
         'polymorphic_identity': ProjectType.DOCUMENT_CLASSIFICATION,
     }
 
-    @ staticmethod
-    def create(data_id, user_id, label_str):
-        """
-        Create a document classification label and add it to a ProjectData.
-        """
-        check_types([(data_id, int), (user_id, int), (label_str, str)])
-        label = DocumentClassificationLabel(data_id=data_id,
-                                            user_id=user_id,
-                                            label=label_str)
-        return try_add(label)
+    def __init__(self, data_id, user_id, label_str):
+        args = [(data_id, int), (label_str, str)]
+        if user_id is not None:
+            args.append((user_id, int))
+        check_types(args)
+        
+        self.data_id = data_id
+        self.user_id = user_id
+        self.label = label_str
 
 
 class SequenceLabel(Label):
@@ -349,18 +284,20 @@ class SequenceLabel(Label):
         'polymorphic_identity': ProjectType.SEQUENCE_LABELING,
     }
 
-    @ staticmethod
-    def create(data_id, user_id, label_str, begin, end):
+    def __init__(self, data_id, user_id, label_str, begin, end):
         """
         Create a sequence label and add it to a ProjectData.
         """
-        check_types([(data_id, int), (user_id, int), (label_str, str)])
-        label = SequenceLabel(data_id=data_id,
-                              user_id=user_id,
-                              label=label_str,
-                              begin=begin,
-                              end=end)
-        return try_add(label)
+        args = [(data_id, int), (label_str, str),
+                (begin, int), (begin, int)]
+        if user_id is not None:
+            args.append((user_id, int))
+        check_types(args)
+        self.data_id = data_id
+        self.user_id = user_id
+        self.label = label_str
+        self.begin = begin
+        self.end = end
 
 
 class SequenceToSequenceLabel(Label):
@@ -371,25 +308,19 @@ class SequenceToSequenceLabel(Label):
 
     id = db.Column(db.Integer, db.ForeignKey("label.id", ondelete="CASCADE"),
                    primary_key=True)
-    from_type = db.Column(db.Text, nullable=False)
-    to_type = db.Column(db.Text, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': ProjectType.SEQUENCE_TO_SEQUENCE,
     }
 
-    @ staticmethod
-    def create(data_id, user_id, label_str, from_type, to_type):
-        """
-        Create a sequence to sequence label and add it to a ProjectData.
-        """
-        check_types([(data_id, int), (user_id, int), (label_str, str)])
-        label = SequenceToSequenceLabel(data_id=data_id,
-                                        user_id=user_id,
-                                        label=label_str,
-                                        from_type=from_type,
-                                        to_type=to_type)
-        return try_add(label)
+    def __init__(self, data_id, user_id, label_str):
+        args = [(data_id, int), (label_str, str)]
+        if user_id is not None:
+            args.append((user_id, int))
+        check_types(args)
+        self.data_id = data_id
+        self.user_id = user_id
+        self.label = label_str
 
 
 class ImageClassificationLabel(Label):
@@ -410,18 +341,16 @@ class ImageClassificationLabel(Label):
         'polymorphic_identity': ProjectType.IMAGE_CLASSIFICATION,
     }
 
-    @ staticmethod
-    def create(data_id, user_id, label_str, coord1, coord2):
-        """
-        Create an image classification label and add it to a ProjectData.
-        coord1 and coord2 are tuples.
-        """
-        check_types([(data_id, int), (user_id, int), (label_str, str)])
-        label = ImageClassificationLabel(data_id=data_id,
-                                         user_id=user_id,
-                                         label=label_str,
-                                         x1=coord1[0],
-                                         y1=coord1[1],
-                                         x2=coord2[0],
-                                         y2=coord2[1])
-        return try_add(label)
+    def __init__(self, data_id, user_id, label_str, coord1, coord2):
+        args = [(data_id, int), (label_str, str),
+                (coord1, tuple), (coord2, tuple)]
+        if user_id is not None:
+            args.append((user_id, int))
+        check_types(args)
+        self.data_id = data_id
+        self.user_id = user_id
+        self.label = label_str
+        self.x1 = coord1[0]
+        self.y1 = coord1[1]
+        self.x2 = coord2[0]
+        self.y2 = coord2[1]

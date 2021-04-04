@@ -14,15 +14,13 @@ class TestModels(Resource):
 
     def get(self):
         t = Test()
-        db.session.add(t)
 
-        User.create("Oscar",
+        try_add(User("Oscar",
                     "Lonnqvist",
                     "oscar@mail.com" + str(len(User.query.all())),
                     False
-                    )
+                    ))
 
-        db.session.commit()
         return {"result": len(User.query.all())}
 
 
