@@ -1,8 +1,6 @@
 import os
 import pathlib
 import json
-from pytest import raises
-from sqlalchemy.exc import IntegrityError
 from api.database_handler import reset_db, try_add
 from api.models import Project, ProjectType
 from api.parser import (import_document_classification_data,

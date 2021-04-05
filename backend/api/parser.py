@@ -213,7 +213,7 @@ def export_sequence_labeling_data(project_id, filters=None):
                     [0, 3, PER],
                     [16, 27, LOC],
                     [31, 41, LOC]
-                    ]
+                ]
             },
             ...
         ]
