@@ -32,21 +32,24 @@ def test_create_user():
     reset_db()
 
     # Test correctly creating an admin user.
-    user = try_add(User("Oscar", "Lonnqvist", "oscar@gmail.com", True))
+    user = try_add(User("Oscar", "Lonnqvist", "oscar@gmail.com", "password",
+                        True))
     assert user is not None
 
     # Test correctly creating an non-admin user.
-    user = try_add(User("first", "last", "user@gmail.com", False))
+    user = try_add(User("first", "last", "user@gmail.com", "password", False))
     assert user is not None
 
     # Test duplicate email.
     with raises(IntegrityError):
-        user = try_add(User("Oscar", "Lonnqvist", "oscar@gmail.com", True))
+        user = try_add(User("Oscar", "Lonnqvist", "oscar@gmail.com",
+                            "password", True))
         assert user is None
 
     # Test incorrect first name type.
     with raises(TypeError):
-        user = try_add(User(["Oscar"], "Lonnqvist", "name@gmail.com", True))
+        user = try_add(User(["Oscar"], "Lonnqvist",
+                            "name@gmail.com", "password", True))
         assert user is None
 
 
@@ -75,53 +78,56 @@ def test_authorize_user():
     project = try_add(Project("A project", ProjectType.SEQUENCE_LABELING))
 
     # Test authorizing existing user.
-    user = try_add(User("firstname", "lastname", "mail@gmail.com", False))
-    project.authorize_user(user.id)
+    user = try_add(User("firstname", "lastname", "mail@gmail.com", "password",
+                        False))
+    user.authorize(project.id)
     assert user in project.users
 
     # Test authorizing admin user.
     with raises(ValueError):
         admin_user = try_add(
-            User("admin", "lastname", "admin@gmail.com", True))
-        project.authorize_user(admin_user.id)
+            User("admin", "lastname", "admin@gmail.com", "password", True))
+        admin_user.authorize(project.id)
         assert admin_user not in project.users
 
-    # Test authorizing non-existent user.
+    # Test authorizing for none-existant project
     with raises(ValueError):
-        project.authorize_user(550)
-        for u in project.users:
-            assert u.id != 550
+        user.authorize(550)
+        for proj in user.projects:
+            assert proj.id != 550
 
 
 def test_deauthorize_user():
     reset_db()
 
-    user = try_add(User("first", "last", "user@gmail.com"))
+    user = try_add(User("first", "last", "user@gmail.com", "password"))
     project = try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
-    project.authorize_user(user.id)
+    user.authorize(project.id)
 
     # Test deauthorizing existing user.
-    project.deauthorize_user(user.id)
+    user.deauthorize(project.id)
     assert user not in project.users
 
-    # Test deauthorizing non existing user.
+    # Test deauthorizing from non existing project.
     with raises(ValueError):
-        project.deauthorize_user(490)
-        for u in project.users:
-            assert u.id != 490
+        user.deauthorize(490)
+        for proj in user.projects:
+            assert proj.id != 490
 
     # Test deauthorizing user from a project it isn't authorized to.
-    user = try_add(User("firstname", "lastname", "user57@gmail.com"))
+    user = try_add(User("firstname", "lastname", "user57@gmail.com",
+                        "password"))
     project = try_add(Project("Projecttest",
                               ProjectType.DOCUMENT_CLASSIFICATION))
     with raises(ValueError):
-        project.deauthorize_user(user.id)
+        user.deauthorize(project.id)
 
 
 def test_document_classification_label():
     reset_db()
 
-    user = try_add(User("firsttest", "lasttest", "usertest@gmail.com"))
+    user = try_add(User("firsttest", "lasttest",
+                        "usertest@gmail.com", "password"))
     project = try_add(Project(
         "Project", ProjectType.DOCUMENT_CLASSIFICATION))
     label_str = "Positive"
@@ -141,7 +147,8 @@ def test_document_classification_label():
 def test_sequence_label():
     reset_db()
 
-    user = try_add(User("firsttest", "lasttest", "usertest@gmail.com"))
+    user = try_add(User("firsttest", "lasttest",
+                        "usertest@gmail.com", "password"))
     project = try_add(Project(
         "Project", ProjectType.SEQUENCE_LABELING))
     data = try_add(ProjectTextData(
@@ -158,7 +165,8 @@ def test_sequence_label():
 def test_sequence_to_sequence_label():
     reset_db()
 
-    user = try_add(User("firsttest", "lasttest", "usertest@gmail.com"))
+    user = try_add(User("firsttest", "lasttest",
+                        "usertest@gmail.com", "password"))
     project = try_add(Project(
         "Project", ProjectType.SEQUENCE_TO_SEQUENCE))
     data = try_add(
@@ -176,7 +184,8 @@ def test_sequence_to_sequence_label():
 def test_image_classification_label():
     reset_db()
 
-    user = try_add(User("firsttest", "lasttest", "usertest@gmail.com"))
+    user = try_add(User("firsttest", "lasttest",
+                        "usertest@gmail.com", "password"))
     project = try_add(Project(
         "Project", ProjectType.IMAGE_CLASSIFICATION))
 
@@ -196,7 +205,8 @@ def test_image_classification_label():
 def test_delete_label():
     reset_db()
 
-    user = try_add(User("firsttest", "lasttest", "usertest@gmail.com"))
+    user = try_add(User("firsttest", "lasttest",
+                        "usertest@gmail.com", "password"))
     project = try_add(Project(
         "Project", ProjectType.DOCUMENT_CLASSIFICATION))
     in_data = "Test"
@@ -218,7 +228,7 @@ def test_delete_project():
     project_id = project.id
     data = try_add(ProjectTextData(project.id, "text"))
     data_id = data.id
-    user = try_add(User("name", "surname", "email@email.com"))
+    user = try_add(User("name", "surname", "email@email.com", "password"))
     label_str = "Negative"
     label = try_add(DocumentClassificationLabel(data.id, user.id, label_str))
     label_id = label.id

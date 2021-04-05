@@ -2,9 +2,13 @@
 This file contains all database models and associated methods.
 """
 import datetime
+import random
 from enum import IntEnum
 from api import db
 from api.database_handler import check_types
+from sqlalchemy.ext.hybrid import hybrid_property
+from . import bcrypt
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 
 class ProjectType(IntEnum):
@@ -57,11 +61,12 @@ class User(db.Model):
     email = db.Column(db.Text, unique=True, nullable=False)
     access_level = db.Column(db.Integer, nullable=False,
                              default=AccessLevel.USER)
+    _password = db.Column(db.Text, nullable=False)
 
     projects = db.relationship(
         "Project", secondary=access_control, back_populates="users")
 
-    def __init__(self, first_name, last_name, email, isAdmin=False):
+    def __init__(self, first_name, last_name, email, password, isAdmin=False):
         check_types([(first_name, str), (last_name, str), (email, str),
                      (isAdmin, bool)])
 
@@ -69,11 +74,80 @@ class User(db.Model):
         self.last_name = last_name
         self.email = email
         self.access_level = AccessLevel.ADMIN if isAdmin else AccessLevel.USER
+        self.password = password
+
+    @staticmethod
+    def get_by_email(email):
+        return User.query.filter_by(email=email).first()
+
+    @hybrid_property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, new_password):
+        self._password = bcrypt.generate_password_hash(
+            new_password).decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self._password, password)
+
+    def login(self, password):
+        """
+        Tries to login an user. If successful, returns
+        an access token and a refresh token.
+        """
+
+        check_types([(password, str)])
+
+        if(self.check_password(password)):
+            access_token = create_access_token(identity=self.email)
+            refresh_token = create_refresh_token(identity=self.email)
+            return (access_token, refresh_token)
+        return None
+
+    def authorize(self, project_id):
+        """
+        Function adds an existing user to an existing project.
+        """
+        check_types([(project_id, int)])
+        project = Project.query.get(project_id)
+        if self.is_authorized(project_id):
+            raise ValueError(f"{self} is already authorized for {project}.")
+        try:
+            project.users.append(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback
+            raise
+
+    def deauthorize(self, project_id):
+        """
+        Function removes an existing user from an existing project.
+        """
+        check_types([(project_id, int)])
+        project = Project.query.get(project_id)
+        if not self.is_authorized(project_id):
+            raise ValueError(f"{self} is not authorized for {project}.")
+        try:
+            project.users.remove(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback
+            raise
+
+    def is_authorized(self, project_id):
+        check_types([(project_id, int)])
+        project = Project.query.get(project_id)
+        if project is None:
+            raise ValueError("Project does not exist.")
+        return self.access_level == AccessLevel.ADMIN or \
+            project in self.projects
 
     def __repr__(self):
         return (
             f"<User(first_name={self.first_name}, last_name={self.last_name}, "
-            f"email={self.email}, access_level={self.access_level})>"
+            f"email={self.email}, access_level={self.access_level}) >"
         )
 
 
@@ -97,47 +171,41 @@ class Project(db.Model):
 
     def __init__(self, project_name, project_type):
         check_types([(project_name, str), (project_type, int)])
-
+        if not ProjectType.has_value(project_type):
+            raise ValueError(f"Project type '{project_type}' is invalid.")
         self.name = project_name
         self.project_type = project_type
 
-    def authorize_user(self, user_id):
+    def get_data(self, user_id, amount):
         """
-        Function adds an existing user to an existing project.
+        Function for retrieving datapoints that
+        are previously unlabeled by the user
         """
-        check_types([(user_id, int)])
-        try:
-            user = User.query.get(user_id)
-            if user is None:
-                raise ValueError("User does not exist.")
-            elif user in self.users or user.access_level == AccessLevel.ADMIN:
-                raise ValueError(f"{user} is already authorized for {self}.")
 
-            self.users.append(user)
-            db.session.commit()
-        except Exception:
-            db.session.rollback
-            raise
+        check_types([(amount, int), (user_id, int)])
 
-    def deauthorize_user(self, user_id):
-        """
-        Function removes an existing user from an existing project.
-        """
-        check_types([(user_id, int)])
-        try:
-            user = User.query.get(user_id)
+        user_labels = Label.query.filter_by(user_id=user_id).all()
 
-            if user is None:
-                raise ValueError("User does not exist.")
-            elif (user not in self.users
-                    and user.access_level != AccessLevel.ADMIN):
-                raise ValueError(f"{user} is not authorized for {self}.")
+        labeled_ids = set()
+        unlabeled_data = {}
 
-            self.users.remove(user)
-            db.session.commit()
-        except Exception:
-            db.session.rollback
-            raise
+        for label in user_labels:
+            labeled_ids.add(label.data_id)
+
+        for data in self.data:
+            if data.id not in labeled_ids:
+                unlabeled_data[data.id] = data.data
+
+        if len(unlabeled_data) > amount:
+            random_numbers = random.sample(range(len(unlabeled_data)), amount)
+            keys = list(unlabeled_data.keys())
+            random_data = {}
+            for n in random_numbers:
+                random_data[keys[n]] = unlabeled_data[keys[n]]
+
+            return random_data
+
+        return unlabeled_data
 
 
 class ProjectData(db.Model):
@@ -284,6 +352,7 @@ class SequenceLabel(Label):
         if user_id is not None:
             args.append((user_id, int))
         check_types(args)
+
         self.data_id = data_id
         self.user_id = user_id
         self.label = label_str
@@ -310,6 +379,7 @@ class SequenceToSequenceLabel(Label):
         if user_id is not None:
             args.append((user_id, int))
         check_types(args)
+
         self.data_id = data_id
         self.user_id = user_id
         self.label = label_str
@@ -341,6 +411,7 @@ class ImageClassificationLabel(Label):
         if user_id is not None:
             args.append((user_id, int))
         check_types(args)
+
         self.data_id = data_id
         self.user_id = user_id
         self.label = label_str

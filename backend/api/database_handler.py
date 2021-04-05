@@ -8,8 +8,7 @@ from api import db
 
 def try_add(object):
     """
-    Try to add the column 'object' to its table in the database. Returns its ID
-    and a status message.
+    Try to add the column 'object' to its table in the database.
     """
     try:
         db.session.add(object)
@@ -18,6 +17,25 @@ def try_add(object):
     except Exception:
         db.session.rollback()
         raise
+
+
+def try_add_response(object):
+    """
+    Try to add the column 'object' to its table in the database. Returns its ID
+    and a status message.
+    """
+    try:
+        db.session.add(object)
+        db.session.commit()
+        msg = f"{type(object).__name__} '{object}' created."
+    except Exception as e:
+        db.session.rollback()
+        msg = f"Could not create {type(object).__name__}: {e}"
+    finally:
+        return {
+            "id": object.id,
+            "message": msg
+        }
 
 
 def try_add_list(objects):
@@ -36,7 +54,6 @@ def try_add_list(objects):
 def try_delete(object):
     """
     Try to delete the column 'object' from its table in the database.
-    Returns its ID and a status message.
     """
     try:
         db.session.delete(object)
@@ -44,6 +61,27 @@ def try_delete(object):
     except Exception:
         db.session.rollback()
         raise
+
+
+def try_delete_response(object):
+    """
+    Try to delete the column 'object' to its table in the database.
+    Returns its ID and a status message.
+    """
+    try:
+        db.session.delete(object)
+        db.session.commit()
+        msg = f"{type(object).__name__} '{object}' deleted."
+        id = object.id
+    except Exception as e:
+        db.session.rollback()
+        msg = f"Could not delete {type(object).__name__}: {e}"
+        id = None
+    finally:
+        return {
+            "id": id,
+            "message": msg
+        }
 
 
 def check_types(arg_types):
