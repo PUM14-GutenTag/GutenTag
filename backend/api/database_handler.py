@@ -256,8 +256,10 @@ def deauthorize_user(project_id, user_id):
             project = Project.query.get(project_id)
             user = User.query.get(user_id)
 
-            if (user not in project.users
-                    and user.access_level != AccessLevel.ADMIN):
+            if user not in project.users:
+                if user.access_level == AccessLevel.ADMIN:
+                    return (f"Could not deauthorize user. {user} is an admin.")
+
                 return (f"Could not deauthorize user. {user} is not authorized"
                         f"for {project}.")
 
