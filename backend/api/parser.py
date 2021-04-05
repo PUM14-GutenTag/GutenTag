@@ -195,7 +195,7 @@ def export_document_classification_data(project_id, filters=None):
             "labels": [lab.label for lab in data.labels]
         })
 
-    return json.dumps(result)
+    return json.dumps(result, ensure_ascii=False)
 
 
 def export_sequence_labeling_data(project_id, filters=None):
@@ -233,7 +233,7 @@ def export_sequence_labeling_data(project_id, filters=None):
             "labels": [[lab.begin, lab.end, lab.label] for lab in data.labels]
         })
 
-    return json.dumps(result)
+    return json.dumps(result, ensure_ascii=False)
 
 
 def export_sequence_to_sequence_data(project_id, filters=None):
@@ -270,7 +270,7 @@ def export_sequence_to_sequence_data(project_id, filters=None):
             "labels": [lab.label for lab in data.labels]
         })
 
-    return json.dumps(result)
+    return json.dumps(result, ensure_ascii=False)
 
 
 def export_image_classification_data(project_id, filters=None):
@@ -311,4 +311,4 @@ def export_image_classification_data(project_id, filters=None):
             "labels": labels
         })
 
-    return json.dumps(result)
+    return json.dumps(result, ensure_ascii=False)
