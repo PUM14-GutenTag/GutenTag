@@ -3,9 +3,7 @@ import pathlib
 from pytest import raises
 from sqlalchemy.exc import IntegrityError
 from api.database_handler import reset_db, try_add
-from api.models import (User, Project, ProjectData, ProjectTextData, ProjectImageData, Label, ProjectType,
-                        DocumentClassificationLabel, SequenceLabel,
-                        SequenceToSequenceLabel, ImageClassificationLabel)
+from api.models import Project, ProjectType
 from api.parser import (import_document_classification_data,
                         import_image_classification_data,
                         import_sequence_labeling_data,
@@ -29,7 +27,8 @@ def test_document_classification_import_export():
     project = try_add(Project(
         "Document project", ProjectType.DOCUMENT_CLASSIFICATION))
 
-    text_file = os.path.join(PATH, "res/text/input_document_classification.json")
+    text_file = os.path.join(
+        PATH, "res/text/input_document_classification.json")
     with open(text_file) as file:
         import_document_classification_data(project.id, file.read())
 
@@ -51,6 +50,7 @@ def test_sequence_label():
     out_file = os.path.join(OUT_PATH, "output_sequence.json")
     with open(out_file, "w") as file:
         file.write(export_sequence_labeling_data(project.id))
+
 
 def test_sequence_to_sequence_label():
     reset_db()

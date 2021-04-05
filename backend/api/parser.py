@@ -1,8 +1,14 @@
 import json
-from api import db
 from api.database_handler import try_add, try_add_list
-from api.models import (User, Project, ProjectData, ProjectTextData, ProjectImageData, Label, ProjectType, DocumentClassificationLabel,
-ImageClassificationLabel, SequenceLabel, SequenceToSequenceLabel)
+from api.models import (Project,
+                        ProjectData,
+                        ProjectTextData,
+                        ProjectImageData,
+                        ProjectType,
+                        DocumentClassificationLabel,
+                        ImageClassificationLabel,
+                        SequenceLabel,
+                        SequenceToSequenceLabel)
 
 
 def import_document_classification_data(project_id, json_data):
@@ -31,10 +37,11 @@ def import_document_classification_data(project_id, json_data):
         try_add(project_data)
         labels = obj.get("labels")
         if labels is not None:
-            prelabels = [DocumentClassificationLabel(project_data.id, None, l)
-                for l in set(labels)]
+            prelabels = [
+                DocumentClassificationLabel(project_data.id, None, lab)
+                for lab in set(labels)
+            ]
             try_add_list(prelabels)
-        
 
 
 def import_image_classification_data(project_id, json_data, image_data):
@@ -78,8 +85,10 @@ def import_sequence_labeling_data(project_id, json_data):
         try_add(project_data)
         labels = obj.get("labels")
         if labels is not None:
-            prelabels = [SequenceLabel(project_data.id, None, l[2], l[0], l[1])
-                for l in labels]
+            prelabels = [
+                SequenceLabel(project_data.id, None, lab[2], lab[0], lab[1])
+                for lab in labels
+            ]
             try_add_list(prelabels)
 
 
@@ -108,8 +117,8 @@ def import_sequence_to_sequence_data(project_id, json_data):
         try_add(project_data)
         labels = obj.get("labels")
         if labels is not None:
-            prelabels = [SequenceToSequenceLabel(project_data.id, None, l)
-                for l in labels]
+            prelabels = [SequenceToSequenceLabel(project_data.id, None, lab)
+                         for lab in labels]
             try_add_list(prelabels)
 
 

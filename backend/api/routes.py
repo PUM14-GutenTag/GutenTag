@@ -1,6 +1,6 @@
-from api import rest, db
-from api.models import Test, User
-from api.database_handler import reset_db
+from api import rest
+from api.models import User
+from api.database_handler import reset_db, try_add
 from flask_restful import Resource
 """
 This file contains the routes to the database.
@@ -13,13 +13,11 @@ class TestModels(Resource):
     """
 
     def get(self):
-        t = Test()
-
         try_add(User("Oscar",
-                    "Lonnqvist",
-                    "oscar@mail.com" + str(len(User.query.all())),
-                    False
-                    ))
+                     "Lonnqvist",
+                     "oscar@mail.com" + str(len(User.query.all())),
+                     False
+                     ))
 
         return {"result": len(User.query.all())}
 

@@ -8,9 +8,17 @@ import pathlib
 from pytest import raises
 from sqlalchemy.exc import IntegrityError
 from api.database_handler import reset_db, try_add, try_delete
-from api.models import (User, Project, ProjectData, ProjectTextData, ProjectImageData, Label, ProjectType,
-                        DocumentClassificationLabel, SequenceLabel,
-                        SequenceToSequenceLabel, ImageClassificationLabel)
+from api.models import (User,
+                        Project,
+                        ProjectData,
+                        ProjectTextData,
+                        ProjectImageData,
+                        Label,
+                        ProjectType,
+                        DocumentClassificationLabel,
+                        SequenceLabel,
+                        SequenceToSequenceLabel,
+                        ImageClassificationLabel)
 
 
 PATH = os.path.dirname(__file__)
@@ -56,7 +64,8 @@ def test_create_project():
 
     # Test incorrect project name.
     with raises(TypeError):
-        project = try_add(Project({"Project"}, ProjectType.IMAGE_CLASSIFICATION))
+        project = try_add(
+            Project({"Project"}, ProjectType.IMAGE_CLASSIFICATION))
         assert project is None
 
 
@@ -72,7 +81,8 @@ def test_authorize_user():
 
     # Test authorizing admin user.
     with raises(ValueError):
-        admin_user = try_add(User("admin", "lastname", "admin@gmail.com", True))
+        admin_user = try_add(
+            User("admin", "lastname", "admin@gmail.com", True))
         project.authorize_user(admin_user.id)
         assert admin_user not in project.users
 
@@ -103,7 +113,7 @@ def test_deauthorize_user():
     # Test deauthorizing user from a project it isn't authorized to.
     user = try_add(User("firstname", "lastname", "user57@gmail.com"))
     project = try_add(Project("Projecttest",
-                             ProjectType.DOCUMENT_CLASSIFICATION))
+                              ProjectType.DOCUMENT_CLASSIFICATION))
     with raises(ValueError):
         project.deauthorize_user(user.id)
 
@@ -134,11 +144,13 @@ def test_sequence_label():
     user = try_add(User("firsttest", "lasttest", "usertest@gmail.com"))
     project = try_add(Project(
         "Project", ProjectType.SEQUENCE_LABELING))
-    data = try_add(ProjectTextData(project.id, "Alex is going to Los Angeles in California"))
+    data = try_add(ProjectTextData(
+        project.id, "Alex is going to Los Angeles in California"))
 
     # Test label valid data.
     for lab in [(0, 3, "PER"), (16, 27, "LOC"), (31, 41, "LOC")]:
-        label = try_add(SequenceLabel(data.id, user.id, lab[2], lab[0], lab[1]))
+        label = try_add(SequenceLabel(
+            data.id, user.id, lab[2], lab[0], lab[1]))
         assert label is not None
         assert label in data.labels
 
@@ -149,8 +161,9 @@ def test_sequence_to_sequence_label():
     user = try_add(User("firsttest", "lasttest", "usertest@gmail.com"))
     project = try_add(Project(
         "Project", ProjectType.SEQUENCE_TO_SEQUENCE))
-    data = try_add(ProjectTextData(project.id,
-        "John saw the man on the mountain with a telescope."))
+    data = try_add(
+        ProjectTextData(project.id,
+                        "John saw the man on the mountain with a telescope."))
 
     # Test label valid data.
     for lab in ["John såg mannen på berget med hjälp av ett teleskop.",

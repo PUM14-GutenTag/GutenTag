@@ -4,7 +4,7 @@ This file contains all database models and associated methods.
 import datetime
 from enum import IntEnum
 from api import db
-from api.database_handler import try_add, try_add_list, try_delete, check_types
+from api.database_handler import check_types
 
 
 class ProjectType(IntEnum):
@@ -44,18 +44,6 @@ access_control = db.Table("access_control", db.Model.metadata,
                           )
 
 
-class Test(db.Model):
-    """
-    This is a testing table not intended for the final product.
-    """
-    __tablename__ = "test"
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    def __repr__(self):
-        return f"<Test {self.id}>"
-
-
 class User(db.Model):
     """
     User contains information about the users, has information about which
@@ -87,6 +75,7 @@ class User(db.Model):
             f"<User(first_name={self.first_name}, last_name={self.last_name}, "
             f"email={self.email}, access_level={self.access_level})>"
         )
+
 
 class Project(db.Model):
     """
@@ -161,7 +150,7 @@ class ProjectData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id',
                                                      ondelete="CASCADE"),
-                                        nullable=False)
+                           nullable=False)
     project = db.relationship("Project", back_populates="data")
     labels = db.relationship("Label", back_populates="data",
                              cascade="all, delete", passive_deletes=True)
@@ -263,7 +252,7 @@ class DocumentClassificationLabel(Label):
         if user_id is not None:
             args.append((user_id, int))
         check_types(args)
-        
+
         self.data_id = data_id
         self.user_id = user_id
         self.label = label_str
