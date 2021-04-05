@@ -12,9 +12,9 @@ class ProjectType(IntEnum):
     Enum for the project types.
     """
     DOCUMENT_CLASSIFICATION = 1
-    IMAGE_CLASSIFICATION = 2
-    SEQUENCE_TO_SEQUENCE = 3
-    SEQUENCE_LABELING = 4
+    SEQUENCE_TO_SEQUENCE = 2
+    SEQUENCE_LABELING = 3
+    IMAGE_CLASSIFICATION = 4
 
     @classmethod
     def has_value(cls, value):
@@ -247,7 +247,7 @@ class DocumentClassificationLabel(Label):
         'polymorphic_identity': ProjectType.DOCUMENT_CLASSIFICATION,
     }
 
-    def __init__(self, data_id, user_id, label_str):
+    def __init__(self, data_id, user_id, label_str, is_prelabel=False):
         args = [(data_id, int), (label_str, str)]
         if user_id is not None:
             args.append((user_id, int))
@@ -256,6 +256,7 @@ class DocumentClassificationLabel(Label):
         self.data_id = data_id
         self.user_id = user_id
         self.label = label_str
+        self.is_prelabel = is_prelabel
 
 
 class SequenceLabel(Label):
@@ -273,7 +274,8 @@ class SequenceLabel(Label):
         'polymorphic_identity': ProjectType.SEQUENCE_LABELING,
     }
 
-    def __init__(self, data_id, user_id, label_str, begin, end):
+    def __init__(self, data_id, user_id, label_str, begin, end,
+                 is_prelabel=False):
         """
         Create a sequence label and add it to a ProjectData.
         """
@@ -287,6 +289,7 @@ class SequenceLabel(Label):
         self.label = label_str
         self.begin = begin
         self.end = end
+        self.is_prelabel = is_prelabel
 
 
 class SequenceToSequenceLabel(Label):
@@ -302,7 +305,7 @@ class SequenceToSequenceLabel(Label):
         'polymorphic_identity': ProjectType.SEQUENCE_TO_SEQUENCE,
     }
 
-    def __init__(self, data_id, user_id, label_str):
+    def __init__(self, data_id, user_id, label_str, is_prelabel=False):
         args = [(data_id, int), (label_str, str)]
         if user_id is not None:
             args.append((user_id, int))
@@ -310,6 +313,7 @@ class SequenceToSequenceLabel(Label):
         self.data_id = data_id
         self.user_id = user_id
         self.label = label_str
+        self.is_prelabel = is_prelabel
 
 
 class ImageClassificationLabel(Label):
@@ -330,7 +334,8 @@ class ImageClassificationLabel(Label):
         'polymorphic_identity': ProjectType.IMAGE_CLASSIFICATION,
     }
 
-    def __init__(self, data_id, user_id, label_str, coord1, coord2):
+    def __init__(self, data_id, user_id, label_str, coord1, coord2,
+                 is_prelabel=False):
         args = [(data_id, int), (label_str, str),
                 (coord1, tuple), (coord2, tuple)]
         if user_id is not None:
@@ -343,3 +348,4 @@ class ImageClassificationLabel(Label):
         self.y1 = coord1[1]
         self.x2 = coord2[0]
         self.y2 = coord2[1]
+        self.is_prelabel = is_prelabel
