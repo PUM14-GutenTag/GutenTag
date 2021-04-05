@@ -20,19 +20,22 @@ def test_create_user():
     reset_db()
 
     # Test correctly creating an admin user.
-    ret = create_user("Oscar", "Lonnqvist", "oscar@gmail.com", True)
+    ret = create_user("Oscar", "Lonnqvist",
+                      "oscar@gmail.com", "password", True)
     assert User.query.get(ret["id"]) is not None
 
     # Test correctly creating an non-admin user.
-    ret = create_user("first", "last", "user@gmail.com", False)
+    ret = create_user("first", "last", "user@gmail.com", "password", False)
     assert User.query.get(ret["id"]) is not None
 
     # Test duplicate email.
-    ret = create_user("Oscar", "Lonnqvist", "oscar@gmail.com", True)
+    ret = create_user("Oscar", "Lonnqvist",
+                      "oscar@gmail.com", "password", True)
     assert User.query.get(ret["id"]) is None
 
     # Test incorrect first name type.
-    ret = create_user(["Oscar"], "Lonnqvist", "name@gmail.com", True)
+    ret = create_user(["Oscar"], "Lonnqvist",
+                      "name@gmail.com", "password", True)
     assert User.query.get(ret["id"]) is None
 
 
@@ -55,7 +58,7 @@ def test_create_project():
 def test_add_data():
     reset_db()
 
-    create_user("first", "last", "user@gmail.com", True)
+    create_user("first", "last", "user@gmail.com", "password", True)
     project_ret = create_project(
         "Project", ProjectType.DOCUMENT_CLASSIFICATION)
     project_id = project_ret["id"]
@@ -99,7 +102,8 @@ def test_authorize_user():
     project_ret = create_project("A project", ProjectType.SEQUENCE_LABELING)
 
     # Test authorizing existing user.
-    user_ret = create_user("firstname", "lastname", "mail@gmail.com", False)
+    user_ret = create_user("firstname", "lastname",
+                           "mail@gmail.com", "password", False)
     authorize_user(project_ret["id"], user_ret["id"])
 
     project = Project.query.get(project_ret["id"])
@@ -119,8 +123,9 @@ def test_authorize_user():
     user = User.query.get(550)
     assert user not in project.users
 
-    # Test authorizing user for non-existent project.
-    user_ret = create_user("nameer", "lastname", "mailer@gmail.com", False)
+    # Test authorizing user for non-existent project
+    user_ret = create_user("nameer", "lastname",
+                           "mailer@gmail.com", "password", False)
     user = User.query.get(user_ret["id"])
     assert len(user.projects) == 0
     authorize_user(1000, user.id)
@@ -130,7 +135,7 @@ def test_authorize_user():
 def test_deauthorize_user():
     reset_db()
 
-    user_ret = create_user("first", "last", "user@gmail.com")
+    user_ret = create_user("first", "last", "user@gmail.com", "password")
     project_ret = create_project(
         "Project", ProjectType.DOCUMENT_CLASSIFICATION)
     user_id = user_ret["id"]
@@ -147,8 +152,9 @@ def test_deauthorize_user():
     deauthorize_user(project_id, 490)
     assert user not in project.users
 
-    # Test deauthorizing user from a project he isn't authorized to.
-    user_ret = create_user("firstname", "lastname", "user57@gmail.com")
+    # Test deauthorizing user from a project he isn't authorized to
+    user_ret = create_user("firstname", "lastname",
+                           "user57@gmail.com", "password")
     project_ret = create_project(
         "Projecttest", ProjectType.DOCUMENT_CLASSIFICATION)
     project = Project.query.get(project_ret["id"])
@@ -160,7 +166,8 @@ def test_deauthorize_user():
 def test_label_data():
     reset_db()
 
-    user_ret = create_user("firsttest", "lasttest", "usertest@gmail.com")
+    user_ret = create_user("firsttest", "lasttest",
+                           "usertest@gmail.com", "password")
     project_ret = create_project(
         "Project", ProjectType.DOCUMENT_CLASSIFICATION)
     user_id = user_ret["id"]

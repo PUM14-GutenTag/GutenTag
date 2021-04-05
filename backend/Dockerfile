@@ -5,7 +5,7 @@ FROM python:3.9.1-alpine3.13
 WORKDIR /usr/src/backend
 
 # Install system dependencies
-RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev libffi-dev
 
 # install python dependencies
 RUN pip install --upgrade pip
