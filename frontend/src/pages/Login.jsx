@@ -1,18 +1,22 @@
 import React from 'react';
 import '../css/Login.css';
 
-import {Col, Row, Form} from 'react-bootstrap';
+import {Button, Col, Row, Form} from 'react-bootstrap';
 
 import logo from '../res/hat_dark.svg';
+
+function doSomething(){
+  console.log('Button clicked');
+}
 
 function Login() {
     return(
         <div className="login-wrapper">
-          <img src={logo} alt="logo" className="login-logo" />
+          <img src={logo} alt="logo" className="login-logo" /> {/* Placeholder image. */}
           <Form>
             <Form.Group as={Row} className="text-right" controlId="formBasicName">
               <Col>
-                <Form.Label column="lg" lg={3} className="text-label-big">
+                <Form.Label className="text-label-big">
                   Name
                 </Form.Label>
               </Col>
@@ -22,7 +26,7 @@ function Login() {
             </Form.Group>
             <Form.Group as={Row} className="text-right" controlId="formBasicPassword">
               <Col>
-                <Form.Label column="lg" lg={4} className="text-label-big">
+                <Form.Label className="text-label-big">
                   Password
                 </Form.Label>
                 </Col>  
@@ -31,11 +35,16 @@ function Login() {
               </Col>
             </Form.Group>
             <Form.Group as={Row} controlId="formHorizontalCheck">
-              <Col sm={{ span: 10, offset: 3 }}>
+              <Col sm={{ span: 10, offset: 4 }}>
                 <Form.Check className="text-label-small" label="Stay logged in" />
               </Col>
             </Form.Group>
+            <Button size="lg" className="mx-auto" variant="login" onClick={doSomething} >
+              Login
+            </Button>
           </Form>
+          <div >
+          </div>
         </div>
       )
     }
