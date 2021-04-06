@@ -8,6 +8,9 @@
   },
   "ignorePatterns": ["**/nodes_modules/*"],
   "rules": {
+    "react/destructuring-assignment": "off",
+    "react/forbid-prop-types": "warn",
+    "prefer-destructuring": "off",
     "jsx-a11y/href-no-hash": ["off"],
     "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
     "max-len": [
