@@ -76,7 +76,7 @@ class Login(Resource):
         self.reqparse.add_argument("email", type=str, required=True)
         self.reqparse.add_argument("password", type=str, required=True)
 
-    def get(self):
+    def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(args.email)
         response = user.login(args.password)
@@ -101,6 +101,7 @@ class RefreshToken(Resource):
     @ jwt_required(refresh=True)
     def post(self):
         current_user = get_jwt_identity()
+        print(current_user)
         access_token = create_access_token(identity=current_user)
 
         return jsonify({"access_token": access_token})
@@ -119,7 +120,7 @@ class Authorize(Resource):
     @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
-        user = User.get_by_email(get_jwt_identity)
+        user = User.get_by_email(get_jwt_identity())
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
@@ -146,7 +147,7 @@ class Deauthorize(Resource):
     @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
-        user = User.get_by_email(get_jwt_identity)
+        user = User.get_by_email(get_jwt_identity())
 
         if user.access_level >= AccessLevel.ADMIN:
             try:

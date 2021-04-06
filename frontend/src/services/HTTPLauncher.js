@@ -1,11 +1,11 @@
 const axios = require('axios');
 const authHeader = require('./auth-header');
 
-const apiUrl = 'http://localhost:5000/';
+const apiUrl = 'http://backend:5000/';
 
 class HTTPLauncher {
   // Send HTTP-request to register a user.
-  static sendRegister(firstName, lastName, email, password, admin) {
+  static sendRegister(firstName, lastName, password, email, admin) {
     return axios.post(`${apiUrl}register`, {
       first_name: firstName,
       last_name: lastName,
@@ -25,8 +25,9 @@ class HTTPLauncher {
 
   // Send HTTP-request to refresh an access token.
   static sendRefreshToken() {
+    console.log(authHeader(true));
     return axios.post(`${apiUrl}refresh-token`, {
-      headers: authHeader(),
+      headers: authHeader(true),
     });
   }
 
@@ -157,6 +158,11 @@ class HTTPLauncher {
     });
 
     return axios.get(`${apiUrl}get-export-data`, { params });
+  }
+
+  // Send HTTP-request to reset database (TODO: remove for production).
+  static sendResetDatabase() {
+    return axios.get(`${apiUrl}reset`);
   }
 }
 
