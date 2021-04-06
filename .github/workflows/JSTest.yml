@@ -1,14 +1,14 @@
 name: JS CI Test
 on:
   push:
-    branches: [main, test-build]
+    branches: [main, build-test]
   pull_request:
     branches: [main]
 
 jobs:
   test:
     name: Run test suite
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest, windows-latest, macos-latest
 
     steps:
       - name: Checkout code

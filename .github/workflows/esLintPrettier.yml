@@ -1,9 +1,9 @@
 name: CI ESLint Prettier
 on:
   push:
-    branches: [ main ]
+    branches: [main, build-test]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 defaults:
   run:
@@ -11,7 +11,7 @@ defaults:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest, windows-latest, macos-latest
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js

@@ -2,13 +2,13 @@ name: Python CI autopep8 Flake8
 
 on:
   push:
-    branches: [main]
+    branches: [main, build-test]
   pull_request:
     branches: [main]
 
 jobs:
   build_pycodestyle:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest, windows-latest, macos-latest
 
     steps:
       - uses: actions/checkout@v2

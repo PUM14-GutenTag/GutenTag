@@ -5,14 +5,14 @@ name: Python CI Test
 
 on:
   push:
-    branches: [main]
+    branches: [main, build-test]
   pull_request:
     branches: [main]
 
 jobs:
   test:
     name: Run test suite
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest, windows-latest, macos-latest
 
     steps:
       - name: Checkout code
