@@ -7,5 +7,3 @@ export default function authHeader() {
   }
   return {};
 }
-
-module.exports = authHeader;
