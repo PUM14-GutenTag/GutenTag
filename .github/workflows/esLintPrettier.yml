@@ -1,7 +1,7 @@
 name: CI ESLint Prettier
 on:
   push:
-    branches: [main, build-test]
+    branches: [main, test-build]
   pull_request:
     branches: [main]
 
