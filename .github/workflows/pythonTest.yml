@@ -5,7 +5,7 @@ name: Python CI Test
 
 on:
   push:
-    branches: [main, test-build]
+    branches: [main]
   pull_request:
     branches: [main]
 
