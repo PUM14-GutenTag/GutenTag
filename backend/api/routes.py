@@ -56,7 +56,7 @@ class Login(Resource):
         self.reqparse.add_argument('email', type=str, required=True)
         self.reqparse.add_argument('password', type=str, required=True)
 
-    def get(self):
+    def post(self):
         args = self.reqparse.parse_args()
         return login_user(args.email, args.password)
 

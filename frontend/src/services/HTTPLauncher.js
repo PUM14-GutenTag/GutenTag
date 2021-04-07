@@ -1,5 +1,5 @@
+import authHeader from './auth-header';
 const axios = require('axios');
-const authHeader = require('./auth-header');
 
 const apiUrl = 'http://localhost:5000/';
 
@@ -115,4 +115,4 @@ class HTTPLauncher {
   }
 }
 
-module.exports = HTTPLauncher;
+export default HTTPLauncher;
