@@ -1,9 +1,9 @@
 name: CI ESLint Prettier
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 defaults:
   run:
