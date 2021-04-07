@@ -1,7 +1,7 @@
 import React from 'react';
 import '../css/Login.css';
 
-import {Button, Col, Row, Form} from 'react-bootstrap';
+import {Button, Col, Row, Form, Container} from 'react-bootstrap';
 
 import logo from '../res/hat_dark.svg';
 
@@ -35,8 +35,10 @@ function Login() {
               </Col>
             </Form.Group>
             <Form.Group as={Row} controlId="formHorizontalCheck">
-              <Col sm={{ span: 10, offset: 4 }}>
-                <Form.Check className="text-label-small" label="Stay logged in" />
+              <Col>
+                <Row className="justify-content-center">
+                  <Form.Check className="text-label-small" label="Stay logged in" />
+                </Row>
               </Col>
             </Form.Group>
             <Button size="lg" className="mx-auto" variant="login" onClick={doSomething} >
