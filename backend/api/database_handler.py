@@ -96,7 +96,6 @@ def login_user(email, password):
     Tries to login an user. If successful, returns
     an access token and a refresh token.
     """
-
     if validate_input([(email, str), (password, str)]):
         user = get_user_by("email", email)
 

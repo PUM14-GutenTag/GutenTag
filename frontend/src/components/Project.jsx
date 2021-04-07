@@ -6,8 +6,9 @@ import  HTTPLauncher from "../services/HTTPLauncher";
 
 function Project() {
     // eslint-disable-next-line
+    /*
     const [project, setProject] = useState([{name:"",type:""}])
-
+*/
     const [projectName, setProjectName] = useState("");
     const [projectType, setProjectType] = useState("");
 
@@ -18,24 +19,27 @@ function Project() {
         setProject({
             name: event.target.name.value,
             type: event.target.type.value
-        })*/
+        })
+        */
+
         // eslint-disable-next-line
+        console.log("Project Name: " + projectName + "Project Type: " + projectType);
+
+
+        const responseProject = await HTTPLauncher.sendCreateProject(projectName, projectType);
+        /*const responseProject2 = await HTTPLauncher.sendCreateProject(projectName, projectType);*/
         
-        /*const responseProject = await HTTPLauncher.sendCreateProject(project.name, project.type);*/
-        const responseProject2 = await HTTPLauncher.sendCreateProject(projectName, projectType);
-        
-        console.log(responseProject2);
+        console.log(responseProject);
     }
 
     const registerAndLogin = async (event) => {
         event.preventDefault();
-        console.log("hello there - obi wan kenobi")
         // eslint-disable-next-line        
-        const sendRegister = await HTTPLauncher.sendRegister("Oscar", "last_name", "email", "password", true);
+        const sendRegister = await HTTPLauncher.sendRegister("Oscar", "last_name", "emails", "passwords", true);
         // eslint-disable-next-line
-        const responeLogin = await HTTPLauncher.sendLogin("email", "password");
-        //const token = responeLogin.access_token;
-        //localStorage.setItem('gutentag-accesstoken', token)
+        const responeLogin = await HTTPLauncher.sendLogin("emails", "passwords");
+        const token = responeLogin.data.access_token;
+        localStorage.setItem('gutentag-accesstoken', JSON.stringify(token));
         console.log(responeLogin);
     }
     
@@ -61,10 +65,10 @@ function Project() {
                         name="type"
                         onChange={(event) => setProjectType(event.target.value)}    
                         >
-                        <option>Text classification</option>
-                        <option>Image classification</option>
-                        <option>Sequence to Sequence</option>
-                        <option>Sequence labeling</option>
+                        <option value="1">Text classification</option>
+                        <option value="2">Image classification</option>
+                        <option value="3">Sequence to Sequence</option>
+                        <option value="4">Sequence labeling</option>
                     </Form.Control>
                 </Form.Group>
                 <Form.Group>   

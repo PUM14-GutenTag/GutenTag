@@ -56,7 +56,7 @@ class Login(Resource):
         self.reqparse.add_argument('email', type=str, required=True)
         self.reqparse.add_argument('password', type=str, required=True)
 
-    def get(self):
+    def post(self):
         args = self.reqparse.parse_args()
         return login_user(args.email, args.password)
 
@@ -119,14 +119,17 @@ class NewProject(Resource):
     """
     Endpoint for creating a project.
     """
+    print("1111111111111111111111111111111")
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project_name', type=str, required=True)
         self.reqparse.add_argument('project_type', type=int, required=True)
+        print("2222222222222222222222222222222222")
 
     @jwt_required()
     def post(self):
+        print("3333333333333333333333333333333333333")
         args = self.reqparse.parse_args()
         current_user = get_user_by("email", get_jwt_identity())
 
