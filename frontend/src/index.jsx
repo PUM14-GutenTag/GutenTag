@@ -7,14 +7,13 @@ import './css/App.css';
 
 import Login from './pages/Login';
 
-import Layout from './components/Layout';
 import App from './components/App';
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Switch>
-        <Route exact path="/"> 
+        <Route exact path="/">
           <div className="page-container">
             <div className="content-wrap">
               <Login />

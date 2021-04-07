@@ -10,35 +10,48 @@ import HTTPLauncher from '../services/HTTPLauncher';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [validated, setValidated] = useState(false);
 
   function validateForm() {
     return email.length > 0 && password.length > 0;
   }
 
   async function handleSubmit(event) {
-    event.preventDefault();
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+    }
+
+    setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
     const token = responseLogin.data.access_token;
     localStorage.setItem('gutentag-accesstoken', JSON.stringify(token));
+    if (token != null) {
+      // Something
+    }
   }
 
   return (
     <div className="login-wrapper">
       <img src={logo} alt="logo" className="login-logo" /> {/* Placeholder image. */}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group as={Row} className="text-right" controlId="formBasicName">
+      <Form noValidate validated={validated} onSubmit={handleSubmit}>
+        <Form.Group as={Row} className="text-right" controlId="formBasicEmail">
           <Col>
-            <Form.Label className="text-label-big"> Name </Form.Label>
+            <Form.Label className="text-label-big"> Email </Form.Label>
           </Col>
           <Col>
             <Form.Control
+              required
               autoFocus
               size="lg"
               className="input-box"
-              type="text"
-              placeholder="Enter name"
+              type="email"
+              placeholder="Enter email"
               onChange={(e) => setEmail(e.target.value)}
             />
+            <Form.Control.Feedback type="invalid">
+              Please input a valid email.
+            </Form.Control.Feedback>
           </Col>
         </Form.Group>
         <Form.Group as={Row} className="text-right" controlId="formBasicPassword">
@@ -47,19 +60,14 @@ function Login() {
           </Col>
           <Col>
             <Form.Control
+              required
               size="lg"
               className="input-box"
               type="password"
               placeholder="Enter password"
               onChange={(e) => setPassword(e.target.value)}
             />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} controlId="formHorizontalCheck">
-          <Col>
-            <Row className="justify-content-center">
-              <Form.Check className="text-label-small" label="Stay logged in" />
-            </Row>
+            <Form.Control.Feedback type="invalid">Please input a password.</Form.Control.Feedback>
           </Col>
         </Form.Group>
         <Button

@@ -1,14 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 
-//Pages
+// Pages
 import Home from '../pages/Home';
 import Settings from '../pages/Settings';
 import Projects from '../pages/Projects';
 import NotFoundPage from '../pages/404';
-import Layout from '../components/Layout';
+import Layout from './Layout';
 
-//Styles
+// Styles
 import '../css/index.css';
 import '../css/App.css';
 
@@ -24,7 +24,7 @@ function App() {
               <Route exact path="/settings" component={Settings} />
               <Route exact path="/projects" component={Projects} />
               <Route exact path="/404" component={NotFoundPage} />
-              <Redirect to="/404"/>
+              <Redirect to="/404" />
             </Switch>
           </Router>
         </div>
