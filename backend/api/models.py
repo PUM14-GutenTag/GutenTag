@@ -4,6 +4,8 @@ This file contains all database models.
 import datetime
 from enum import IntEnum
 from api import db
+from sqlalchemy.ext.hybrid import hybrid_property
+from . import bcrypt
 
 
 class ProjectType(IntEnum):
@@ -68,14 +70,27 @@ class User(db.Model):
     email = db.Column(db.Text, unique=True, nullable=False)
     access_level = db.Column(db.Integer, nullable=False,
                              default=0)
+    _password = db.Column(db.Text, nullable=False)
 
     projects = db.relationship(
         "Project", secondary=access_control, back_populates="users")
 
+    @hybrid_property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, new_password):
+        self._password = bcrypt.generate_password_hash(
+            new_password).decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self._password, password)
+
     def __repr__(self):
         return (
             f"<User(first_name={self.first_name}, last_name={self.last_name}, "
-            f"email={self.email}, access_level={self.access_level})>"
+            f"email={self.email}, access_level={self.access_level}) >"
         )
 
 
@@ -111,6 +126,9 @@ class ProjectData(db.Model):
     prelabel = db.Column(db.Text)
     project_type = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, default=datetime.datetime.now())
+
+    def __repr__(self):
+        return f"<Data_id={self.id}, Data={self.data}>"
 
 
 class Label(db.Model):
