@@ -13,7 +13,7 @@ function Project() {
     const [projectType, setProjectType] = useState("");
 
     const submitHandler = async (event) => {
-        event.preventDefault();
+        event.preventDefault(); 
         console.log("hej");
         /*
         setProject({
@@ -27,21 +27,24 @@ function Project() {
 
 
         const responseProject = await HTTPLauncher.sendCreateProject(projectName, projectType);
-        /*const responseProject2 = await HTTPLauncher.sendCreateProject(projectName, projectType);*/
-        
-        console.log(responseProject);
+        const newResponse = await HTTPLauncher.sendAddNewData(1, 1, "hej");
+        console.log("newresponse", newResponse);
+        console.log("responseproject", responseProject);
     }
 
     const registerAndLogin = async (event) => {
         event.preventDefault();
         // eslint-disable-next-line        
-        const sendRegister = await HTTPLauncher.sendRegister("Oscar", "last_name", "emails", "passwords", true);
+        //const sendRegister = await HTTPLauncher.sendRegister("Oscar", "last_name", "emails", "passwords", true);
+        //const sendRegister2 = await HTTPLauncher.sendRegister("Oscar", "last_name", "email2", "passwords", false);
+
+        //console.log("sendregister", sendRegister2);
         // eslint-disable-next-line
-        const responeLogin = await HTTPLauncher.sendLogin("emails", "passwords");
-        const token = responeLogin.data.access_token;
-        localStorage.setItem('gutentag-accesstoken', JSON.stringify(token));
-        console.log(responeLogin);
+        const responseLogin = await HTTPLauncher.sendLogin("email2", "passwords");
+        console.log(responseLogin);
+        localStorage.setItem('gutentag-accesstoken', responseLogin.data.access_token);
     }
+
     
 
     return (

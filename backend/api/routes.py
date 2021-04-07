@@ -1,5 +1,5 @@
 from api import rest
-from flask import jsonify
+from flask import jsonify, request
 from api.models import AccessLevel, ProjectData, Label
 from flask_restful import Resource, reqparse, inputs
 from flask_jwt_extended import (
@@ -7,6 +7,8 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
 )
+
+import sys
 
 from api.database_handler import (
     create_user,
@@ -119,20 +121,20 @@ class NewProject(Resource):
     """
     Endpoint for creating a project.
     """
-    print("1111111111111111111111111111111")
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project_name', type=str, required=True)
         self.reqparse.add_argument('project_type', type=int, required=True)
-        print("2222222222222222222222222222222222")
+
+
 
     @jwt_required()
     def post(self):
-        print("3333333333333333333333333333333333333")
         args = self.reqparse.parse_args()
-        current_user = get_user_by("email", get_jwt_identity())
 
+        current_user = get_user_by("email", get_jwt_identity())
+        
         if current_user.access_level >= AccessLevel.ADMIN:
             return create_project(args.project_name, args.project_type)
 
