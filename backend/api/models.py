@@ -16,8 +16,8 @@ class ProjectType(IntEnum):
     Enum for the project types.
     """
     DOCUMENT_CLASSIFICATION = 1
-    SEQUENCE_TO_SEQUENCE = 2
-    SEQUENCE_LABELING = 3
+    SEQUENCE_LABELING = 2
+    SEQUENCE_TO_SEQUENCE = 3
     IMAGE_CLASSIFICATION = 4
 
     @classmethod
