@@ -96,13 +96,13 @@ def login_user(email, password):
     Tries to login an user. If successful, returns
     an access token and a refresh token.
     """
-
     if validate_input([(email, str), (password, str)]):
         user = get_user_by("email", email)
 
         if user:
             if(user.check_password(password)):
-                access_token = create_access_token(identity=user.email)
+                access_token = create_access_token(
+                    identity=user.email, expires_delta=False)  # !!!!!!!!!!!!!!!!! Remove expires_delta=False!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 refresh_token = create_refresh_token(identity=user.email)
 
                 return {

@@ -1,4 +1,5 @@
 import authHeader from './auth-header';
+
 const axios = require('axios');
 
 const apiUrl = 'http://localhost:5000/';
@@ -114,5 +115,4 @@ class HTTPLauncher {
     return axios.get(`${apiUrl}get-export-data`, { params });
   }
 }
-
 export default HTTPLauncher;
