@@ -88,9 +88,10 @@ class Authorize(Resource):
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
-        current_user = get_user_by("email", get_jwt_identity())
+        admin_user = get_user_by("email", get_jwt_identity())
+        current_user = get_user_by("email", args.email)
 
-        if current_user.access_level >= AccessLevel.ADMIN:
+        if admin_user.access_level >= AccessLevel.ADMIN:
             return authorize_user(args.project_id, current_user.id)
 
         return {"message": "User is not authorized to authorize other users"}
@@ -109,9 +110,10 @@ class Deauthorize(Resource):
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
-        current_user = get_user_by("email", get_jwt_identity())
+        admin_user = get_user_by("email", get_jwt_identity())
+        current_user = get_user_by("email", args.email)
 
-        if current_user.access_level >= AccessLevel.ADMIN:
+        if admin_user.access_level >= AccessLevel.ADMIN:
             return deauthorize_user(args.project_id, current_user.id)
 
         return {"message": "User is not authorized to authorize other users"}
@@ -249,6 +251,21 @@ class DeleteLabel(Resource):
 
         return jsonify({"message": "User unauthorized to remove this label"})
 
+class FetchUserProjects(Resource):
+    """
+    Fetch all projects that a user is authorized to
+    """
+
+    @jwt_required()
+    def get(self):
+        current_user = get_user_by("email", get_jwt_identity())
+        user_projects = {}
+        for project in current_user.projects:
+            user_projects[project.id] = project.name
+
+        return jsonify({"msg": "Retrieved user projects", "projects" : user_projects})
+
+
 
 class GetExportData(Resource):
     """
@@ -288,5 +305,6 @@ rest.add_resource(AddNewData, '/add-data')
 rest.add_resource(GetNewData, '/get-data')
 rest.add_resource(CreateLabel, '/label-data')
 rest.add_resource(DeleteLabel, '/remove-label')
+rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, '/get-export-data')
 rest.add_resource(Reset, '/reset')

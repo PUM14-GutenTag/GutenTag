@@ -105,6 +105,14 @@ class HTTPLauncher {
     });
   }
 
+  static sendGetUserProjects() {
+    return axios.get(`${apiUrl}get-user-projects`, {
+
+    }, {
+      headers: authHeader()
+    });
+  }
+
   // Send HTTP-request to remove a label
   static sendRemoveLabel(labelID) {
     return axios.delete(`${apiUrl}label-text`, {
