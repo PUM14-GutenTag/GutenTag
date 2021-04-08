@@ -56,14 +56,14 @@ class HTTPLauncher {
   static sendCreateProject(projectName, projectType) {
 
     console.log("Accesstoken:", localStorage.getItem('gutentag-accesstoken'))
-    return axios.post(`${apiUrl}create-project`, { 
+    return axios.post(`${apiUrl}create-project`, {
       project_name: projectName,
       project_type: projectType,
     }, {
       headers: authHeader()
     });
   }
-  
+
 
   // Send HTTP-request to delete an existing project
   static sendDeleteProject(projectID) {
