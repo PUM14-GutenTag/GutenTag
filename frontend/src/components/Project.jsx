@@ -3,7 +3,7 @@ import "../css/project.css"
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 
-function Project () {
+function Project (props) {
     const [ showInfo, setShowInfo ] = useState(false)
 
     const toggleInfo = () => {
@@ -14,7 +14,7 @@ function Project () {
         <div className="project-container" onClick={toggleInfo}>
             <div >
                 <div>
-                    <h1>Project Name</h1>
+                    <h1>{props.projectName}</h1>
                 </div>
                 <div className="progress-bar-project">
                     <ProgressBar animated now={75} striped variant="danger"  />

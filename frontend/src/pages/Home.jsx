@@ -5,13 +5,17 @@ import HTTPLauncher from "../services/HTTPLauncher";
 import "../css/home.css"
 
 function Home() {
-  const [ projectsShow, setProjectsShow ] = useState(false);
-  const [ projects, setProjects ] = useState([1, 2, 3,4])
+  const [ projectsShow, setProjectsShow ] = useState(true);
+  const [ projects, setProjects ] = useState([])
 
-  useEffect(async () => {
-    const result = await HTTPLauncher.sendGetUserProjects();
-    console.log(result);
-  })
+  useEffect(() => {
+    async function fetchData(){
+      const result = await HTTPLauncher.sendGetUserProjects();
+      setProjects(Object.values(result.data.projects))
+    }
+    fetchData()
+
+  },[projectsShow]);
 
   function toggleProjects() {
     setProjectsShow(!projectsShow)
@@ -22,9 +26,9 @@ function Home() {
       {projectsShow ? 
         <div>
           <h1> Your projects: </h1>
-          <ul>{projects.map(project => 
-            <li><Project></Project></li>
-          )}</ul>
+            <ul>{projects.map(result => <li key={result}><Project projectName={result}></Project></li>)}</ul>
+          <div>
+          </div>
           <button onClick={toggleProjects}>Create project</button>
         </div>
         :

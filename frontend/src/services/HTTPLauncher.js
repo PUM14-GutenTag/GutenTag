@@ -108,11 +108,10 @@ class HTTPLauncher {
   static sendGetUserProjects() {
     console.log("Accesstoken User Proje:", localStorage.getItem('gutentag-accesstoken'))
 
-    return axios.get(`${apiUrl}get-user-projects`, {
-      "xxx": "LOL"
-    }, {
-      headers: authHeader()
-    });
+    return axios.get(`${apiUrl}get-user-projects`,
+      {
+        headers: authHeader()
+      });
   }
 
   // Send HTTP-request to remove a label
