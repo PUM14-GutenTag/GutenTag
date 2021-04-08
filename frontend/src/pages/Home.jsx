@@ -1,25 +1,39 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect } from 'react';
+import CreateProject from "../components/CreateProject"
 import Project from "../components/Project"
-
+import HTTPLauncher from "../services/HTTPLauncher";
+import "../css/home.css"
 
 function Home() {
   const [ projectsShow, setProjectsShow ] = useState(true);
+  const [ projects, setProjects ] = useState([])
+
+  useEffect(async () => {
+    const result = await HTTPLauncher.sendGetUserProjects();
+    console.log(result);
+    
+  })
 
   function toggleProjects() {
     setProjectsShow(!projectsShow)
   }
-
+  /*
+<ul>{projects.map(project => 
+            <li><Project></Project></li>
+          )}</ul>
+          */
   return (
     <div className="home-container">
       {projectsShow ? 
         <div>
-        <h1> Home </h1>
-        <button onClick={toggleProjects}>Create project</button>
+          <h1> Your projects: </h1>
+          
+          <button onClick={toggleProjects}>Create project</button>
         </div>
         :
         <div>
           <button onClick={toggleProjects}>Back to home</button>
-          <Project></Project> 
+          <CreateProject toggleCallback={toggleProjects}></CreateProject> 
         </div>
       }
     </div>

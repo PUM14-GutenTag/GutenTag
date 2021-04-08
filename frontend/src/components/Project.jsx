@@ -1,91 +1,40 @@
 import React, { useState } from 'react';
-import Form from "react-bootstrap/Form";
+import "../css/project.css"
 import Button from 'react-bootstrap/Button';
-import  HTTPLauncher from "../services/HTTPLauncher";
-/*const HTTPLauncher = require('../services/HTTPLauncher');*/
+import ProgressBar from 'react-bootstrap/ProgressBar'
 
-function Project() {
-    // eslint-disable-next-line
-    /*
-    const [project, setProject] = useState([{name:"",type:""}])
-*/
-    const [projectName, setProjectName] = useState("");
-    const [projectType, setProjectType] = useState("");
+function Project () {
+    const [ showInfo, setShowInfo ] = useState(true)
 
-    const submitHandler = async (event) => {
-        event.preventDefault(); 
-        console.log("hej");
-        /*
-        setProject({
-            name: event.target.name.value,
-            type: event.target.type.value
-        })
-        */
-
-        // eslint-disable-next-line
-        console.log("Project Name: " + projectName + "Project Type: " + projectType);
-
-
-        const responseProject = await HTTPLauncher.sendCreateProject(projectName, projectType);
-        const newResponse = await HTTPLauncher.sendAddNewData(1, 1, "hej");
-        console.log("newresponse", newResponse);
-        console.log("responseproject", responseProject);
+    const toggleInfo = () => {
+        setShowInfo(!showInfo)
     }
-
-    const registerAndLogin = async (event) => {
-        event.preventDefault();
-        // eslint-disable-next-line        
-        //const sendRegister = await HTTPLauncher.sendRegister("Oscar", "last_name", "emails", "passwords", true);
-        //const sendRegister2 = await HTTPLauncher.sendRegister("Oscar", "last_name", "email2", "passwords", false);
-
-        //console.log("sendregister", sendRegister2);
-        // eslint-disable-next-line
-        const responseLogin = await HTTPLauncher.sendLogin("email2", "passwords");
-        console.log(responseLogin);
-        localStorage.setItem('gutentag-accesstoken', responseLogin.data.access_token);
-    }
-
-    
 
     return (
-    <div className="project-container">
-        <div>
-            <Form onSubmit={submitHandler}>
-                <Form.Group controlId="form.name">
-                    <Form.Label>Project Name:</Form.Label>
-                    <Form.Control 
-                        type="text"
-                        name="name" 
-                        onChange={(event) => setProjectName(event.target.value)}    
-                        placeholder="Project name"
-                        required
-                        />
-                </Form.Group>
-                <Form.Group controlId="form.select">  
-                    <Form.Label>Select Project Type</Form.Label>
-                    <Form.Control 
-                        as="select"
-                        name="type"
-                        onChange={(event) => setProjectType(event.target.value)}    
-                        >
-                        <option value="1">Text classification</option>
-                        <option value="2">Image classification</option>
-                        <option value="3">Sequence to Sequence</option>
-                        <option value="4">Sequence labeling</option>
-                    </Form.Control>
-                </Form.Group>
-                <Form.Group>   
-                </Form.Group>
-                <Button variant="primary" type="submit" >
-                 Submit
-                 </Button>
-            </Form>
-        </div>
-        <Button onClick={registerAndLogin}>
-            Login
-        </Button>
-    </div>
-    );
-}
+        <div className="project-container" onClick={toggleInfo}>
+            <div >
+                <div>
+                    <h1>Project Name</h1>
+                </div>
+                <div className="progress-bar-project">
+                    <ProgressBar animated now={75} striped variant="danger"  />
+                </div>
+            </div>
+            {showInfo ? 
+                <div className="projectInfo" >
+                    <div className="left-info">
+                    <p>Type: Text Classification</p>
+                    <p>Progress: 1/4 </p>
+                    <p>Started: 2020-01-14 </p>
+                    <Button variant="outline-primary">Start</Button>
+                    </div>
+                    
+                </div>
+            :
+            null
+            }
 
-export default Project;
+        </div>
+    )
+}
+export default Project
