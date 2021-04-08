@@ -459,8 +459,8 @@ class DeleteLabel(Resource):
         user = User.get_by_email(get_jwt_identity())
         label = Label.query.get(args.label_id)
 
-        if (label.user_id == user.id or
-                (user.access_level >= AccessLevel.ADMIN)):
+        if (label.user_id == user.id
+                or (user.access_level >= AccessLevel.ADMIN)):
             try:
                 return jsonify(try_delete_response(label))
             except Exception as e:

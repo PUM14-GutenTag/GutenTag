@@ -28,9 +28,9 @@ def is_same_shape(d1, d2):
     if isinstance(d1, dict):
         if isinstance(d2, dict):
             # then we have shapes to check
-            return (d1.keys() == d2.keys() and
+            return (d1.keys() == d2.keys()
                     # so the keys are all the same
-                    all(is_same_shape(d1[k], d2[k]) for k in d1.keys()))
+                    and all(is_same_shape(d1[k], d2[k]) for k in d1.keys()))
             # thus all values will be tested in the same way.
         else:
             return False  # d1 is a dict, but d2 isn't

@@ -491,7 +491,7 @@ describe('sendGetExportData', () => {
     });
   });
 
-  test.only('Image classification project', async () => {
+  test('Image classification project', async () => {
     await resetDB();
     await createUser();
     const projectID = await createProject(4, 'Image');
@@ -503,7 +503,6 @@ describe('sendGetExportData', () => {
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
     const parsed = JSON.parse(response.data);
-    console.log(parsed);
     const fileNames = parsed.data.map((d) => d.file_name);
 
     imageData.forEach((obj) => {

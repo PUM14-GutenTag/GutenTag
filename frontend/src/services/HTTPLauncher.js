@@ -186,7 +186,7 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to get data to be exported.
-  static sendGetExportData(projectID, filters = []) {
+  static sendGetExportData(projectID /* , filters = [] */) {
     // FIXME
     // const params = new URLSearchParams();
     // params.append('headers', authHeader());
