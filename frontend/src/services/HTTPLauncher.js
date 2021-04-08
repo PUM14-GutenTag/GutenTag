@@ -88,8 +88,10 @@ class HTTPLauncher {
   // Send HTTP-request to fetch datapoints to be labelled.
   static sendGetData(projectID, amount = 1) {
     return axios.get(`${apiUrl}get-data`, {
-      project_id: projectID,
-      amount,
+      params: {
+        project_id: projectID,
+        amount 
+      }
     }, {
       headers: authHeader()
     });
@@ -106,14 +108,11 @@ class HTTPLauncher {
   }
 
   static sendGetUserProjects() {
-    console.log("Accesstoken User Proje:", localStorage.getItem('gutentag-accesstoken'))
-
-    return axios.get(`${apiUrl}get-user-projects`,
-      {
-        headers: authHeader()
-      });
+    return axios.get(`${apiUrl}get-user-projects`, {
+      headers: authHeader()
+    });
   }
-
+  
   // Send HTTP-request to remove a label
   static sendRemoveLabel(labelID) {
     return axios.delete(`${apiUrl}label-text`, {
@@ -125,14 +124,16 @@ class HTTPLauncher {
 
   // Send HTTP-request to get data to be exported
   static sendGetExportData(projectID, filters) {
-    const params = new URLSearchParams();
-    params.append('project_id', projectID);
+    const URLparams = new URLSearchParams();
+    URLparams.append('project_id', projectID);
 
     filters.forEach((element) => {
-      params.append('filter', element);
+      URLparams.append('filter', element);
     });
 
-    return axios.get(`${apiUrl}get-export-data`, { params }, {
+    return axios.get(`${apiUrl}get-export-data`, { 
+      params : URLparams
+     }, {
       headers: authHeader()
     });
   }
