@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Route } from 'react-router-dom';
 
 import { Helmet } from 'react-helmet';
 import Header from './Header';
@@ -28,17 +28,4 @@ Layout.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-const LayoutRoute = ({ component: Component, ...rest }) => {
-  return (
-    <Route
-      {...rest}
-      render={(props) => (
-        <Layout>
-          <Component {...props} />
-        </Layout>
-      )}
-    />
-  );
-};
-
-export default LayoutRoute;
+export default Layout;

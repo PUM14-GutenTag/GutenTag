@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import '../css/Login.css';
 
 import { Button, Col, Row, Form } from 'react-bootstrap';
@@ -17,18 +18,16 @@ function Login() {
   }
 
   async function handleSubmit(event) {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-    }
+    event.preventDefault();
+    console.log('This is token');
 
     setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
     const token = responseLogin.data.access_token;
+
+    console.log(token);
     localStorage.setItem('gutentag-accesstoken', JSON.stringify(token));
-    if (token != null) {
-      // Something
-    }
+    <Redirect to="/home" />;
   }
 
   return (

@@ -273,6 +273,8 @@ class Reset(Resource):
 
     def get(self):
         reset_db()
+        create_user("Admin", "Admin",
+                    "admin@admin", "password", True)
 
 
 rest.add_resource(Register, '/register')
