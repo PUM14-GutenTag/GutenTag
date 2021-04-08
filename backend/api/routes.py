@@ -1,6 +1,6 @@
 from api import rest
 from flask import jsonify, request
-from api.models import AccessLevel, ProjectData, Label
+from api.models import AccessLevel, ProjectData, Label, Project
 from flask_restful import Resource, reqparse, inputs
 from flask_jwt_extended import (
     create_access_token,
@@ -260,7 +260,14 @@ class FetchUserProjects(Resource):
     def get(self):
         current_user = get_user_by("email", get_jwt_identity())
         user_projects = {}
-        for project in current_user.projects:
+        projects = []
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            projects = Project.query.all()
+        else:
+            projects = current_user.projects
+
+        for project in projects:
             user_projects[project.id] = project.name
 
         return jsonify({"msg": "Retrieved user projects", "projects" : user_projects})
