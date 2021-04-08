@@ -83,13 +83,12 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to add one or more text data points to an existing project.
-  static sendAddNewTextData(projectID, projectType, JsonData) {
+  static sendAddNewTextData(projectID, JSONData) {
     return axios.post(
       `${apiUrl}add-text-data`,
       {
         project_id: projectID,
-        project_type: projectType,
-        json_data: JsonData,
+        json_data: JSONData,
       },
       {
         headers: authHeader(),
@@ -98,36 +97,22 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to add one or more text data points to an existing project.
-  static sendAddNewImageData(projectID, projectType, JsonData, images) {
+  static sendAddNewImageData(projectID, JSONData, images) {
     const formData = new FormData();
-    formData.append('images', images);
-    return axios.post(
-      `${apiUrl}add-image-data`,
-      formData,
-      {
-        headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
-        project_id: projectID,
-        project_type: projectType,
-        json_data: JsonData,
-      },
-      {
-        headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
-      }
-    );
+    formData.append('project_id', projectID);
+    formData.append('json_data', JSONData);
+    images.forEach((i) => formData.append('images', i));
+    return axios.post(`${apiUrl}add-image-data`, formData, {
+      headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
+    });
   }
 
   // Send HTTP-request to fetch datapoints to be labelled.
   static sendGetData(projectID, amount = 1) {
-    return axios.get(
-      `${apiUrl}get-data`,
-      {
-        project_id: projectID,
-        amount,
-      },
-      {
-        headers: authHeader(),
-      }
-    );
+    return axios.get(`${apiUrl}get-data`, {
+      headers: authHeader(),
+      params: { project_id: projectID, amount },
+    });
   }
 
   // Send HTTP-request to label a datapoint.
@@ -194,28 +179,37 @@ class HTTPLauncher {
 
   // Send HTTP-request to remove a label.
   static sendRemoveLabel(labelID) {
-    return axios.delete(
-      `${apiUrl}label-text`,
-      {
-        label_id: labelID,
-      },
-      {
-        headers: authHeader(),
-      }
-    );
+    return axios.delete(`${apiUrl}remove-label`, {
+      headers: authHeader(),
+      data: { label_id: labelID },
+    });
   }
 
   // Send HTTP-request to get data to be exported.
-  static sendGetExportData(projectID, filters) {
-    const params = new URLSearchParams();
-    params.append('headers', authHeader());
-    params.append('project_id', projectID);
+  static sendGetExportData(projectID, filters = []) {
+    // FIXME
+    // const params = new URLSearchParams();
+    // params.append('headers', authHeader());
+    // params.append('project_id', projectID);
 
-    filters.forEach((element) => {
-      params.append('filter', element);
+    // filters.forEach((element) => {
+    //   params.append('filter', element);
+    // });
+
+    return axios.get(`${apiUrl}get-export-data`, {
+      headers: authHeader(),
+      params: {
+        project_id: projectID,
+      },
     });
+  }
 
-    return axios.get(`${apiUrl}get-export-data`, { params });
+  // Send HTTP-request to get image file from a data point.
+  static sendGetImageData(dataID) {
+    return axios.get(`${apiUrl}get-image-data`, {
+      headers: authHeader(),
+      params: { data_id: dataID },
+    });
   }
 
   // Send HTTP-request to reset database (TODO: remove for production).

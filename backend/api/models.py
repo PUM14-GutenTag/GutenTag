@@ -2,6 +2,7 @@
 This file contains all database models and associated methods.
 """
 import datetime
+import io
 import random
 from enum import IntEnum
 from api import db
@@ -194,7 +195,11 @@ class Project(db.Model):
 
         for data in self.data:
             if data.id not in labeled_ids:
-                unlabeled_data[data.id] = data.data
+                if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
+                    data_item = data.file_name
+                else:
+                    data_item = data.text_data
+                unlabeled_data[data.id] = data_item
 
         if len(unlabeled_data) > amount:
             random_numbers = random.sample(range(len(unlabeled_data)), amount)
@@ -274,6 +279,15 @@ class ProjectImageData(ProjectData):
         self.project_id = project_id
         self.file_name = file_name
         self.image_data = image_data
+
+    def get_image_file(self):
+        """
+        Store the image file in memory and return it.
+        """
+        file = io.BytesIO()
+        file.write(self.image_data)
+        file.seek(0)
+        return file
 
 
 class Label(db.Model):

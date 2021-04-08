@@ -286,6 +286,7 @@ def export_image_classification_data(project_id, filters=None):
         data: [
             {
                 "file_name": "image.jpg",
+                "id": 101,
                 "labels": [
                     [[442, 420], [530, 540], "car"],
                     [[700, 520], [800, 640], "bus"]
@@ -308,6 +309,7 @@ def export_image_classification_data(project_id, filters=None):
                   for lab in data.labels]
         result["data"].append({
             "file_name": data.file_name,
+            "id": data.id,
             "labels": labels
         })
 

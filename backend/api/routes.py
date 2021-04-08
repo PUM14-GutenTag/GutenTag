@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, send_file
 from flask_restful import Resource, reqparse, inputs, request
 from flask_jwt_extended import (
     create_access_token,
@@ -10,6 +10,8 @@ from api import rest
 from api.models import (
     AccessLevel,
     Project,
+    ProjectData,
+    ProjectType,
     Label,
     DocumentClassificationLabel,
     SequenceLabel,
@@ -27,10 +29,10 @@ from api.parser import (
     import_sequence_labeling_data,
     import_sequence_to_sequence_data,
     import_image_classification_data,
-    # export_document_classification_data,
-    # export_sequence_labeling_data,
-    # export_sequence_to_sequence_data,
-    # export_image_classification_data
+    export_document_classification_data,
+    export_sequence_labeling_data,
+    export_sequence_to_sequence_data,
+    export_image_classification_data
 )
 """
 This file contains the routes to the database.
@@ -223,13 +225,13 @@ class AddNewTextData(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument("project_type", type=int, required=True)
         self.reqparse.add_argument("json_data", type=str, required=True)
 
     @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
 
         if user.access_level >= AccessLevel.ADMIN:
             import_funcs = {
@@ -238,7 +240,7 @@ class AddNewTextData(Resource):
                 3: import_sequence_to_sequence_data,
             }
             try:
-                import_funcs[args.project_type](
+                import_funcs[project.project_type](
                     args.project_id, args.json_data)
                 msg = "Data added."
             except Exception as e:
@@ -262,18 +264,19 @@ class AddNewImageData(Resource):
     @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
+
         if "images" not in request.files:
             msg = "No images uploaded."
         else:
             image_files = request.files.getlist("images")
             for file in image_files:
-                if not allowed_image_extension:
+                if not allowed_image_extension(file.filename):
                     return jsonify(
                         {"message": ("Invalid file extension. "
                                      f"must be one of {IMAGE_EXTENSIONS}")}
                     )
             image_dict = {secure_filename(
-                file): file.read for file in image_files}
+                file.filename): file.read() for file in image_files}
             user = User.get_by_email(get_jwt_identity())
             if user.access_level >= AccessLevel.ADMIN:
                 try:
@@ -329,8 +332,9 @@ class CreateDocumentClassificationLabel(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
+        data = ProjectData.query.get(args.data_id)
 
-        if user.is_authorized(args.project_id):
+        if user.is_authorized(data.project.id):
             try:
                 return jsonify(try_add_response(
                     DocumentClassificationLabel(
@@ -360,8 +364,9 @@ class CreateSequenceLabel(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
+        data = ProjectData.query.get(args.data_id)
 
-        if user.is_authorized(args.project_id):
+        if user.is_authorized(data.project.id):
             try:
                 return jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
@@ -388,8 +393,9 @@ class CreateSequenceToSequenceLabel(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
+        data = ProjectData.query.get(args.data_id)
 
-        if user.is_authorized(args.project_id):
+        if user.is_authorized(data.project.id):
             try:
                 return jsonify(try_add_response(
                     SequenceToSequenceLabel(
@@ -421,8 +427,9 @@ class CreateImageClassificationLabel(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
+        data = ProjectData.query.get(args.data_id)
 
-        if user.is_authorized(args.project_id):
+        if user.is_authorized(data.project.id):
             try:
                 return jsonify(try_add_response(
                     ImageClassificationLabel(
@@ -471,14 +478,57 @@ class GetExportData(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("user_id", type=int, required=True)
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument(
-            "filter", type=str, required=False, action="append")
+        self.reqparse.add_argument("filter", type=str,
+                                   required=False,
+                                   action="append")
 
     @ jwt_required()
     def get(self):
-        return jsonify({"message": "Get export data not implemented in API"})
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+
+        if user.access_level >= AccessLevel.ADMIN:
+            export_funcs = {
+                1: export_document_classification_data,
+                2: export_sequence_labeling_data,
+                3: export_sequence_to_sequence_data,
+                4: export_image_classification_data
+            }
+            try:
+                return export_funcs[project.project_type](args.project_id)
+            except Exception as e:
+                msg = f"Could not export data: {e}"
+        else:
+            msg = "User is not authorized to export data."
+
+        return jsonify({"message": msg})
+
+
+class GetImageData(Resource):
+    """
+    Endpoint for getting the image file from a data point.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("data_id", type=int, required=True)
+
+    @ jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        data = ProjectData.query.get(args.data_id)
+        if (data.project.project_type != ProjectType.IMAGE_CLASSIFICATION):
+            msg = "Data is not an image."
+        else:
+            try:
+                return send_file(data.get_image_file(),
+                                 attachment_filename=data.file_name,
+                                 as_attachment=True)
+            except Exception as e:
+                msg = f"Could not get image: {e}"
+        return jsonify({"message": msg})
 
 
 class Reset(Resource):
@@ -507,4 +557,5 @@ rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
 rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
 rest.add_resource(GetExportData, "/get-export-data")
+rest.add_resource(GetImageData, "/get-image-data")
 rest.add_resource(Reset, "/reset")
