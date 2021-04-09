@@ -471,29 +471,6 @@ class DeleteLabel(Resource):
         return jsonify({"message": msg})
 
 
-class FetchUserProjects(Resource):
-    """
-    Fetch all projects that a user is authorized to
-    """
-
-    @jwt_required()
-    def get(self):
-        current_user = get_user_by("email", get_jwt_identity())
-        user_projects = {}
-        projects = []
-
-        if current_user.access_level >= AccessLevel.ADMIN:
-            projects = Project.query.all()
-        else:
-            projects = current_user.projects
-
-        for project in projects:
-            user_projects[project.id] = project.name
-
-        return jsonify({"msg": "Retrieved user projects",
-                        "projects": user_projects})
-
-
 class GetExportData(Resource):
     """
     Endpoint for exporting data from project according to filters.
