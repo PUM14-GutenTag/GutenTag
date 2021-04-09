@@ -129,14 +129,12 @@ class NewProject(Resource):
         self.reqparse.add_argument('project_name', type=str, required=True)
         self.reqparse.add_argument('project_type', type=int, required=True)
 
-
-
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
 
         current_user = get_user_by("email", get_jwt_identity())
-        
+
         if current_user.access_level >= AccessLevel.ADMIN:
             return create_project(args.project_name, args.project_type)
 
@@ -251,6 +249,7 @@ class DeleteLabel(Resource):
 
         return jsonify({"message": "User unauthorized to remove this label"})
 
+
 class FetchUserProjects(Resource):
     """
     Fetch all projects that a user is authorized to
@@ -268,10 +267,10 @@ class FetchUserProjects(Resource):
             projects = current_user.projects
 
         for project in projects:
-            user_projects[project.id] = project.name
+            user_projects[project.id] = {
+                "name": project.name, "type": project.project_type, "created": project.created}
 
-        return jsonify({"msg": "Retrieved user projects", "projects" : user_projects})
-
+        return jsonify({"msg": "Retrieved user projects", "projects": user_projects})
 
 
 class GetExportData(Resource):

@@ -46,10 +46,10 @@ const Project = ({toggleCallback}) => {
                         onChange={(event) => setProjectType(event.target.value)}  
                         defaultValue="1"  
                         >
-                        <option value="1">Text classification</option>
-                        <option value="2">Image classification</option>
-                        <option value="3">Sequence to Sequence</option>
-                        <option value="4">Sequence labeling</option>
+                        <option value="0">Text classification</option>
+                        <option value="1">Image classification</option>
+                        <option value="2">Sequence to Sequence</option>
+                        <option value="3">Sequence labeling</option>
                     </Form.Control>
                 </Form.Group>
                 <Button variant="primary" type="submit" >

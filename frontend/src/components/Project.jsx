@@ -3,29 +3,32 @@ import "../css/project.css"
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 
-function Project (props) {
-    const [ showInfo, setShowInfo ] = useState(false)
+function Project ({ name, created, projectType, selectedColor}) {
+    const [ showInfo, setShowInfo ] = useState(false);
+    const projectTypeNames= ["Text classification", "Image classification", "Sequence to Sequence", "Sequence labeling"];
 
     const toggleInfo = () => {
         setShowInfo(!showInfo)
     }
 
+
+
     return (
-        <div className="project-container" onClick={toggleInfo}>
+        <div className="project-container" style={{backgroundColor:selectedColor}} onClick={toggleInfo}>
             <div >
                 <div>
-                    <h1>{props.projectName}</h1>
+                    <h1>{name}</h1>
                 </div>
                 <div className="progress-bar-project">
-                    <ProgressBar animated now={75} striped variant="danger"  />
+                    <ProgressBar animated now={50} striped />
                 </div>
             </div>
             {showInfo ? 
                 <div className="projectInfo" >
                     <div className="left-info">
-                    <p>Type: Text Classification</p>
+                    <p>Type: {projectTypeNames[projectType]}</p>
                     <p>Progress: 1/4 </p>
-                    <p>Started: 2020-01-14 </p>
+                    <p>Started: {created}</p>
                     <Button variant="outline-primary">Start</Button>
                     </div>
                     
