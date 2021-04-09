@@ -8,8 +8,6 @@ from flask_jwt_extended import (
     get_jwt_identity,
 )
 
-import sys
-
 from api.database_handler import (
     create_user,
     login_user,
