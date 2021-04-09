@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
+import { propTypes } from 'react-bootstrap/esm/Image';
 import { Redirect, Route } from 'react-router-dom';
 
 import Layout from './Layout';
@@ -39,6 +40,11 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
       }}
     />
   );
+};
+
+ProtectedRoute.propTypes = {
+  component: propTypes.func.isRequired,
+  location: propTypes.func.isRequired,
 };
 
 export default ProtectedRoute;
