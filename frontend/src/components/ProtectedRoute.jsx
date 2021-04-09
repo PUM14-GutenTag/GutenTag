@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import { propTypes } from 'react-bootstrap/esm/Image';
 import { Redirect, Route } from 'react-router-dom';
 
 import Layout from './Layout';
@@ -15,6 +14,7 @@ function isLoggedIn() {
 }
 
 // Protected route wraps content in token validation
+// eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ component: Component, ...rest }) => {
   return (
     <Route
@@ -32,6 +32,7 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
             to={{
               pathname: '/',
               state: {
+                // eslint-disable-next-line react/prop-types
                 from: props.location,
               },
             }}
@@ -40,11 +41,6 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
       }}
     />
   );
-};
-
-ProtectedRoute.propTypes = {
-  component: propTypes.func.isRequired,
-  location: propTypes.func.isRequired,
 };
 
 export default ProtectedRoute;
