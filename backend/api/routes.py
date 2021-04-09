@@ -1,5 +1,5 @@
 from api import rest
-from flask import jsonify, request
+from flask import jsonify
 from api.models import AccessLevel, ProjectData, Label, Project
 from flask_restful import Resource, reqparse, inputs
 from flask_jwt_extended import (
@@ -7,8 +7,6 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
 )
-
-import sys
 
 from api.database_handler import (
     create_user,
@@ -129,14 +127,12 @@ class NewProject(Resource):
         self.reqparse.add_argument('project_name', type=str, required=True)
         self.reqparse.add_argument('project_type', type=int, required=True)
 
-
-
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
 
         current_user = get_user_by("email", get_jwt_identity())
-        
+
         if current_user.access_level >= AccessLevel.ADMIN:
             return create_project(args.project_name, args.project_type)
 
@@ -251,6 +247,7 @@ class DeleteLabel(Resource):
 
         return jsonify({"message": "User unauthorized to remove this label"})
 
+
 class FetchUserProjects(Resource):
     """
     Fetch all projects that a user is authorized to
@@ -270,8 +267,8 @@ class FetchUserProjects(Resource):
         for project in projects:
             user_projects[project.id] = project.name
 
-        return jsonify({"msg": "Retrieved user projects", "projects" : user_projects})
-
+        return jsonify({"msg" : "Retrieved user projects",
+                        "projects" : user_projects})
 
 
 class GetExportData(Resource):

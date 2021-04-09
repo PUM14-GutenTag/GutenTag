@@ -102,7 +102,7 @@ def login_user(email, password):
         if user:
             if(user.check_password(password)):
                 access_token = create_access_token(
-                    identity=user.email, expires_delta=False)  # !!!!!!!!!!!!!!!!! Remove expires_delta=False!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    identity=user.email)
                 refresh_token = create_refresh_token(identity=user.email)
 
                 return {
