@@ -4,7 +4,7 @@ function authHeader() {
   const token = localStorage.getItem('gutentag-accesstoken');
 
   if (token) {
-    return { Authorization: 'Bearer ' + token};
+    return { Authorization: `Bearer ${token}` };
   }
   return {};
 }
