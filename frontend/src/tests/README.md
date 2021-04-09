@@ -33,4 +33,8 @@ All terminal commands are expected to be run from the project's root folder.
 1. Make sure that you are running the Docker containers beforehand.
 2. Run `docker-compose run frontend npm test` in your terminal.
 
-It will run all the tests in file.test.js.
+It will run all tests meeting the following [filename conventions](https://create-react-app.dev/docs/running-tests/#filename-conventions):
+
+- Files with .js suffix in \_\_tests\_\_ folders.
+- Files with .test.js suffix.
+- Files with .spec.js suffix.
