@@ -8,7 +8,7 @@ There are a test example in the test file. Follow the convention of that test fo
 
 ## Use functions from another file
 
-You must declare a variable if 
+You must declare a variable if
 a function you want to use is in a file that haven't been
 assigned to any variable yet.
 For example if the function you want to use is named "diff"
@@ -20,7 +20,7 @@ a variable like this:
 And the test might look like this:
 
 `test('Subtracts 2 - 1 to equal 1', () => {`
-`  expect(testing.diff(2, 1)).toBe(1);`
+` expect(testing.diff(2, 1)).toBe(1);`
 `});`
 
 And a last step for this to work is that "diff" must be included
@@ -31,6 +31,10 @@ in test.js module.exports.
 All terminal commands are expected to be run from the project's root folder.
 
 1. Make sure that you are running the Docker containers beforehand.
-2. Run `docker-compose run frontend jest` in your terminal.
+2. Run `docker-compose run frontend npm test` in your terminal.
 
-It will run all the tests in file.test.js.
+It will run all tests meeting the following [filename conventions](https://create-react-app.dev/docs/running-tests/#filename-conventions):
+
+- Files with .js suffix in \_\_tests\_\_ folders.
+- Files with .test.js suffix.
+- Files with .spec.js suffix.
