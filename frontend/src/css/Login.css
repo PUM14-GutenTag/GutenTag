@@ -1,3 +1,4 @@
+/* Input box style */
 .input-box {
   width: 330px;
   height: 54px;
@@ -5,6 +6,7 @@
   border-radius: 6px;
 }
 
+/* Big text style */
 .text-label-big {
   font-family: Roboto;
   font-style: normal;
@@ -15,22 +17,14 @@
   color: #063954;
 }
 
-.text-label-small {
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 24px;
-  line-height: 28px;
-
-  color: #063954;
-}
-
+/* Center page and follow columndirection */
 .login-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* Set logosize */
 .login-logo {
   width: 500px;
   height: auto;
@@ -40,6 +34,7 @@
   bottom: 0%;
 }
 
+/* Makes button centered and styled */
 .btn-login {
   font-family: Roboto;
   font-style: normal;

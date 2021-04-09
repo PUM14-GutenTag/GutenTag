@@ -4,6 +4,7 @@ import { Redirect, Route } from 'react-router-dom';
 
 import Layout from './Layout';
 
+// Checks for token in localstorage
 function isLoggedIn() {
   const token = localStorage.getItem('gutentag-accesstoken');
   if (token !== 'null') {
@@ -12,6 +13,7 @@ function isLoggedIn() {
   return false;
 }
 
+// Protected route wraps content in token validation
 const ProtectedRoute = ({ component: Component, ...rest }) => {
   return (
     <Route

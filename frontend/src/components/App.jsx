@@ -14,7 +14,7 @@ import ProtectedRoute from './ProtectedRoute';
 import '../css/index.css';
 import '../css/App.css';
 
-// Placeholder content from create-react-app script.
+// App content.
 function App() {
   return (
     <Router>

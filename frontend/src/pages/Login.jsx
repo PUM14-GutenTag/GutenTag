@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import '../css/Login.css';
-
 import { Button, Col, Row, Form } from 'react-bootstrap';
 
-import logo from '../res/hat_dark.svg';
+import '../css/Login.css';
 
+import logoUnder from '../res/hat_dark_under.svg';
 import HTTPLauncher from '../services/HTTPLauncher';
 
+// Login-page redirects submitting login details, does not verify valid login credentials
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validated, setValidated] = useState(false);
 
+  // Checks the email and password length to be over 0
   function validateForm() {
     return email.length > 0 && password.length > 0;
   }
 
+  // Gets acesstoken from database and saves in localstorage, then redirects
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -29,7 +31,7 @@ function Login() {
 
   return (
     <div className="login-wrapper">
-      <img src={logo} alt="logo" className="login-logo" /> {/* Placeholder image. */}
+      <img src={logoUnder} alt="logo" className="login-logo" />
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Form.Group as={Row} className="text-right" controlId="formBasicEmail">
           <Col>

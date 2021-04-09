@@ -1,5 +1,6 @@
 import React from 'react';
 
+// 404 page
 function NotFoundPage() {
   return (
     <div>
