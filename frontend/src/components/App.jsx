@@ -8,6 +8,7 @@ import Projects from '../pages/Projects';
 import NotFoundPage from '../pages/404';
 import Login from '../pages/Login';
 
+// Components
 import ProtectedRoute from './ProtectedRoute';
 
 // Styles
