@@ -1,12 +1,14 @@
 from api import rest
-from flask import jsonify
-from api.models import AccessLevel, ProjectData, Label
+from flask import jsonify, request
+from api.models import AccessLevel, ProjectData, Label, Project
 from flask_restful import Resource, reqparse, inputs
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     get_jwt_identity,
 )
+
+import sys
 
 from api.database_handler import (
     create_user,
@@ -86,9 +88,10 @@ class Authorize(Resource):
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
-        current_user = get_user_by("email", get_jwt_identity())
+        admin_user = get_user_by("email", get_jwt_identity())
+        current_user = get_user_by("email", args.email)
 
-        if current_user.access_level >= AccessLevel.ADMIN:
+        if admin_user.access_level >= AccessLevel.ADMIN:
             return authorize_user(args.project_id, current_user.id)
 
         return {"message": "User is not authorized to authorize other users"}
@@ -107,9 +110,10 @@ class Deauthorize(Resource):
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
-        current_user = get_user_by("email", get_jwt_identity())
+        admin_user = get_user_by("email", get_jwt_identity())
+        current_user = get_user_by("email", args.email)
 
-        if current_user.access_level >= AccessLevel.ADMIN:
+        if admin_user.access_level >= AccessLevel.ADMIN:
             return deauthorize_user(args.project_id, current_user.id)
 
         return {"message": "User is not authorized to authorize other users"}
@@ -119,20 +123,20 @@ class NewProject(Resource):
     """
     Endpoint for creating a project.
     """
-    print("1111111111111111111111111111111")
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project_name', type=str, required=True)
         self.reqparse.add_argument('project_type', type=int, required=True)
-        print("2222222222222222222222222222222222")
+
+
 
     @jwt_required()
     def post(self):
-        print("3333333333333333333333333333333333333")
         args = self.reqparse.parse_args()
-        current_user = get_user_by("email", get_jwt_identity())
 
+        current_user = get_user_by("email", get_jwt_identity())
+        
         if current_user.access_level >= AccessLevel.ADMIN:
             return create_project(args.project_name, args.project_type)
 
@@ -247,6 +251,28 @@ class DeleteLabel(Resource):
 
         return jsonify({"message": "User unauthorized to remove this label"})
 
+class FetchUserProjects(Resource):
+    """
+    Fetch all projects that a user is authorized to
+    """
+
+    @jwt_required()
+    def get(self):
+        current_user = get_user_by("email", get_jwt_identity())
+        user_projects = {}
+        projects = []
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            projects = Project.query.all()
+        else:
+            projects = current_user.projects
+
+        for project in projects:
+            user_projects[project.id] = project.name
+
+        return jsonify({"msg": "Retrieved user projects", "projects" : user_projects})
+
+
 
 class GetExportData(Resource):
     """
@@ -288,5 +314,6 @@ rest.add_resource(AddNewData, '/add-data')
 rest.add_resource(GetNewData, '/get-data')
 rest.add_resource(CreateLabel, '/label-data')
 rest.add_resource(DeleteLabel, '/remove-label')
+rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, '/get-export-data')
 rest.add_resource(Reset, '/reset')
