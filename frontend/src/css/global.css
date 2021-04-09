@@ -1,0 +1,10 @@
+article {
+  position: relative;
+  font-size: 1em;
+  max-width: 1320px;
+  padding-left: 3em;
+  padding-right: 3em;
+  padding-top: 2em;
+  margin: auto;
+  flex: 1 0 auto;
+}
