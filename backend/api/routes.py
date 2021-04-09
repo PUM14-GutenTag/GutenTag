@@ -1,5 +1,5 @@
 from api import rest
-from flask import jsonify, request
+from flask import jsonify, request  # noqa: F401
 from api.models import AccessLevel, ProjectData, Label, Project
 from flask_restful import Resource, reqparse, inputs
 from flask_jwt_extended import (
