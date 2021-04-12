@@ -1,9 +1,15 @@
+.projects-container {
+  margin-left: 2%;
+  margin-right: 2%;
+  margin-top: 2%;
+}
+.toggleButton {
+  font-size: 24px;
+}
 ul {
-    list-style-type: none;
-    margin-left: 2%;
-    margin-right: 2%;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
 }
 li {
-    margin-top: 5px;
+  margin-top: 10px;
 }

@@ -7,7 +7,7 @@ import Projects from '../pages/Projects';
 import '../css/App.css';
 
 // Placeholder content from create-react-app script.
-function App() {
+const App = () => {
   return (
     <div className="page-container">
       <div className="content-wrap">
@@ -23,6 +23,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;
