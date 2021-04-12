@@ -1,4 +1,5 @@
 import React from 'react';
+import { HouseFill, GearFill } from 'react-bootstrap-icons';
 
 import '../css/Header.css';
 import { Navbar, Nav, Container } from 'react-bootstrap';
@@ -19,13 +20,11 @@ function Header() {
         <Navbar.Collapse id="basic-navbar-nav" className="navbar-collapse">
           <Nav className="m-auto">
             <Nav.Link className="text-label" href="home">
-              Home
+              <HouseFill className="icon-offset" /> Home
             </Nav.Link>
-            <Nav.Link className="text-label" href="projects">
-              Projects
-            </Nav.Link>
+
             <Nav.Link className="text-label" href="settings">
-              Settings
+              <GearFill className="icon-offset" /> Settings
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>

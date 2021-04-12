@@ -1,17 +1,16 @@
 .main-footer {
-  color: white;
-  background-color: #282c34;
+  color: #063954;
+  background-color: #ededed;
   padding-top: 3em;
   padding-left: 3em;
   position: relative;
   bottom: 0;
   max-width: 100%;
-  text-align: center;
+  text-align: center !important;
 }
 
 .github-logo {
   object-fit: contain;
-  object-position: center;
   max-width: 100%;
   max-height: 100%;
   width: 100px;
@@ -29,8 +28,8 @@
 .footer-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
 @media screen and (max-width: 960px) {
@@ -38,8 +37,8 @@
     font-size: 13px;
   }
   .github-logo {
-    max-width: 90%;
-    max-height: 90%;
+    width: 90px;
+    height: 90px;
   }
 
   .row > div {
@@ -52,8 +51,8 @@
     font-size: 12px;
   }
   .github-logo {
-    max-width: 85%;
-    max-height: 85%;
+    width: 85px;
+    height: 85px;
   }
   .col-small {
     font-size: 11px;
@@ -72,8 +71,8 @@
     font-size: 9px;
   }
   .github-logo {
-    max-width: 85%;
-    max-height: 85%;
+    width: 70px;
+    height: 70px;
   }
   .col-small {
     font-size: 9px;

@@ -34,3 +34,9 @@
 
   color: #063954 !important;
 }
+
+.icon-offset {
+  padding-bottom: 0.125em;
+  position: relative;
+  color: #063954;
+}

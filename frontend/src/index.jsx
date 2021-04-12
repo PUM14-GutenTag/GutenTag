@@ -7,10 +7,8 @@ import Layout from './components/Layout';
 import App from './components/App';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Layout>
-      <App />
-    </Layout>
-  </React.StrictMode>,
+  <Layout>
+    <App />
+  </Layout>,
   document.getElementById('root')
 );
