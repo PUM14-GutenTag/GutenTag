@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const HTTPLauncher = require('../services/HTTPLauncher');
+import HTTPLauncher from '../services/HTTPLauncher';
 
 const outDir = path.join(__dirname, 'out');
 
