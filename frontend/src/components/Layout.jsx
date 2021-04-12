@@ -7,7 +7,6 @@ import Footer from './Footer';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/global.css';
-import '../css/App.css';
 
 // Default page layout. The content is sandwiches by a header and footer.
 const Layout = ({ children }) => (
