@@ -1,7 +1,7 @@
 import React from 'react';
 
 import '../css/Header.css';
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar, Nav, Container } from 'react-bootstrap';
 
 import logo from '../res/hat_dark.svg';
 /**
@@ -11,7 +11,7 @@ import logo from '../res/hat_dark.svg';
 function Header() {
   return (
     <Navbar className="sticky-top" expand="md">
-      <Nav className="navbar-container">
+      <Container className="navbar-container">
         <Navbar.Brand className="logo" href="https://github.com/th3tard1sparadox/GutenTag">
           <img src={logo} alt="logo" className="logo" />
         </Navbar.Brand>
@@ -29,7 +29,7 @@ function Header() {
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
-      </Nav>
+      </Container>
     </Navbar>
   );
 }
