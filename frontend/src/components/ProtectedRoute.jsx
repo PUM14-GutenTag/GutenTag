@@ -7,10 +7,7 @@ import Layout from './Layout';
 // Checks for token in localstorage
 function isLoggedIn() {
   const token = localStorage.getItem('gutentag-accesstoken');
-  if (token !== 'null') {
-    return true;
-  }
-  return false;
+  return token !== 'null' && token !== null;
 }
 
 // Protected route wraps content in token validation
