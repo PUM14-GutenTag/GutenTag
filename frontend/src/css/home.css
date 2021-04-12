@@ -1,0 +1,9 @@
+ul {
+    list-style-type: none;
+    margin-left: 2%;
+    margin-right: 2%;
+    padding: 0;
+}
+li {
+    margin-top: 2%;
+}
