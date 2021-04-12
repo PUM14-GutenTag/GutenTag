@@ -12,7 +12,6 @@ import Login from '../pages/Login';
 import ProtectedRoute from './ProtectedRoute';
 
 // Styles
-import '../css/index.css';
 import '../css/App.css';
 
 // App content.
