@@ -1,15 +1,42 @@
+.navbar {
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+  background-color: #ffffff !important;
+}
+
 .navbar-container {
-  max-width: 100%;
+  position: relative;
+  font-size: 1em;
+  max-width: 1320px !important;
+  padding-left: 3em !important;
+  padding-right: 3em;
+  margin: auto;
+  flex: auto;
+  display: flex;
 }
 
 .navbar-collapse {
   text-align: center;
 }
 
-.basic-navbar-nav {
-  max-width: 100%;
-}
 .logo {
   width: 100px;
   height: 100px;
+}
+
+.text-label {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 44px;
+  line-height: 54px;
+
+  padding: 0.2em 0.4em !important;
+
+  color: #063954 !important;
+}
+
+.icon-offset {
+  padding-bottom: 0.125em;
+  position: relative;
+  color: #063954;
 }

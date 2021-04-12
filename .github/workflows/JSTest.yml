@@ -1,9 +1,9 @@
 name: JS CI Test
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -17,5 +17,8 @@ jobs:
       - name: Build docker images
         run: docker-compose build
 
+      - name: Build react app
+        run: docker-compose run --rm frontend npm run build
+
       - name: Run tests
-        run: docker-compose run frontend jest
+        run: docker-compose run -e CI=true frontend npm test

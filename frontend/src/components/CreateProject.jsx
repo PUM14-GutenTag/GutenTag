@@ -11,7 +11,6 @@ const CreateProject = ({ toggleCallback }) => {
   const submitHandler = async (event) => {
     event.preventDefault();
     await HTTPLauncher.sendCreateProject(projectName, parseInt(projectType));
-    await HTTPLauncher.sendAddNewData(1, 1, 'hej');
     toggleCallback();
   };
   const register = async (event) => {

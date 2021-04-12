@@ -1,0 +1,12 @@
+[
+  {
+    "text": "Alex is going to Los Angeles in California",
+    "labels": [
+      [0, 3, "PER"],
+      [16, 27, "LOC"],
+      [31, 41, "LOC"]
+    ]
+  },
+  { "text": "Peter Blackburn", "labels": [[0, 15, "PER"]] },
+  { "text": "President Obama", "labels": [] }
+]
