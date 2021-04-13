@@ -21,10 +21,6 @@
   font-size: 16px;
 }
 
-.row > div {
-  padding: 0 50px 0 50px;
-}
-
 .footer-container {
   display: flex;
   flex-direction: column;
@@ -40,10 +36,6 @@
     width: 90px;
     height: 90px;
   }
-
-  .row > div {
-    padding: 0 30px 0 30px;
-  }
 }
 
 @media screen and (max-width: 768px) {
@@ -51,18 +43,15 @@
     font-size: 12px;
   }
   .github-logo {
-    width: 85px;
-    height: 85px;
+    width: 80px;
+    height: 80px;
   }
   .col-small {
     font-size: 11px;
   }
 
   .col > h1 {
-    font-size: 15px;
-  }
-  .row > div {
-    padding: 0 20px 0 20px;
+    font-size: 20px;
   }
 }
 
@@ -71,8 +60,8 @@
     font-size: 9px;
   }
   .github-logo {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
   }
   .col-small {
     font-size: 9px;
@@ -80,9 +69,5 @@
 
   .col > h1 {
     font-size: 11px;
-  }
-
-  .row > div {
-    padding: 0 10px 0 10px;
   }
 }

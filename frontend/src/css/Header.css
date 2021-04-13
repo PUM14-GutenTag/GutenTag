@@ -4,14 +4,9 @@
 }
 
 .navbar-container {
-  position: relative;
-  font-size: 1em;
   max-width: 1320px !important;
   padding-left: 3em !important;
   padding-right: 3em;
-  margin: auto;
-  flex: auto;
-  display: flex;
 }
 
 .navbar-collapse {
