@@ -12,7 +12,7 @@ import logo from '../res/hat_dark.svg';
 function Header() {
   return (
     <Navbar className="sticky-top" expand="md">
-      <Container className="navbar-container">
+      <Container>
         <Navbar.Brand className="logo" href="https://github.com/th3tard1sparadox/GutenTag">
           <img src={logo} alt="logo" className="logo" />
         </Navbar.Brand>
