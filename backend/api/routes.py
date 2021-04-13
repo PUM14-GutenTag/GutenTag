@@ -297,7 +297,6 @@ class AddNewImageData(Resource):
                     msg = f"Could not add data: {e}"
             else:
                 msg = "User is not authorized to add data."
-
         return jsonify({"message": msg})
 
 
