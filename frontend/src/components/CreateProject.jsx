@@ -9,7 +9,7 @@ const CreateProject = ({ toggleCallback }) => {
   const [projectType, setProjectType] = useState(1);
 
   const submitHandler = async (event) => {
-    event.preventDefault();    
+    event.preventDefault();
     await HTTPLauncher.sendCreateProject(projectName, projectType);
     toggleCallback();
   };

@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
 import CreateProject from '../components/CreateProject';
 import Project from '../components/Project';
 import HTTPLauncher from '../services/HTTPLauncher';
-import Button from 'react-bootstrap/Button';
 import '../css/home.css';
 
 const Home = () => {
   const [projectsShow, setProjectsShow] = useState(true);
   const [projects, setProjects] = useState([]);
-  var colorCounter = 0;
+  let colorCounter = 0;
   const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
 
   useEffect(() => {
-    if (projectsShow){
-    async function fetchData() {
-      const result = await HTTPLauncher.sendGetUserProjects();
-      /*makes Object of Objects to Array of Arrays*/
-      const dataArray = Object.values(result.data.projects);
-      const mapedDataArray = dataArray.map((projectObject) => Object.values(projectObject));
-      setProjects(mapedDataArray);
+    if (projectsShow) {
+      async function fetchData() {
+        const result = await HTTPLauncher.sendGetUserProjects();
+        /*makes Object of Objects to Array of Arrays*/
+        const dataArray = Object.values(result.data.projects);
+        const mapedDataArray = dataArray.map((projectObject) => Object.values(projectObject));
+        setProjects(mapedDataArray);
+      }
+      fetchData();
     }
-    fetchData();}
   }, [projectsShow]);
 
   function toggleProjects() {
