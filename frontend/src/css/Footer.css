@@ -6,7 +6,7 @@
   position: relative;
   bottom: 0;
   max-width: 100%;
-  text-align: center !important;
+  text-align: center;
 }
 
 .github-logo {
@@ -24,8 +24,8 @@
 .footer-container {
   display: flex;
   flex-direction: column;
-  justify-content: center !important;
-  align-items: center !important;
+  justify-content: center;
+  align-items: center;
 }
 
 .row {
@@ -74,5 +74,15 @@
 
   .col > h1 {
     font-size: 11px;
+  }
+
+  .main-footer {
+    padding-left: 1em;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  .main-footer {
+    padding-left: 0.5em;
   }
 }
