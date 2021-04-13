@@ -349,5 +349,4 @@ class HTTPLauncher {
     return axiosInstance().get('reset');
   }
 }
-
-module.exports = HTTPLauncher;
+export default HTTPLauncher;

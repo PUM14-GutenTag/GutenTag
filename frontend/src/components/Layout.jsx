@@ -15,7 +15,9 @@ const Layout = ({ children }) => (
       <title>GutenTag</title>
     </Helmet>
     <Header />
-    {children}
+    <div className="page-container">
+      <div className="content-wrap">{children}</div>
+    </div>
     <Footer />
   </>
 );
