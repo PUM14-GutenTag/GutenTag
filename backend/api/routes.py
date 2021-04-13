@@ -197,7 +197,7 @@ class NewProject(Resource):
         if current_user.access_level >= AccessLevel.ADMIN:
             return Project(args.project_name, args.project_type)
 
-        return jsonify({"message": "User unauthorized to create a project."})
+        return jsonify({"message": msg})
 
 
 class RemoveProject(Resource):

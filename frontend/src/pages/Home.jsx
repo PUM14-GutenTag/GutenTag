@@ -30,7 +30,7 @@ const Home = () => {
 
   function setColorCounter() {
     const selectedColor = colorList[colorCounter];
-    colorCounter = colorCounter + 1;
+    ++colorCounter;
     if (colorCounter === colorList.length) {
       colorCounter = 0;
     }

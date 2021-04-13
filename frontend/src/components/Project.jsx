@@ -22,7 +22,7 @@ const Project = ({ name, created, projectType, selectedColor }) => {
       className="project-container"
       style={{ backgroundColor: selectedColor }}
       onClick={toggleInfo}
-      onKeyDown={toggleInfo}
+      aria-hidden="true"
     >
       <div>
         <div>
