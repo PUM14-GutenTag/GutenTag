@@ -96,7 +96,7 @@ def check_types(arg_types):
 
 def reset_db():
     """
-    WARNING: use carefully!
+    WARNING: Use carefully!
     Remove all tables from the database (including all data) and recreate it
     according to models.py.
     """
