@@ -89,7 +89,7 @@ class Login(Resource):
             response = user.login(args.password)
             if response is None:
                 msg = "Incorrect login credentials"
-                access_token, refresh_token = response
+                access_token, refresh_token = None, None
             else:
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response

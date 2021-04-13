@@ -7,6 +7,7 @@ import Settings from '../pages/Settings';
 import Projects from '../pages/Projects';
 import NotFoundPage from '../pages/404';
 import Login from '../pages/Login';
+import Upload from '../pages/Upload';
 
 // Components
 import ProtectedRoute from './ProtectedRoute';
@@ -23,6 +24,7 @@ function App() {
         <ProtectedRoute exact path="/home" component={Home} />
         <ProtectedRoute exact path="/settings" component={Settings} />
         <ProtectedRoute exact path="/projects" component={Projects} />
+        <ProtectedRoute exact path="/upload" component={Upload} />
         <Route exact path="/404" component={NotFoundPage} />
         <Redirect to="/404" />
       </Switch>
