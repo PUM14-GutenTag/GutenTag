@@ -45,11 +45,15 @@ const Project = ({ name, created, projectType, selectedColor }) => {
   );
 };
 
+// Project.propTypes = {
+//   name: PropTypes.string,
+//   created: PropType.string,
+//   projectType: PropType.number,
+//   selectedColor: PropType.string,
+// };
+
 Project.propTypes = {
-  name: PropTypes.string,
-  created: PropType.string,
-  projectType: PropType.number,
-  selectedColor: PropType.string,
+  children: React.PropTypes.node,
 };
 
 export default Project;
