@@ -191,10 +191,10 @@ class NewProject(Resource):
         else:
             msg = "User is not authorized to create projects."
 
-        current_user = get_user_by("email", get_jwt_identity())
+        current_user = User.get_by_email(get_jwt_identity())
 
         if current_user.access_level >= AccessLevel.ADMIN:
-            return create_project(args.project_name, args.project_type)
+            return Project(args.project_name, args.project_type)
 
         return jsonify({"message": "User unauthorized to create a project."})
 
@@ -485,9 +485,12 @@ class FetchUserProjects(Resource):
     Fetch all projects that a user is authorized to
     """
 
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
     @jwt_required()
     def get(self):
-        current_user = get_user_by("email", get_jwt_identity())
+        current_user = User.get_by_email(get_jwt_identity())
         user_projects = {}
         projects = []
 

@@ -36,7 +36,7 @@ const Footer = () => {
           {/* Column 3 */}
           <div className="col">
             <h1>GitHub</h1>
-            <a href="https://github.com/">
+            <a href="https://github.com/th3tard1sparadox/GutenTag">
               <Github className="github-logo" color="#063954" />
             </a>
           </div>

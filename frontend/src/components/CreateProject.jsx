@@ -6,11 +6,13 @@ import '../css/CreateProject.css';
 
 const CreateProject = ({ toggleCallback }) => {
   const [projectName, setProjectName] = useState('');
-  const [projectType, setProjectType] = useState('');
+  const [projectType, setProjectType] = useState(1);
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateProject(projectName, parseInt(projectType));
+    console.log("prooooooooooooooooject type: " + typeof projectType);
+    
+    await HTTPLauncher.sendCreateProject(projectName, projectType);
     toggleCallback();
   };
   const register = async (event) => {
@@ -43,12 +45,11 @@ const CreateProject = ({ toggleCallback }) => {
                 as="select"
                 name="type"
                 onChange={(event) => setProjectType(event.target.value)}
-                defaultValue="1"
               >
-                <option value="0">Text classification</option>
-                <option value="1">Image classification</option>
-                <option value="2">Sequence to Sequence</option>
-                <option value="3">Sequence labeling</option>
+                <option value={1}>Text classification</option>
+                <option value={2}>Image classification</option>
+                <option value={3}>Sequence to Sequence</option>
+                <option value={4}>Sequence labeling</option>
               </Form.Control>
             </Form.Group>
             <Button className="submitButton" variant="primary" type="submit">

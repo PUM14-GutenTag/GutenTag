@@ -12,6 +12,7 @@ const Home = () => {
   const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
 
   useEffect(() => {
+    if (projectsShow){
     async function fetchData() {
       const result = await HTTPLauncher.sendGetUserProjects();
       /*makes Object of Objects to Array of Arrays*/
@@ -19,7 +20,7 @@ const Home = () => {
       const mapedDataArray = dataArray.map((projectObject) => Object.values(projectObject));
       setProjects(mapedDataArray);
     }
-    fetchData();
+    fetchData();}
   }, [projectsShow]);
 
   function toggleProjects() {
