@@ -28,6 +28,11 @@
   align-items: center !important;
 }
 
+.row {
+  margin-right: 0px !important;
+  margin-left: 0px !important;
+}
+
 @media screen and (max-width: 960px) {
   .list-unstyled {
     font-size: 13px;
