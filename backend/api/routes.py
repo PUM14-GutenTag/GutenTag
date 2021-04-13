@@ -21,6 +21,7 @@ from api.models import (
 )
 from api.database_handler import (
     reset_db,
+    try_add,
     try_add_response,
     try_delete_response
 )
@@ -575,7 +576,7 @@ class Reset(Resource):
     def get(self):
         reset_db()
         admin = User("Admin", "Admin", "admin@admin", "password", True)
-        try_add_response(admin)
+        try_add(admin)
 
 
 rest.add_resource(Register, "/register")

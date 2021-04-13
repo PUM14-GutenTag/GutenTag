@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
@@ -11,7 +12,6 @@ function isLoggedIn() {
 }
 
 // Protected route wraps content in token validation
-// eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ component: Component, ...rest }) => {
   return (
     <Route
@@ -29,7 +29,6 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
             to={{
               pathname: '/',
               state: {
-                // eslint-disable-next-line react/prop-types
                 from: props.location,
               },
             }}
