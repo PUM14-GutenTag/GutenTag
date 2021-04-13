@@ -4,7 +4,8 @@ import Button from 'react-bootstrap/Button';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/CreateProject.css';
 
-const CreateProject = ({ toggleCallback }) => {
+const CreateProject = (props) => {
+  const { toggleCallback } = props;
   const [projectName, setProjectName] = useState('');
   const [projectType, setProjectType] = useState(1);
 

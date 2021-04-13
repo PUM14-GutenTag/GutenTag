@@ -3,7 +3,8 @@ import '../css/project.css';
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
-const Project = ({ name, created, projectType, selectedColor }) => {
+const Project = (props) => {
+  const { name, created, projectType, selectedColor } = props;
   const [showInfo, setShowInfo] = useState(false);
   const projectTypeNames = [
     'Text classification',
