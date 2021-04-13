@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import '../css/project.css';
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
-const Project = (props) => {
-  const { name, created, projectType, selectedColor } = props;
+const Project = ({ name, created, projectType, selectedColor }) => {
   const [showInfo, setShowInfo] = useState(false);
   const projectTypeNames = [
     'Text classification',
@@ -44,4 +44,12 @@ const Project = (props) => {
     </div>
   );
 };
+
+Project.propTypes = {
+  name: PropTypes.string,
+  created: PropType.string,
+  projectType: PropType.number,
+  selectedColor: PropType.string,
+};
+
 export default Project;
