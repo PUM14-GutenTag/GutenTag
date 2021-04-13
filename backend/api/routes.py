@@ -92,7 +92,7 @@ class Login(Resource):
                 access_token, refresh_token = None, None
             else:
                 msg = f"Logged in as {user.first_name} {user.last_name}"
-                access_token, refresh_token = None, None
+                access_token, refresh_token = response
 
         return jsonify({
             "message": msg,
