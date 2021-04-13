@@ -501,9 +501,13 @@ class FetchUserProjects(Resource):
 
         for project in projects:
             user_projects[project.id] = {
-                "name": project.name, "type": project.project_type, "created": project.created}
+                "name": project.name,
+                "type": project.project_type,
+                "created": project.created
+            }
 
-        return jsonify({"msg": "Retrieved user projects", "projects": user_projects})
+        return jsonify({"msg": "Retrieved user projects",
+                        "projects": user_projects})
 
 
 class GetExportData(Resource):

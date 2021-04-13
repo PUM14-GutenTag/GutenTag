@@ -11,15 +11,15 @@ const Home = () => {
   let colorCounter = 0;
   const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
 
+  async function fetchData() {
+    const result = await HTTPLauncher.sendGetUserProjects();
+    const dataArray = Object.values(result.data.projects);
+    const mapedDataArray = dataArray.map((projectObject) => Object.values(projectObject));
+    setProjects(mapedDataArray);
+  }
+
   useEffect(() => {
     if (projectsShow) {
-      async function fetchData() {
-        const result = await HTTPLauncher.sendGetUserProjects();
-        /*makes Object of Objects to Array of Arrays*/
-        const dataArray = Object.values(result.data.projects);
-        const mapedDataArray = dataArray.map((projectObject) => Object.values(projectObject));
-        setProjects(mapedDataArray);
-      }
       fetchData();
     }
   }, [projectsShow]);
@@ -52,18 +52,17 @@ const Home = () => {
                   name={result[1]}
                   projectType={result[2]}
                   selectedColor={setColorCounter()}
-                ></Project>
+                />
               </li>
             ))}
           </ul>
-          <div></div>
         </div>
       ) : (
         <div>
           <Button className="toggleButton" variant="success" onClick={toggleProjects}>
             Back to home
           </Button>
-          <CreateProject toggleCallback={toggleProjects}></CreateProject>
+          <CreateProject toggleCallback={toggleProjects} />
         </div>
       )}
     </div>

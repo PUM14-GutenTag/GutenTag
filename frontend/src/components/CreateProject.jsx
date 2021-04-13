@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/CreateProject.css';
 
-const CreateProject = (props) => {
-  const { toggleCallback } = props;
+const CreateProject = ({ toggleCallback }) => {
   const [projectName, setProjectName] = useState('');
   const [projectType, setProjectType] = useState(1);
 
@@ -14,15 +14,7 @@ const CreateProject = (props) => {
     await HTTPLauncher.sendCreateProject(projectName, projectType);
     toggleCallback();
   };
-  const register = async (event) => {
-    event.preventDefault();
-    await HTTPLauncher.sendRegister('Oscar', 'last_name', 'email', 'passwords', true);
-  };
-  const login = async (event) => {
-    event.preventDefault();
-    const responseLogin = await HTTPLauncher.sendLogin('email', 'passwords');
-    localStorage.setItem('gutentag-accesstoken', responseLogin.data.access_token);
-  };
+
   return (
     <div>
       <div className="create-container">
@@ -57,12 +49,12 @@ const CreateProject = (props) => {
           </Form>
         </div>
       </div>
-      <div className="buttons">
-        <Button onClick={register}>Register</Button>
-        <Button onClick={login}>Login</Button>
-      </div>
     </div>
   );
+};
+
+CreateProject.propTypes = {
+  toggleCallback: PropTypes.func.isRequired,
 };
 
 export default CreateProject;
