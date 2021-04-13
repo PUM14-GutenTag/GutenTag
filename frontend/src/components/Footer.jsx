@@ -9,7 +9,7 @@ const Footer = () => {
   return (
     <div className="main-footer">
       <div className="footer-container">
-        <div className="row">
+        <div id="content-row" className="row">
           {/* Column 1 */}
           <div className="col">
             <h1>GutenTag</h1>
@@ -44,7 +44,7 @@ const Footer = () => {
 
         <hr />
 
-        <div className="row">
+        <div id="copyright-row" className="row">
           <p className="col-small">
             &copy; Copyright {new Date().getFullYear()} GutenTag | All rights reserved | Terms of
             Service | Privacy

@@ -28,9 +28,9 @@
   align-items: center;
 }
 
-.row {
-  margin-right: 0px !important;
-  margin-left: 0px !important;
+.row, #content-row, #copyright-row {
+  margin-right: 0px;
+  margin-left: 0px;
 }
 
 @media screen and (max-width: 960px) {
