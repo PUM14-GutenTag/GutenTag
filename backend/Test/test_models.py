@@ -71,6 +71,14 @@ def test_create_project():
             Project({"Project"}, ProjectType.IMAGE_CLASSIFICATION))
         assert project is None
 
+def test_get_all_projects():
+    reset_db()
+    user = try_add(User("first", "last", "user@gmail.com", "password", true))
+    project = try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
+    project2 = try_add(Project("Project2", ProjectType.DOCUMENT_CLASSIFICATION))
+    
+    all_projects = Project.query.all()
+    assert all_projects in not None
 
 def test_authorize_user():
     reset_db()
