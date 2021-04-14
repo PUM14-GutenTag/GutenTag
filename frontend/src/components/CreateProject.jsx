@@ -38,9 +38,9 @@ const CreateProject = ({ toggleCallback }) => {
                 onChange={(event) => setProjectType(event.target.value)}
               >
                 <option value={1}>Text classification</option>
-                <option value={2}>Image classification</option>
+                <option value={2}>Sequence labeling</option>
                 <option value={3}>Sequence to Sequence</option>
-                <option value={4}>Sequence labeling</option>
+                <option value={4}>Image classification</option>
               </Form.Control>
             </Form.Group>
             <Button className="submitButton" variant="primary" type="submit">

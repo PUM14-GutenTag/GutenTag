@@ -249,6 +249,7 @@ class AddNewTextData(Resource):
                 2: import_sequence_labeling_data,
                 3: import_sequence_to_sequence_data,
             }
+            print("hej")
             try:
                 import_funcs[project.project_type](
                     args.project_id, args.json_data)
@@ -502,6 +503,7 @@ class FetchUserProjects(Resource):
         for project in projects:
             user_projects[project.id] = {
                 "name": project.name,
+                "id": project.id,
                 "type": project.project_type,
                 "created": project.created
             }

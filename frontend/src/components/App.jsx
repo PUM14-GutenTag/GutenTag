@@ -7,6 +7,7 @@ import Settings from '../pages/Settings';
 import Projects from '../pages/Projects';
 import NotFoundPage from '../pages/404';
 import Login from '../pages/Login';
+import Labeling from '../pages/Labeling';
 
 // Components
 import ProtectedRoute from './ProtectedRoute';
@@ -20,6 +21,7 @@ const App = () => {
     <Router>
       <Switch>
         <Route exact path="/" component={Login} />
+        <ProtectedRoute exact path="/labeling/:projectType/:id" component={Labeling} />
         <ProtectedRoute exact path="/home" component={Home} />
         <ProtectedRoute exact path="/settings" component={Settings} />
         <ProtectedRoute exact path="/projects" component={Projects} />

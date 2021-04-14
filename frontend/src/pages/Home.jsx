@@ -49,8 +49,9 @@ const Home = () => {
               <li key={result}>
                 <Project
                   created={result[0]}
-                  name={result[1]}
-                  projectType={result[2]}
+                  id={result[1]}
+                  name={result[2]}
+                  projectType={result[3]}
                   selectedColor={setColorCounter()}
                 />
               </li>
