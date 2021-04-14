@@ -5,11 +5,12 @@ import Project from '../components/Project';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/home.css';
 
+const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
+
 const Home = () => {
   const [projectsShow, setProjectsShow] = useState(true);
   const [projects, setProjects] = useState([]);
   let colorCounter = 0;
-  const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
 
   async function fetchData() {
     const result = await HTTPLauncher.sendGetUserProjects();
@@ -24,18 +25,16 @@ const Home = () => {
     }
   }, [projectsShow]);
 
-  function toggleProjects() {
+  const toggleProjects = () => {
     setProjectsShow((previousValue) => !previousValue);
-  }
+  };
 
-  function setColorCounter() {
+  const setColorCounter = () => {
     const selectedColor = colorList[colorCounter];
-    colorCounter += 1;
-    if (colorCounter === colorList.length) {
-      colorCounter = 0;
-    }
+    colorCounter === colorList.length - 1 ? (colorCounter = 0) : (colorCounter += 1);
+
     return selectedColor;
-  }
+  };
 
   return (
     <div className="home-container">

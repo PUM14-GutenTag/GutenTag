@@ -1,14 +1,12 @@
 import React from 'react';
-import { HouseFill, GearFill } from 'react-bootstrap-icons';
-
-import '../css/Header.css';
 import { Navbar, Nav, Container } from 'react-bootstrap';
-
+import { HouseFill, GearFill } from 'react-bootstrap-icons';
 import logo from '../res/hat_dark.svg';
+import '../css/header.css';
+
 /**
  * Header to be used across all pages.
  */
-
 function Header() {
   return (
     <Navbar className="sticky-top" expand="md">

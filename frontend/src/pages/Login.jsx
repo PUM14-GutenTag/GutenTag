@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Col, Row, Form } from 'react-bootstrap';
 
-import '../css/Login.css';
+import '../css/login.css';
 
 import logoUnder from '../res/hat_dark_under.svg';
 import HTTPLauncher from '../services/HTTPLauncher';

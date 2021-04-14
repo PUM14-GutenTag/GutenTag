@@ -1,6 +1,6 @@
 import React from 'react';
 import { Github } from 'react-bootstrap-icons';
-import '../css/Footer.css';
+import '../css/footer.css';
 
 /**
  * Footer to be used across all pages.

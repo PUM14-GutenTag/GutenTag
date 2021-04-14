@@ -174,8 +174,8 @@ class NewProject(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project_name', type=str, required=True)
-        self.reqparse.add_argument('project_type', type=int, required=True)
+        self.reqparse.add_argument("project_name", type=str, required=True)
+        self.reqparse.add_argument("project_type", type=int, required=True)
 
     @jwt_required()
     def post(self):
@@ -191,11 +191,6 @@ class NewProject(Resource):
                 msg = f"Could not create project: {e}"
         else:
             msg = "User is not authorized to create projects."
-
-        current_user = User.get_by_email(get_jwt_identity())
-
-        if current_user.access_level >= AccessLevel.ADMIN:
-            return Project(args.project_name, args.project_type)
 
         return jsonify({"message": msg})
 

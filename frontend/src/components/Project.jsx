@@ -7,16 +7,16 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 const Project = ({ name, created, projectType, selectedColor }) => {
   const [showInfo, setShowInfo] = useState(false);
   const projectTypeNames = [
-    'Text classification',
-    'Image classification',
-    'Sequence to Sequence',
+    'Document classification',
+    'Sequence labeling',
+    'sequence to sequence labeling',
     'Sequence labeling',
   ];
 
   const toggleInfo = () => {
     setShowInfo((previousValue) => !previousValue);
   };
-
+  console.log(selectedColor);
   return (
     <div
       className="project-container"
@@ -24,13 +24,9 @@ const Project = ({ name, created, projectType, selectedColor }) => {
       onClick={toggleInfo}
       aria-hidden="true"
     >
-      <div>
-        <div>
-          <h1>{name}</h1>
-        </div>
-        <div className="progress-bar-project">
-          <ProgressBar animated now={50} striped />
-        </div>
+      <div className="title-container">
+        <h1>{name}</h1>
+        <ProgressBar now={50} striped id="progress-bar-project" />
       </div>
       {showInfo ? (
         <div className="projectInfo">

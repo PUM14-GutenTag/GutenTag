@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import HTTPLauncher from '../services/HTTPLauncher';
-import '../css/CreateProject.css';
+import '../css/createProject.css';
 
 const CreateProject = ({ toggleCallback }) => {
   const [projectName, setProjectName] = useState('');
@@ -37,10 +37,10 @@ const CreateProject = ({ toggleCallback }) => {
                 name="type"
                 onChange={(event) => setProjectType(event.target.value)}
               >
-                <option value={1}>Text classification</option>
-                <option value={2}>Image classification</option>
-                <option value={3}>Sequence to Sequence</option>
-                <option value={4}>Sequence labeling</option>
+                <option value={1}>Document classification</option>
+                <option value={2}>Sequence labeling</option>
+                <option value={3}>sequence to sequence labeling</option>
+                <option value={4}>Image classification</option>
               </Form.Control>
             </Form.Group>
             <Button className="submitButton" variant="primary" type="submit">

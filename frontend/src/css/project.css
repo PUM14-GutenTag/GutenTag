@@ -4,10 +4,21 @@
   border: 1px #b1b1b1 solid;
   box-shadow: 2px 2px 2px;
 }
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.title-container h1 {
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 p {
   font-size: 12px;
 }
 
-.progress-bar-project {
-  margin: 0px 0px 0px 0px;
+#progress-bar-project {
+  margin: 0;
+  width: 50%;
 }
