@@ -10,7 +10,7 @@ const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
 const Home = () => {
   const [projectsShow, setProjectsShow] = useState(true);
   const [projects, setProjects] = useState([]);
-  let colorCounter = 0;
+  const [counter, setCounter] = useState(0);
 
   async function fetchData() {
     const result = await HTTPLauncher.sendGetUserProjects();
@@ -29,12 +29,6 @@ const Home = () => {
     setProjectsShow((previousValue) => !previousValue);
   };
 
-  const setColorCounter = () => {
-    const selectedColor = colorList[colorCounter];
-    colorCounter === colorList.length - 1 ? (colorCounter = 0) : (colorCounter += 1);
-    return selectedColor;
-  };
-
   return (
     <div className="home-container">
       {projectsShow ? (
@@ -43,13 +37,13 @@ const Home = () => {
             Create project
           </Button>
           <ul>
-            {projects.map((result) => (
+            {projects.map((result, i) => (
               <li key={result}>
                 <Project
                   created={result[0]}
                   name={result[1]}
                   projectType={result[2]}
-                  selectedColor={setColorCounter()}
+                  selectedColor={colorList[i % colorList.length]}
                 />
               </li>
             ))}

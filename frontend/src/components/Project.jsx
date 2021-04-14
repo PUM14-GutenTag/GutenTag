@@ -16,7 +16,6 @@ const Project = ({ name, created, projectType, selectedColor }) => {
   const toggleInfo = () => {
     setShowInfo((previousValue) => !previousValue);
   };
-  console.log(selectedColor);
   return (
     <div
       className="project-container"
