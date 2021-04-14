@@ -10,7 +10,6 @@ const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
 const Home = () => {
   const [projectsShow, setProjectsShow] = useState(true);
   const [projects, setProjects] = useState([]);
-  const [counter, setCounter] = useState(0);
 
   async function fetchData() {
     const result = await HTTPLauncher.sendGetUserProjects();
