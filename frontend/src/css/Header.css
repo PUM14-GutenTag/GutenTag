@@ -1,17 +1,12 @@
 .navbar {
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
-  background-color: #ffffff !important;
+  background-color: #ffffff;
 }
 
-.navbar-container {
-  position: relative;
-  font-size: 1em;
-  max-width: 1320px !important;
-  padding-left: 3em !important;
+.container.navbar-container, #navbar-content {
+  max-width: 1320px;
+  padding-left: 3em;
   padding-right: 3em;
-  margin: auto;
-  flex: auto;
-  display: flex;
 }
 
 .navbar-collapse {
@@ -23,16 +18,16 @@
   height: 100px;
 }
 
-.text-label {
+a.nav-link.text-label, #home-link, #settings-link {
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
   font-size: 44px;
   line-height: 54px;
 
-  padding: 0.2em 0.4em !important;
+  padding: 0.2em 0.4em;
 
-  color: #063954 !important;
+  color: #063954;
 }
 
 .icon-offset {
