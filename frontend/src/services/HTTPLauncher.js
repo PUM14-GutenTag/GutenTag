@@ -47,9 +47,10 @@ class HTTPLauncher {
 
   // Send HTTP-request to change password
   static sendChangePassword(oldPassword, newPassword) {
-    return axiosInstance().post('change-password', {
+    return axiosInstance().post(
+      'change-password', {
       old_password: oldPassword,
-      new_password: newPassword
+      new_password: newPassword,
     },
     {
       headers: authHeader(),
@@ -58,10 +59,11 @@ class HTTPLauncher {
   }
 
   static sendChangePasswordOther(email, newPassword) {
-    return axiosInstance().post('change-password', {
-      old_password: "old password",
+    return axiosInstance().post(
+      'change-password', {
+      old_password: 'old password',
       new_password: newPassword,
-      email
+      email,
     },
     {
       headers: authHeader(),

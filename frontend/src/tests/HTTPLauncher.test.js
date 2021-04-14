@@ -2,7 +2,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import { getMaxListeners } from 'process';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 
@@ -145,13 +144,13 @@ describe('sendChangePassword request', () => {
     await resetDB();
     await createUser();
 
-    const changePwResponse = await HTTPLauncher.sendChangePassword('pass', 'bass')
+    const changePwResponse = await HTTPLauncher.sendChangePassword('pass', 'bass');
     expect(changePwResponse.status).toBe(200);
 
-    const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass')
-    expect(failedLoginResponse.data.access_token).not.toBeDefined
+    const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
+    expect(failedLoginResponse.data.access_token).not.toBeDefined;
 
-    const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass')
+    const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass');
     expect(successfulLoginResponse.data.access_token).toBeDefined;
 
   });
@@ -160,12 +159,12 @@ describe('sendChangePassword request', () => {
     await resetDB();
     await createUser();
 
-    const changePwResponse = await HTTPLauncher.sendChangePassword('bass', 'pass')
+    await HTTPLauncher.sendChangePassword('bass', 'pass');
 
-    const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass')
+    const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass');
     expect(failedLoginResponse.data.access_token).not.toBeDefined;
 
-    const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass')
+    const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
     expect(successfulLoginResponse.data.access_token).toBeDefined;
 
   });
@@ -186,19 +185,19 @@ describe('sendChangePasswordOther request', () => {
       true
     );
 
-    const adminLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass')
+    await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
 
-    const changePwResponse = await HTTPLauncher.sendChangePasswordOther('email', 'bass')
+    const changePwResponse = await HTTPLauncher.sendChangePasswordOther('email', 'bass');
     expect(changePwResponse.status).toBe(200);
 
-    const oldPasswordLoginResponse = await HTTPLauncher.sendLogin('normal@gmail.com', 'pass')
+    const oldPasswordLoginResponse = await HTTPLauncher.sendLogin('normal@gmail.com', 'pass');
     expect(oldPasswordLoginResponse.data.access_token).not.toBeDefined;
 
-    const normalLoginResponse = await HTTPLauncher.sendLogin('normal@gmailcom', 'bass')
+    const normalLoginResponse = await HTTPLauncher.sendLogin('normal@gmailcom', 'bass');
     expect(normalLoginResponse.data.access_token).toBeDefined;
 
-    const unauthorizedChangePwResponse = await HTTPLauncher.sendChangePasswordOther('mail@gmail.com', 'bass')
-    const pwNotChangedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass')
+    await HTTPLauncher.sendChangePasswordOther('mail@gmail.com', 'bass');
+    const pwNotChangedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
     expect(pwNotChangedLoginResponse.data.access_token).toBeDefined;
   });
 });

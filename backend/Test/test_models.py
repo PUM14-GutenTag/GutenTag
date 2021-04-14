@@ -52,6 +52,7 @@ def test_create_user():
                             "name@gmail.com", "password", True))
         assert user is None
 
+
 def test_change_password():
     reset_db()
 
@@ -64,6 +65,7 @@ def test_change_password():
 
     assert user.check_password("password") is False
     assert user.check_password("bassword") is True
+
 
 def test_create_project():
     reset_db()

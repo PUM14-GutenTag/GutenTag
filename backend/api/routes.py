@@ -68,6 +68,7 @@ class Register(Resource):
                     args.admin)
         return jsonify(try_add_response(user))
 
+
 class CreateUser(Resource):
     """
     Endpoint for creating an user.
@@ -81,17 +82,19 @@ class CreateUser(Resource):
         self.reqparse.add_argument("password", type=str, required=True)
         self.reqparse.add_argument("admin", type=inputs.boolean,
                                    required=False, default=False)
+
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
 
         if user.access_level >= AccessLevel.ADMIN:
-            new_user = User(args.first_name, args.last_name, args.email, args.password,
-                    args.admin)
+            new_user = User(args.first_name, args.last_name, args.email, args.password, 
+                args.admin)
             return jsonify(try_add_response(new_user))
-        
-        return jsonify({"id": None, "message": "You are not authorized to create other users."})
+
+        return jsonify({"id": None, "message": \
+             "You are not authorized to create other users."})
 
 
 class Login(Resource):
@@ -125,6 +128,7 @@ class Login(Resource):
             "refresh_token": refresh_token
         })
 
+
 class ChangePassword(Resource):
     """
     Endpoint for changing user password.
@@ -136,7 +140,8 @@ class ChangePassword(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("old_password", type=str, required=False, default=None)
+        self.reqparse.add_argument("old_password", type=str, required=False,
+            default=None)
         self.reqparse.add_argument("new_password", type=str, required=True)
         self.reqparse.add_argument("email", type=str, required=False, default=None)
 
@@ -148,7 +153,7 @@ class ChangePassword(Resource):
 
         if not args.email:
             if not args.old_password:
-                msg ="Missing parameter: 'old_password'"
+                msg = "Missing parameter: 'old_password'"
             elif user.check_password(args.old_password):
                 user.change_password(args.new_password)
                 msg = "Password changed succesfully"
@@ -160,11 +165,12 @@ class ChangePassword(Resource):
                     msg = f"Password of {args.email} was changed succesfully"
             else:
                 msg = "User is unauthorized to change other users passwords."
-            
+
         return jsonify({
             "message": msg
         })
 
+        
 class RefreshToken(Resource):
     """
     Endpoint for refreshing JWT-tokens.
