@@ -1,6 +1,6 @@
 .main-footer {
-  color: white;
-  background-color: #282c34;
+  color: #063954;
+  background-color: #ededed;
   padding-top: 3em;
   padding-left: 3em;
   position: relative;
@@ -11,7 +11,6 @@
 
 .github-logo {
   object-fit: contain;
-  object-position: center;
   max-width: 100%;
   max-height: 100%;
   width: 100px;
@@ -22,10 +21,6 @@
   font-size: 16px;
 }
 
-.row > div {
-  padding: 0 50px 0 50px;
-}
-
 .footer-container {
   display: flex;
   flex-direction: column;
@@ -33,17 +28,18 @@
   align-items: center;
 }
 
+.row, #content-row, #copyright-row {
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
 @media screen and (max-width: 960px) {
   .list-unstyled {
     font-size: 13px;
   }
   .github-logo {
-    max-width: 90%;
-    max-height: 90%;
-  }
-
-  .row > div {
-    padding: 0 30px 0 30px;
+    width: 90px;
+    height: 90px;
   }
 }
 
@@ -52,18 +48,15 @@
     font-size: 12px;
   }
   .github-logo {
-    max-width: 85%;
-    max-height: 85%;
+    width: 80px;
+    height: 80px;
   }
   .col-small {
     font-size: 11px;
   }
 
   .col > h1 {
-    font-size: 15px;
-  }
-  .row > div {
-    padding: 0 20px 0 20px;
+    font-size: 20px;
   }
 }
 
@@ -72,8 +65,8 @@
     font-size: 9px;
   }
   .github-logo {
-    max-width: 85%;
-    max-height: 85%;
+    width: 60px;
+    height: 60px;
   }
   .col-small {
     font-size: 9px;
@@ -83,7 +76,13 @@
     font-size: 11px;
   }
 
-  .row > div {
-    padding: 0 10px 0 10px;
+  .main-footer {
+    padding-left: 1em;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  .main-footer {
+    padding-left: 0.5em;
   }
 }
