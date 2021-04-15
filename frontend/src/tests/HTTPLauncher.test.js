@@ -195,6 +195,18 @@ describe('sendCreateProject', () => {
   });
 });
 
+describe('sendGetUserProjects', () => {
+  test('Correct request', async () => {
+    await resetDB();
+    await createUser(true);
+    await createProject(1);
+
+    const response = await HTTPLauncher.sendGetUserProjects();
+    expect(response.status).toBe(200);
+    expect(Object.values(response.data.projects.length).toBe(1));
+  });
+});
+
 describe('sendDeleteProject request', () => {
   test('Correct request', async () => {
     await resetDB();
