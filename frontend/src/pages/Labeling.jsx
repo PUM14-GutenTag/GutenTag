@@ -9,19 +9,19 @@ import DocumentClassification from '../components/DocumentClassification';
 import '../css/Labeling.css';
 
 const Labeling = () => {
+  const [lastData, setLastData] = useState('');
+  const [lastLabel, setLastLabel] = useState('');
   const [projectData, setProjectData] = useState('');
-  const [currentData, setCurrentData] = useState(1);
+  const [currentData, setCurrentData] = useState();
   const [label, setLabel] = useState('');
   const type = useParams().projectType;
 
   const projectId = useParams().id;
 
   async function fetchProjectData() {
-    // const result = await HTTPLauncher.sendGetUserProjects();
-    // const data = Object.values(result.data.projects.)
-    const response = await HTTPLauncher.sendGetData(projectId, 3);
-    // setDataId(Object.keys(response).find((key) => response[key] === response.data[currentData]));
+    const response = await HTTPLauncher.sendGetData(projectId);
     setProjectData(response.data);
+    setCurrentData(Object.keys(response.data)[0]);
   }
 
   async function testAddProjectData() {
@@ -30,7 +30,15 @@ const Labeling = () => {
       projectId,
       JSON.stringify([
         {
-          text: 'Baby Yoda',
+          text: 'Data nummer 1',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 2',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 3',
           labels: [],
         },
       ])
@@ -55,10 +63,19 @@ const Labeling = () => {
       }
     }
 
-    return <div>hej</div>;
+    return <div>This data shouldn't be labeled</div>;
   };
-  const changeData = (diff) => {
-    setCurrentData(currentData + diff);
+  const nextData = () => {
+    setLastData(projectData);
+    fetchProjectData();
+  };
+
+  const getLastData = () => {
+    const tempLastData = lastData;
+    const tempProjectData = projectData;
+    setLastData(tempProjectData);
+    setProjectData(tempLastData);
+    setCurrentData(Object.keys(tempLastData)[0]);
   };
 
   const addLabel = async (event) => {
@@ -67,8 +84,9 @@ const Labeling = () => {
     const dataId = parseInt(
       Object.keys(projectData).find((key) => projectData[key] === projectData[currentData])
     );
+    setLastData(projectData);
     const response = await HTTPLauncher.sendCreateDocumentClassificationLabel(dataId, label);
-    console.log(response);
+    fetchProjectData();
   };
 
   return (
@@ -81,15 +99,9 @@ const Labeling = () => {
       <br />
       <div>
         <div className="main-content">
-          <ChevronLeft
-            className="left-align make-large fa-10x arrow-btn"
-            onClick={() => changeData(-1)}
-          />
+          <ChevronLeft className="left-align make-large fa-10x arrow-btn" onClick={getLastData} />
           <div className="data-content">{renderAuthButton(type)}</div>
-          <ChevronRight
-            className="right-align make-large fa-10x arrow-btn"
-            onClick={() => changeData(1)}
-          />
+          <ChevronRight className="right-align make-large fa-10x arrow-btn" onClick={nextData} />
         </div>
         <br />
         <Form onSubmit={addLabel}>

@@ -345,6 +345,10 @@ class CreateDocumentClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                print(jsonify(try_add_response(
+                    DocumentClassificationLabel(
+                        args.data_id, user.id, args.label)
+                )))
                 return jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label)
