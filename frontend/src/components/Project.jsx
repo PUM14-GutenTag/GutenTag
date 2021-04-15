@@ -9,8 +9,8 @@ const Project = ({ name, created, projectType, selectedColor }) => {
   const projectTypeNames = [
     'Document classification',
     'Sequence labeling',
-    'sequence to sequence labeling',
-    'Sequence labeling',
+    'Sequence to sequence labeling',
+    'Image Classification',
   ];
 
   const toggleInfo = () => {
