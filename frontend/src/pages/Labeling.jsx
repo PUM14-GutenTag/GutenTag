@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
-
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useParams } from 'react-router-dom';
-import { Navbar, Nav, Container } from 'react-bootstrap';
 import HTTPLauncher from '../services/HTTPLauncher';
 import DocumentClassification from '../components/DocumentClassification';
 import '../css/Labeling.css';
 
 const Labeling = () => {
   const [projectData, setProjectData] = useState('');
+  const [currentData, setCurrentData] = useState(1);
+  const [label, setLabel] = useState('');
   const type = useParams().projectType;
 
   const projectId = useParams().id;
@@ -17,17 +19,18 @@ const Labeling = () => {
   async function fetchProjectData() {
     // const result = await HTTPLauncher.sendGetUserProjects();
     // const data = Object.values(result.data.projects.)
-    const response = await HTTPLauncher.sendGetData(projectId, 1);
-    console.log(response);
-    setProjectData(response);
+    const response = await HTTPLauncher.sendGetData(projectId, 3);
+    // setDataId(Object.keys(response).find((key) => response[key] === response.data[currentData]));
+    setProjectData(response.data);
   }
 
   async function testAddProjectData() {
+    console.log('Adddddddd data');
     const response = await HTTPLauncher.sendAddNewTextData(
       projectId,
       JSON.stringify([
         {
-          text: 'Gosling provides an amazing performance that dwarfs everything else in the film.',
+          text: 'Baby Yoda',
           labels: [],
         },
       ])
@@ -37,49 +40,75 @@ const Labeling = () => {
 
   useEffect(() => {
     fetchProjectData();
-    console.log(type);
   }, []);
 
   /*
-
-  
-
-  progressbar för hela projektet
-  progressbar för användare
-
-  hämta typ av projekt
-  olika containers beroende på labling-uppgift (if-statement)
-  hämta specifika datan för projektet
-
-  Nån form av textruta där labels skrivs
+  fixa css
+  fixa hämta ny data när det är nödvändigt
+  fixa labeling
  */
 
   const renderAuthButton = (typeOfProject) => {
-    console.log(`this is the type ${typeof type}`);
-    if (typeOfProject === '1') {
-      return <DocumentClassification />;
+    if (projectData[currentData]) {
+      if (typeOfProject === '1') {
+        return <DocumentClassification data={projectData[currentData]} />;
+      }
     }
-    return <button>Login</button>;
+
+    return <div>hej</div>;
+  };
+  const changeData = (diff) => {
+    setCurrentData(currentData + diff);
+  };
+
+  const addLabel = async (event) => {
+    event.preventDefault();
+    // eslint-disable-next-line radix
+    const dataId = parseInt(
+      Object.keys(projectData).find((key) => projectData[key] === projectData[currentData])
+    );
+    const response = await HTTPLauncher.sendCreateDocumentClassificationLabel(dataId, label);
+    console.log(response);
   };
 
   return (
-    <div>
-      <ProgressBar striped variant="success" now={40} />
+    <div className="content-container">
+      <div className="progress-bars">
+        <ProgressBar striped variant="success" now={40} />
+        <br />
+        <ProgressBar striped variant="warning" now={80} />
+      </div>
       <br />
-      <ProgressBar striped variant="warning" now={80} />
-      <br />
-      <div className="container">
+      <div>
         <div className="main-content">
-          <ChevronLeft className="left-align make-large fa-10x" />
+          <ChevronLeft
+            className="left-align make-large fa-10x arrow-btn"
+            onClick={() => changeData(-1)}
+          />
           <div className="data-content">{renderAuthButton(type)}</div>
-          <ChevronRight className="right-align make-large fa-10x" />
+          <ChevronRight
+            className="right-align make-large fa-10x arrow-btn"
+            onClick={() => changeData(1)}
+          />
         </div>
         <br />
+        <Form onSubmit={addLabel}>
+          <Form.Group controlId="form.name">
+            <Form.Control
+              type="text"
+              onChange={(event) => setLabel(event.target.value)}
+              placeholder="Enter label..."
+              required
+            />
+          </Form.Group>
+          <Button className="submitButton" variant="primary" type="submit">
+            Label
+          </Button>
+        </Form>
 
-        <input type="text" />
         <br />
         <button type="button" className="btn btn-primary" onClick={testAddProjectData}>
-          Done labeling
+          Add data
         </button>
       </div>
     </div>

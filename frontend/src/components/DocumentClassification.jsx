@@ -1,12 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
-const DocumentClassification = () => {
-  return (
-    <>
-      Your text here hejsja sadj sad aasydabhdysafasusfa dbaysdbs adbasydba dbysad bad aysbd absd
-      aybsd abys ydbaby dasbd asby
-    </>
-  );
+const DocumentClassification = ({ data }) => {
+  return <>{data}</>;
 };
 
+DocumentClassification.propTypes = {
+  data: PropTypes.string.isRequired,
+};
 export default DocumentClassification;
