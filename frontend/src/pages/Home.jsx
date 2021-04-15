@@ -13,9 +13,6 @@ const Home = () => {
 
   async function fetchData() {
     const result = await HTTPLauncher.sendGetUserProjects();
-    console.log(result.data.projects);
-    console.log(Object.values(result.data.projects));
-
     const dataArray = Object.values(result.data.projects);
     const mapedDataArray = dataArray.map((projectObject) => Object.values(projectObject));
     setProjects(mapedDataArray);

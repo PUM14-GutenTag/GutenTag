@@ -2,7 +2,7 @@
   border-radius: 1vw;
   padding: 12px;
   border: 1px #b1b1b1 solid;
-  box-shadow: 2px 2px 2px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
 }
 .title-container {
   display: flex;

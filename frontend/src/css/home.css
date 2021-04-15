@@ -1,9 +1,4 @@
-.projects-container {
-  margin-left: 2%;
-  margin-right: 2%;
-  margin-top: 2%;
-}
-.toggleButton {
+.create-container.toggleButton {
   font-size: 24px;
 }
 ul {
