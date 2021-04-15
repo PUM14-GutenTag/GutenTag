@@ -15,7 +15,7 @@ import ProtectedRoute from './ProtectedRoute';
 import '../css/App.css';
 
 // App content.
-function App() {
+const App = () => {
   return (
     <Router>
       <Switch>
@@ -28,6 +28,6 @@ function App() {
       </Switch>
     </Router>
   );
-}
+};
 
 export default App;

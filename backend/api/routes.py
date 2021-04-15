@@ -292,7 +292,6 @@ class AddNewImageData(Resource):
                     msg = f"Could not add data: {e}"
             else:
                 msg = "User is not authorized to add data."
-
         return jsonify({"message": msg})
 
 
@@ -476,6 +475,36 @@ class DeleteLabel(Resource):
         return jsonify({"message": msg})
 
 
+class FetchUserProjects(Resource):
+    """
+    Fetch all projects that a user is authorized to
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
+    @jwt_required()
+    def get(self):
+        current_user = User.get_by_email(get_jwt_identity())
+        user_projects = {}
+        projects = []
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            projects = Project.query.all()
+        else:
+            projects = current_user.projects
+
+        for project in projects:
+            user_projects[project.id] = {
+                "name": project.name,
+                "type": project.project_type,
+                "created": project.created
+            }
+
+        return jsonify({"msg": "Retrieved user projects",
+                        "projects": user_projects})
+
+
 class GetExportData(Resource):
     """
     Endpoint for exporting data from project according to filters.
@@ -563,6 +592,7 @@ rest.add_resource(CreateSequenceLabel, "/label-sequence")
 rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
 rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
+rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")
 rest.add_resource(Reset, "/reset")

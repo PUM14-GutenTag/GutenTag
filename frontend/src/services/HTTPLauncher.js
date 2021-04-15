@@ -93,6 +93,12 @@ class HTTPLauncher {
     });
   }
 
+  static sendGetUserProjects() {
+    return axiosInstance().get('get-user-projects', {
+      headers: authHeader(),
+    });
+  }
+
   /* Send HTTP-request to add one or more text data points to an existing project.
 
     Below is the expected structure of JSONData for the different project types:

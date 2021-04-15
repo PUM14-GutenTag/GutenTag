@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Col, Row, Form } from 'react-bootstrap';
 
-import '../css/Login.css';
+import '../css/login.css';
 
 import logoUnder from '../res/hat_dark_under.svg';
 import HTTPLauncher from '../services/HTTPLauncher';
@@ -24,8 +24,7 @@ function Login() {
     setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
     const token = responseLogin.data.access_token;
-
-    localStorage.setItem('gutentag-accesstoken', JSON.stringify(token));
+    localStorage.setItem('gutentag-accesstoken', token);
     window.location.href = 'http://localhost:3000/home';
   }
 

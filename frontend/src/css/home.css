@@ -1,9 +1,10 @@
+.create-container.toggleButton {
+  font-size: 24px;
+}
 ul {
-    list-style-type: none;
-    margin-left: 2%;
-    margin-right: 2%;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
 }
 li {
-    margin-top: 2%;
+  margin-top: 10px;
 }
