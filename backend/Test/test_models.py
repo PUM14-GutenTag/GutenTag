@@ -53,6 +53,20 @@ def test_create_user():
         assert user is None
 
 
+def test_change_password():
+    reset_db()
+
+    # Create user
+    user = try_add(User("Oscar", "Lonnqvist", "admin@gmail.com", "password",
+                        False))
+
+    # Test changing password
+    user.change_password("bassword")
+
+    assert user.check_password("password") is False
+    assert user.check_password("bassword") is True
+
+
 def test_create_project():
     reset_db()
 
