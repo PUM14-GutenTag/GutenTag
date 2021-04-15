@@ -89,12 +89,12 @@ class CreateUser(Resource):
         user = User.get_by_email(get_jwt_identity())
 
         if user.access_level >= AccessLevel.ADMIN:
-            new_user = User(args.first_name, args.last_name, args.email, args.password, 
-                args.admin)
+            new_user = User(args.first_name, args.last_name, args.email,
+                            args.password, args.admin)
             return jsonify(try_add_response(new_user))
 
-        return jsonify({"id": None, "message": \
-             "You are not authorized to create other users."})
+        return jsonify({"id": None, "message":
+                        "You are not authorized to create other users."})
 
 
 class Login(Resource):
@@ -141,9 +141,10 @@ class ChangePassword(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("old_password", type=str, required=False,
-            default=None)
+                                   default=None)
         self.reqparse.add_argument("new_password", type=str, required=True)
-        self.reqparse.add_argument("email", type=str, required=False, default=None)
+        self.reqparse.add_argument(
+            "email", type=str, required=False, default=None)
 
     @jwt_required()
     def post(self):
@@ -170,7 +171,7 @@ class ChangePassword(Resource):
             "message": msg
         })
 
-        
+
 class RefreshToken(Resource):
     """
     Endpoint for refreshing JWT-tokens.

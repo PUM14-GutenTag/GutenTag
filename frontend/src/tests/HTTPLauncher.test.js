@@ -148,11 +148,10 @@ describe('sendChangePassword request', () => {
     expect(changePwResponse.status).toBe(200);
 
     const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
-    expect(failedLoginResponse.data.access_token).not.toBeDefined;
+    expect(failedLoginResponse.data.access_token).not.toBeDefined();
 
     const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass');
-    expect(successfulLoginResponse.data.access_token).toBeDefined;
-
+    expect(successfulLoginResponse.data.access_token).toBeDefined();
   });
 
   test('Unsuccesfully change password of own user', async () => {
@@ -162,11 +161,10 @@ describe('sendChangePassword request', () => {
     await HTTPLauncher.sendChangePassword('bass', 'pass');
 
     const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass');
-    expect(failedLoginResponse.data.access_token).not.toBeDefined;
+    expect(failedLoginResponse.data.access_token).not.toBeDefined();
 
     const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
-    expect(successfulLoginResponse.data.access_token).toBeDefined;
-
+    expect(successfulLoginResponse.data.access_token).toBeDefined();
   });
 });
 
@@ -177,13 +175,7 @@ describe('sendChangePasswordOther request', () => {
 
     const email = 'normal@gmail.com';
     const password = 'pass';
-    const registerResponse = await HTTPLauncher.sendRegister(
-      'Reeman',
-      'Rus',
-      password,
-      email,
-      true
-    );
+    await HTTPLauncher.sendRegister('Reeman', 'Rus', password, email, true);
 
     await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
 
@@ -191,17 +183,16 @@ describe('sendChangePasswordOther request', () => {
     expect(changePwResponse.status).toBe(200);
 
     const oldPasswordLoginResponse = await HTTPLauncher.sendLogin('normal@gmail.com', 'pass');
-    expect(oldPasswordLoginResponse.data.access_token).not.toBeDefined;
+    expect(oldPasswordLoginResponse.data.access_token).not.toBeDefined();
 
     const normalLoginResponse = await HTTPLauncher.sendLogin('normal@gmailcom', 'bass');
-    expect(normalLoginResponse.data.access_token).toBeDefined;
+    expect(normalLoginResponse.data.access_token).toBeDefined();
 
     await HTTPLauncher.sendChangePasswordOther('mail@gmail.com', 'bass');
     const pwNotChangedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
-    expect(pwNotChangedLoginResponse.data.access_token).toBeDefined;
+    expect(pwNotChangedLoginResponse.data.access_token).toBeDefined();
   });
 });
-
 
 describe('sendRefreshToken request', () => {
   test('Request without user', async () => {
