@@ -24,7 +24,6 @@ function Login() {
     setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
     const token = responseLogin.data.access_token;
-
     localStorage.setItem('gutentag-accesstoken', token);
     window.location.href = 'http://localhost:3000/home';
   }
