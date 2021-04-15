@@ -74,7 +74,7 @@ def test_create_project():
 
 def test_get_all_projects():
     reset_db()
-    user = try_add(User("first", "last", "user@gmail.com", "password", True))
+    try_add(User("first", "last", "user@gmail.com", "password", True))
     try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
     try_add(Project("Project2", ProjectType.DOCUMENT_CLASSIFICATION))
 
