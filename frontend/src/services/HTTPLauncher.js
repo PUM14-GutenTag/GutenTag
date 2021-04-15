@@ -95,10 +95,10 @@ class HTTPLauncher {
 
   /* Send HTTP-request to add one or more text data points to an existing project.
 
-    Below is the expected structure of JSONData for the different project types:
+    Below is the expected structure of JSONFile's content for the different project types:
      
     Document classification:
-    JSONData shape, where labels may be omitted:
+    JSON shape, where labels may be omitted:
     [
         {
             "text": "Excellent customer service.",
@@ -108,7 +108,7 @@ class HTTPLauncher {
     ]
 
     Sequence labeling:
-    JSONData shape, where labels may be omitted:
+    JSON shape, where labels may be omitted:
     [
         {
             "text": "Alex is going to Los Angeles in California",
@@ -122,7 +122,7 @@ class HTTPLauncher {
     ]
 
     Sequence to sequence:
-    JSONData shape, where labels may be omitted:
+    JSON shape, where labels may be omitted:
     [
         {
             "text": "John saw the man on the mountain with a telescope.",
@@ -133,23 +133,19 @@ class HTTPLauncher {
         },
     ]
   */
-  static sendAddNewTextData(projectID, JSONData) {
-    return axiosInstance().post(
-      'add-text-data',
-      {
-        project_id: projectID,
-        json_data: JSONData,
-      },
-      {
-        headers: authHeader(),
-      }
-    );
+  static sendAddNewTextData(projectID, JSONFile) {
+    const formData = new FormData();
+    formData.append('project_id', projectID);
+    formData.append('json_file', JSONFile);
+    return axiosInstance().post('add-text-data', formData, {
+      headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
+    });
   }
 
   /* Send HTTP-request to add one or more text data points to an existing project.
-    Below is the expected structure of JSONData:
+    Below is the expected structure of JSONFile's content:
     
-    JSONData shape, where labels may be omitted:
+    JSON shape, where labels may be omitted:
     [
         {
             "labels": [
@@ -160,11 +156,11 @@ class HTTPLauncher {
         ...
     ]
    */
-  static sendAddNewImageData(projectID, JSONData, images) {
+  static sendAddNewImageData(projectID, JSONFile, imageFiles) {
     const formData = new FormData();
     formData.append('project_id', projectID);
-    formData.append('json_data', JSONData);
-    images.forEach((i) => formData.append('images', i));
+    formData.append('json_file', JSONFile);
+    [...imageFiles].forEach((img) => formData.append('images', img));
     return axiosInstance().post('add-image-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
     });

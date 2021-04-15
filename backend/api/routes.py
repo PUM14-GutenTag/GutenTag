@@ -1,3 +1,4 @@
+import json
 from flask import jsonify, send_file
 from flask_restful import Resource, reqparse, inputs, request
 from flask_jwt_extended import (
@@ -39,12 +40,13 @@ from api.parser import (
 This file contains the routes to the database.
 """
 
-IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+IMAGE_EXTENSIONS = {"png", "jpg", "jpeg"}
+TEXT_EXTENSIONS = {"json"}
 
 
-def allowed_image_extension(filename):
+def allowed_extension(filename, allowed):
     return "." in filename and \
-           filename.rsplit(".", 1)[1].lower() in IMAGE_EXTENSIONS
+           filename.rsplit(".", 1)[1].lower() in allowed
 
 
 class Register(Resource):
@@ -230,28 +232,35 @@ class AddNewTextData(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument("json_data", type=str, required=True)
 
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
-        project = Project.query.get(args.project_id)
 
-        if user.access_level >= AccessLevel.ADMIN:
+        if "json_file" not in request.files:
+            msg = "No JSON file uploaded."
+        elif user.access_level < AccessLevel.ADMIN:
+            msg = "User is not authorized to add data."
+        else:
+            json_file = request.files["json_file"]
+            if not allowed_extension(json_file.filename, TEXT_EXTENSIONS):
+                return jsonify({"message":
+                                ("Invalid file extension for "
+                                 f"{json_file.filename}. Must be in "
+                                 f"{TEXT_EXTENSIONS}")})
             import_funcs = {
                 1: import_document_classification_data,
                 2: import_sequence_labeling_data,
                 3: import_sequence_to_sequence_data,
             }
             try:
+                project = Project.query.get(args.project_id)
                 import_funcs[project.project_type](
-                    args.project_id, args.json_data)
+                    args.project_id, json.load(json_file))
                 msg = "Data added."
             except Exception as e:
                 msg = f"Could not add data: {e}"
-        else:
-            msg = "User is not authorized to add data."
 
         return jsonify({"message": msg})
 
@@ -264,34 +273,41 @@ class AddNewImageData(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument("json_data", type=str, required=True)
 
-    @jwt_required()
+    @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
 
-        if "images" not in request.files:
+        if user.access_level < AccessLevel.ADMIN:
+            msg = "User is not authorized to add data."
+        elif "images" not in request.files:
             msg = "No images uploaded."
+        elif "json_file" not in request.files:
+            msg = "No JSON file uploaded."
         else:
+            msg = None
+            json_file = request.files.get("json_file")
+            if not allowed_extension(json_file.filename, TEXT_EXTENSIONS):
+                msg = (f"Invalid file extension for {json_file.filename}. "
+                       f"Must be in {TEXT_EXTENSIONS}.")
+
             image_files = request.files.getlist("images")
             for file in image_files:
-                if not allowed_image_extension(file.filename):
-                    return jsonify(
-                        {"message": ("Invalid file extension. "
-                                     f"must be one of {IMAGE_EXTENSIONS}")}
-                    )
+                if not allowed_extension(file.filename, IMAGE_EXTENSIONS):
+                    msg = (f"Invalid file extension for {file.filename}. "
+                           f"Must be in {IMAGE_EXTENSIONS}.")
+            if msg is not None:
+                return jsonify({"message": msg})
+
             image_dict = {secure_filename(
                 file.filename): file.read() for file in image_files}
-            user = User.get_by_email(get_jwt_identity())
-            if user.access_level >= AccessLevel.ADMIN:
-                try:
-                    import_image_classification_data(
-                        args.project_id, args.json_data, image_dict)
-                    msg = "Data added."
-                except Exception as e:
-                    msg = f"Could not add data: {e}"
-            else:
-                msg = "User is not authorized to add data."
+            try:
+                import_image_classification_data(
+                    args.project_id, json.load(json_file), image_dict)
+                msg = "Data added."
+            except Exception as e:
+                msg = f"Could not add data: {e}"
 
         return jsonify({"message": msg})
 
@@ -306,7 +322,7 @@ class GetNewData(Resource):
         self.reqparse.add_argument("project_id", type=int, required=True)
         self.reqparse.add_argument("amount", type=int, required=True)
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -333,7 +349,7 @@ class CreateDocumentClassificationLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
 
-    @jwt_required()
+    @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -365,7 +381,7 @@ class CreateSequenceLabel(Resource):
         self.reqparse.add_argument("begin", type=int, required=True)
         self.reqparse.add_argument("end", type=int, required=True)
 
-    @jwt_required()
+    @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -394,7 +410,7 @@ class CreateSequenceToSequenceLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
 
-    @jwt_required()
+    @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -428,7 +444,7 @@ class CreateImageClassificationLabel(Resource):
         self.reqparse.add_argument("x2", type=int, required=True)
         self.reqparse.add_argument("y2", type=int, required=True)
 
-    @jwt_required()
+    @ jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -458,7 +474,7 @@ class DeleteLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("label_id", type=int, required=True)
 
-    @jwt_required()
+    @ jwt_required()
     def delete(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -488,7 +504,7 @@ class GetExportData(Resource):
                                    required=False,
                                    action="append")
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -520,7 +536,7 @@ class GetImageData(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         data = ProjectData.query.get(args.data_id)

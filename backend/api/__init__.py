@@ -11,7 +11,7 @@ from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 app.config.from_object("api.config.Config")
-app.config['CORS_HEADERS'] = 'Content-Type, Authorization'
+app.config['CORS_HEADERS'] = 'Accept, Authorization, Content-Type'
 app.config['JWT_SECRET_KEY'] = 't1NP63m4wnAc4KzBAKukd7ZpKOAI4nss'
 
 CORS(app)

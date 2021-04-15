@@ -1,4 +1,3 @@
-import json
 from api.database_handler import try_add, try_add_list
 from api.models import (Project,
                         ProjectData,
@@ -32,10 +31,9 @@ def import_document_classification_data(project_id, json_data):
         ...
     ]
     """
-    data = json.loads(json_data)
     project = get_project(project_id, ProjectType.DOCUMENT_CLASSIFICATION)
 
-    for obj in data:
+    for obj in json_data:
         text = obj.get("text")
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
@@ -68,10 +66,9 @@ def import_sequence_labeling_data(project_id, json_data):
         ...
     ]
     """
-    data = json.loads(json_data)
     project = get_project(project_id, ProjectType.SEQUENCE_LABELING)
 
-    for obj in data:
+    for obj in json_data:
         text = obj.get("text")
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
@@ -101,10 +98,9 @@ def import_sequence_to_sequence_data(project_id, json_data):
         },
     ]
     """
-    data = json.loads(json_data)
     project = get_project(project_id, ProjectType.SEQUENCE_TO_SEQUENCE)
 
-    for obj in data:
+    for obj in json_data:
         text = obj.get("text")
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
@@ -135,13 +131,26 @@ def import_image_classification_data(project_id, json_data, images):
         ...
     ]
     """
-    data = json.loads(json_data)
+    if (len(images) != len(json_data)):
+        raise ValueError(f"Number of data objects ({len(json_data)} must "
+                         f"match number of images ({len(images)}.")
+    image_names = {obj["file_name"] for obj in json_data}
+    image_file_names = set(images.keys())
+    image_names_difference = image_names.difference(image_file_names)
+    image_file_names_difference = image_file_names.difference(image_names)
+    if (image_names_difference):
+        raise ValueError("Data objects contains unmatched image file names. "
+                         + str(image_names_difference))
+    elif (image_file_names_difference):
+        raise ValueError("Uploaded images contain unmached data objects "
+                         + str(image_file_names_difference))
+
     project = get_project(project_id, ProjectType.IMAGE_CLASSIFICATION)
 
-    for obj in data:
+    for obj in json_data:
         file_name = obj.get("file_name")
         if file_name is None:
-            raise ValueError(f"'{obj}' is missing 'text' entry")
+            raise ValueError(f"'{obj}' is missing 'file_name' entry")
         project_data = ProjectImageData(project.id, file_name,
                                         images[file_name])
         try_add(project_data)
@@ -195,7 +204,7 @@ def export_document_classification_data(project_id, filters=None):
             "labels": [lab.label for lab in data.labels]
         })
 
-    return json.dumps(result, ensure_ascii=False)
+    return result
 
 
 def export_sequence_labeling_data(project_id, filters=None):
@@ -233,7 +242,7 @@ def export_sequence_labeling_data(project_id, filters=None):
             "labels": [[lab.begin, lab.end, lab.label] for lab in data.labels]
         })
 
-    return json.dumps(result, ensure_ascii=False)
+    return result
 
 
 def export_sequence_to_sequence_data(project_id, filters=None):
@@ -270,7 +279,7 @@ def export_sequence_to_sequence_data(project_id, filters=None):
             "labels": [lab.label for lab in data.labels]
         })
 
-    return json.dumps(result, ensure_ascii=False)
+    return result
 
 
 def export_image_classification_data(project_id, filters=None):
@@ -313,4 +322,4 @@ def export_image_classification_data(project_id, filters=None):
             "labels": labels
         })
 
-    return json.dumps(result, ensure_ascii=False)
+    return result

@@ -5,81 +5,30 @@ import path from 'path';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 
+const textDir = path.join(__dirname, 'res/text');
+const imgDir = path.join(__dirname, 'res/images');
 const outDir = path.join(__dirname, 'out');
 
 beforeAll(() => {
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 });
 
-const documentData = [
-  {
-    text: 'Gosling provides an amazing performance that dwarfs everything else in the film.',
-    labels: ['positive'],
-  },
-  {
-    text:
-      "Not for everyone, but for those with whom it will connect, it's a nice departure from standard moviegoing fare.",
-    labels: ['positive', 'negative'],
-  },
-  {
-    text:
-      'A disturbing and frighteningly evocative assembly of imagery and hypnotic music composed by Philip Glass.',
-    labels: [],
-  },
-];
+const getTextFile = (filename) => {
+  const filepath = path.resolve(textDir, filename);
+  return new File([fs.readFileSync(filepath)], path.basename(filepath));
+};
 
-const sequenceData = [
-  {
-    text: 'Alex is going to Los Angeles in California',
-    labels: [
-      [0, 3, 'PER'],
-      [16, 27, 'LOC'],
-      [31, 41, 'LOC'],
-    ],
-  },
-  { text: 'Peter Blackburn', labels: [[0, 15, 'PER']] },
-  { text: 'President Obama', labels: [] },
-];
-
-const seqToSeqData = [
-  {
-    text: 'India and Japan prime ministers meet in Tokyo',
-    labels: ['Die Premierminister Indiens und Japans trafen sich in Tokio .'],
-  },
-  {
-    text: 'History is a great teacher',
-    labels: ['Die Geschichte ist ein großartiger Lehrmeister .'],
-  },
-  {
-    text: 'But it in certainly not a radical initiative - at least by American standards .',
-    labels: [],
-  },
-];
-
-const imageData = [
-  {
-    file_name: 'ILSVRC2012_val_00000001.JPEG',
-    labels: [[[50, 100], [90, 120], 'snake']],
-  },
-  {
-    file_name: 'ILSVRC2012_val_00000002.JPEG',
-    labels: [
-      [[75, 125], [100, 150], 'person'],
-      [[100, 150], [160, 200], 'person'],
-    ],
-  },
-  {
-    file_name: 'ILSVRC2012_val_00000003.JPEG',
-    labels: [],
-  },
-];
+const getJSONObject = (filename) => {
+  const filepath = path.resolve(textDir, filename);
+  return JSON.parse(fs.readFileSync(filepath));
+};
 
 const images = [
-  './res/images/ILSVRC2012_val_00000001.JPEG',
-  './res/images/ILSVRC2012_val_00000002.JPEG',
-  './res/images/ILSVRC2012_val_00000003.JPEG',
+  'ILSVRC2012_val_00000001.JPEG',
+  'ILSVRC2012_val_00000002.JPEG',
+  'ILSVRC2012_val_00000003.JPEG',
 ].map((name) => {
-  const filepath = path.resolve(__dirname, name);
+  const filepath = path.resolve(imgDir, name);
   return new File([fs.readFileSync(filepath, { encoding: 'base64' })], path.basename(filepath));
 });
 
@@ -214,7 +163,10 @@ describe('sendAddNewTextData request', () => {
     const projectType = 1;
     const projectID = await createProject(projectType);
 
-    const response = await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(documentData));
+    const response = await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_document_classification.json')
+    );
     expect(response.status).toBe(200);
     expect(response.data.message).toBe('Data added.');
   });
@@ -225,7 +177,10 @@ describe('sendAddNewTextData request', () => {
     const projectType = 2;
     const projectID = await createProject(projectType);
 
-    const response = await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(sequenceData));
+    const response = await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_sequence.json')
+    );
     expect(response.status).toBe(200);
     expect(response.data.message).toBe('Data added.');
   });
@@ -236,7 +191,10 @@ describe('sendAddNewTextData request', () => {
     const projectType = 3;
     const projectID = await createProject(projectType);
 
-    const response = await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(seqToSeqData));
+    const response = await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_sequence_to_sequence.json')
+    );
     expect(response.status).toBe(200);
     expect(response.data.message).toBe('Data added.');
   });
@@ -251,7 +209,7 @@ describe('sendAddNewImageData request', () => {
 
     const response = await HTTPLauncher.sendAddNewImageData(
       projectID,
-      JSON.stringify(imageData),
+      getTextFile('input_image_classification.json'),
       images
     );
     expect(response.status).toBe(200);
@@ -266,11 +224,16 @@ describe('sendGetData request', () => {
     const projectType = 1;
     const projectID = await createProject(projectType, 'Document');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(documentData));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_document_classification.json')
+    );
     const response = await HTTPLauncher.sendGetData(projectID, 5);
     expect(response.status).toBe(200);
     expect(Object.keys(response.data).length).toBe(3);
-    const originalTexts = documentData.map((obj) => obj.text);
+    const originalTexts = getJSONObject('input_document_classification.json').map(
+      (obj) => obj.text
+    );
     Object.values(response.data).forEach((text) => expect(originalTexts).toContain(text));
   });
 
@@ -280,11 +243,11 @@ describe('sendGetData request', () => {
     const projectType = 2;
     const projectID = await createProject(projectType, 'Sequence');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(sequenceData));
+    await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
     const response = await HTTPLauncher.sendGetData(projectID, 5);
     expect(response.status).toBe(200);
     expect(Object.keys(response.data).length).toBe(3);
-    const originalTexts = sequenceData.map((obj) => obj.text);
+    const originalTexts = getJSONObject('input_sequence.json').map((obj) => obj.text);
     Object.values(response.data).forEach((text) => expect(originalTexts).toContain(text));
   });
 
@@ -294,11 +257,14 @@ describe('sendGetData request', () => {
     const projectType = 3;
     const projectID = await createProject(projectType, 'SeqToSeq');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(seqToSeqData));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_sequence_to_sequence.json')
+    );
     const response = await HTTPLauncher.sendGetData(projectID, 5);
     expect(response.status).toBe(200);
     expect(Object.keys(response.data).length).toBe(3);
-    const originalTexts = seqToSeqData.map((obj) => obj.text);
+    const originalTexts = getJSONObject('input_sequence_to_sequence.json').map((obj) => obj.text);
     Object.values(response.data).forEach((text) => expect(originalTexts).toContain(text));
   });
 
@@ -308,12 +274,16 @@ describe('sendGetData request', () => {
     const projectType = 4;
     const projectID = await createProject(projectType);
 
-    await HTTPLauncher.sendAddNewImageData(projectID, JSON.stringify(imageData), images);
+    await HTTPLauncher.sendAddNewImageData(
+      projectID,
+      getTextFile('input_image_classification.json'),
+      images
+    );
 
     const getDataResponse = await HTTPLauncher.sendGetData(projectID, 5);
     expect(getDataResponse.status).toBe(200);
     expect(Object.keys(getDataResponse.data).length).toBe(3);
-    const fileNames = imageData.map((obj) => obj.file_name);
+    const fileNames = getJSONObject('input_image_classification.json').map((obj) => obj.file_name);
     Object.values(getDataResponse.data).forEach((name) => expect(fileNames).toContain(name));
 
     // eslint-disable-next-line no-restricted-syntax
@@ -333,7 +303,10 @@ describe('sendCreateDocumentClassificationLabel request', () => {
     const projectType = 1;
     const projectID = await createProject(projectType, 'Document');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(documentData));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_document_classification.json')
+    );
     const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
     expect(Object.keys(getDataResponse1.data).length).toBe(3);
 
@@ -352,7 +325,7 @@ describe('sendCreateSequenceLabel request', () => {
     const projectType = 2;
     const projectID = await createProject(projectType, 'Sequence');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(sequenceData));
+    await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
     const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
     expect(Object.keys(getDataResponse1.data).length).toBe(3);
 
@@ -371,7 +344,10 @@ describe('sendCreateSequenceToSequenceLabel request', () => {
     const projectType = 3;
     const projectID = await createProject(projectType, 'Sequence To Sequence');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(seqToSeqData));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_sequence_to_sequence.json')
+    );
     const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
     expect(Object.keys(getDataResponse1.data).length).toBe(3);
 
@@ -390,7 +366,11 @@ describe('sendCreateImageClassificationLabel request', () => {
     const projectType = 4;
     const projectID = await createProject(projectType);
 
-    await HTTPLauncher.sendAddNewImageData(projectID, JSON.stringify(imageData), images);
+    await HTTPLauncher.sendAddNewImageData(
+      projectID,
+      getTextFile('input_image_classification.json'),
+      images
+    );
     const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
     expect(Object.keys(getDataResponse1.data).length).toBe(3);
 
@@ -416,7 +396,10 @@ describe('sendRemoveLabel', () => {
     const projectType = 1;
     const projectID = await createProject(projectType, 'Document');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(documentData));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_document_classification.json')
+    );
     const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
     expect(Object.keys(getDataResponse1.data).length).toBe(3);
 
@@ -433,22 +416,24 @@ describe('sendRemoveLabel', () => {
   });
 });
 
-describe('sendGetExportData', () => {
+describe.only('sendGetExportData', () => {
   test('Document classification project', async () => {
     await resetDB();
     await createUser();
     const projectID = await createProject(1, 'Document');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(documentData));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_document_classification.json')
+    );
     await HTTPLauncher.sendGetData(projectID, 5);
     await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const parsed = JSON.parse(response.data);
-    const texts = parsed.data.map((d) => d.text);
+    const texts = response.data.data.map((d) => d.text);
 
-    documentData.forEach((obj) => {
+    getJSONObject('input_document_classification.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
     });
   });
@@ -458,16 +443,15 @@ describe('sendGetExportData', () => {
     await createUser();
     const projectID = await createProject(2, 'Sequence');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(sequenceData));
+    await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
     await HTTPLauncher.sendGetData(projectID, 5);
     await HTTPLauncher.sendCreateSequenceLabel(1, 'new label', 0, 3);
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const parsed = JSON.parse(response.data);
-    const texts = parsed.data.map((d) => d.text);
+    const texts = response.data.data.map((d) => d.text);
 
-    sequenceData.forEach((obj) => {
+    getJSONObject('input_sequence.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
     });
   });
@@ -477,16 +461,18 @@ describe('sendGetExportData', () => {
     await createUser();
     const projectID = await createProject(3, 'Sequence to sequence');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, JSON.stringify(seqToSeqData));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      getTextFile('input_sequence_to_sequence.json')
+    );
     await HTTPLauncher.sendGetData(projectID, 5);
     await HTTPLauncher.sendCreateSequenceToSequenceLabel(1, 'new label');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const parsed = JSON.parse(response.data);
-    const texts = parsed.data.map((d) => d.text);
+    const texts = response.data.data.map((d) => d.text);
 
-    seqToSeqData.forEach((obj) => {
+    getJSONObject('input_sequence_to_sequence.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
     });
   });
@@ -496,16 +482,19 @@ describe('sendGetExportData', () => {
     await createUser();
     const projectID = await createProject(4, 'Image');
 
-    await HTTPLauncher.sendAddNewImageData(projectID, JSON.stringify(imageData), images);
+    await HTTPLauncher.sendAddNewImageData(
+      projectID,
+      getTextFile('input_image_classification.json'),
+      images
+    );
     await HTTPLauncher.sendGetData(projectID, 5);
     await HTTPLauncher.sendCreateImageClassificationLabel(1, 'new label', 100, 120, 200, 220);
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const parsed = JSON.parse(response.data);
-    const fileNames = parsed.data.map((d) => d.file_name);
+    const fileNames = response.data.data.map((d) => d.file_name);
 
-    imageData.forEach((obj) => {
+    getJSONObject('input_image_classification.json').forEach((obj) => {
       expect(fileNames).toContain(obj.file_name);
     });
   });
