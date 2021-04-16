@@ -2,18 +2,35 @@
   margin-top: 1em;
   display: flex;
   justify-content: center;
-  font-family: 'monospace';
 }
 
-.submitButton {
+button.submitButton {
   font-size: 18px;
   width: 100%;
+  color: white;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
 }
+
+button.submitButton:hover {
+  color: white;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+button.submitButton:not(:disabled):not(.disabled):active, button.submitButton:focus, button.submitButton:not(:disabled):not(.disabled):active:focus {
+  color: white;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
 .create-container Form {
   padding: 10%;
-  border: 2px solid black;
   border-radius: 10px;
-  box-shadow: 2px 2px 2px black;
+  box-shadow: 4px 4px 4px rgb(0, 0, 0, 0.25);
   background-color: #cdffff;
   width: fit-content;
 }
