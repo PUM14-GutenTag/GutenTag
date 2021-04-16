@@ -1,3 +1,8 @@
+from io import BytesIO
+import zipfile
+import time
+import json
+import io
 from api.database_handler import try_add, try_add_list
 from api.models import (Project,
                         ProjectData,
@@ -282,7 +287,27 @@ def export_sequence_to_sequence_data(project_id, filters=None):
     return result
 
 
-def export_image_classification_data(project_id, filters=None):
+def write_zip_entry(file_name, date_time, data, file):
+    data_zip = zipfile.ZipInfo(file_name)
+    data_zip.date_time = date_time
+    data_zip.compress_type = zipfile.ZIP_DEFLATED
+    file.writestr(data_zip, data)
+
+
+def get_image_zip(project_id, project_name, json_data, filters=None):
+    all_data = ProjectImageData.query.filter_by(project_id=project_id).all()
+    date_time = time.localtime(time.time())[:6]
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, "w") as zf:
+        for data in all_data:
+            write_zip_entry(data.file_name, date_time, data.image_data, zf)
+        write_zip_entry(f"{project_name}.json", date_time, json_data, zf)
+    memory_file.seek(0)
+    return memory_file
+
+
+def export_image_classification_data(project_id, filters=None,
+                                     with_images=True):
     """
     Export all data from the image classification project with the given id.
 
@@ -312,14 +337,19 @@ def export_image_classification_data(project_id, filters=None):
     if project.project_type != ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Project is not of type IMAGE_CLASSIFICATION")
 
-    result = get_standard_dict(project)
+    text = get_standard_dict(project)
     for data in ProjectData.query.filter_by(project_id=project_id).all():
         labels = [[[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label]
                   for lab in data.labels]
-        result["data"].append({
+        text["data"].append({
             "file_name": data.file_name,
             "id": data.id,
             "labels": labels
         })
 
-    return result
+    if with_images:
+        zip_file = get_image_zip(project.id, project.name,
+                                 json.dumps(text, ensure_ascii=False))
+        return zip_file
+    else:
+        return text

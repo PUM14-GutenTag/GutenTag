@@ -1,4 +1,5 @@
 import json
+import io
 from flask import jsonify, send_file
 from flask_restful import Resource, reqparse, inputs, request
 from flask_jwt_extended import (
@@ -584,6 +585,7 @@ class FetchUserProjects(Resource):
 
         for project in projects:
             user_projects[project.id] = {
+                "id": project.id,
                 "name": project.name,
                 "type": project.project_type,
                 "created": project.created
@@ -591,6 +593,13 @@ class FetchUserProjects(Resource):
 
         return jsonify({"msg": "Retrieved user projects",
                         "projects": user_projects})
+
+
+def text_to_json_file(text):
+    file = io.BytesIO()
+    file.write(json.dumps(text).encode())
+    file.seek(0)
+    return file
 
 
 class GetExportData(Resource):
@@ -612,14 +621,23 @@ class GetExportData(Resource):
         project = Project.query.get(args.project_id)
 
         if user.access_level >= AccessLevel.ADMIN:
-            export_funcs = {
-                1: export_document_classification_data,
-                2: export_sequence_labeling_data,
-                3: export_sequence_to_sequence_data,
-                4: export_image_classification_data
-            }
             try:
-                return export_funcs[project.project_type](args.project_id)
+                if (project.project_type == ProjectType.IMAGE_CLASSIFICATION):
+                    return send_file(
+                        export_image_classification_data(args.project_id),
+                        attachment_filename=f"{project.name}.zip",
+                        as_attachment=True
+                    )
+                else:
+                    export_funcs = {
+                        1: export_document_classification_data,
+                        2: export_sequence_labeling_data,
+                        3: export_sequence_to_sequence_data,
+                    }
+                    return export_funcs[project.project_type](
+                        args.project_id)
+
+                    return export_funcs[project.project_type](args.project_id)
             except Exception as e:
                 msg = f"Could not export data: {e}"
         else:

@@ -4,10 +4,9 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 // Pages
 import Home from '../pages/Home';
 import Settings from '../pages/Settings';
-import Projects from '../pages/Projects';
-import NotFoundPage from '../pages/404';
+import NotFound from '../pages/404';
 import Login from '../pages/Login';
-import Upload from '../pages/Upload';
+import EditProject from '../pages/EditProject';
 
 // Components
 import ProtectedRoute from './ProtectedRoute';
@@ -23,9 +22,8 @@ const App = () => {
         <Route exact path="/" component={Login} />
         <ProtectedRoute exact path="/home" component={Home} />
         <ProtectedRoute exact path="/settings" component={Settings} />
-        <ProtectedRoute exact path="/projects" component={Projects} />
-        <ProtectedRoute exact path="/upload" component={Upload} />
-        <Route exact path="/404" component={NotFoundPage} />
+        <ProtectedRoute exact path="/edit-project" component={EditProject} />
+        <Route exact path="/404" component={NotFound} />
         <Redirect to="/404" />
       </Switch>
     </Router>

@@ -371,6 +371,7 @@ class HTTPLauncher {
 
     return axiosInstance().get('get-export-data', {
       headers: authHeader(),
+      responseType: 'arraybuffer',
       params: {
         project_id: projectID,
       },

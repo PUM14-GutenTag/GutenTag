@@ -11,12 +11,11 @@ const Home = () => {
   const [projectsShow, setProjectsShow] = useState(true);
   const [projects, setProjects] = useState([]);
 
-  async function fetchData() {
+  const fetchData = async () => {
     const result = await HTTPLauncher.sendGetUserProjects();
     const dataArray = Object.values(result.data.projects);
-    const mapedDataArray = dataArray.map((projectObject) => Object.values(projectObject));
-    setProjects(mapedDataArray);
-  }
+    setProjects(dataArray);
+  };
 
   useEffect(() => {
     if (projectsShow) {
@@ -39,9 +38,10 @@ const Home = () => {
             {projects.map((result, i) => (
               <li key={result}>
                 <Project
-                  created={result[0]}
-                  name={result[1]}
-                  projectType={result[2]}
+                  id={result.id}
+                  created={result.created}
+                  name={result.name}
+                  projectType={result.type}
                   selectedColor={colorList[i % colorList.length]}
                 />
               </li>

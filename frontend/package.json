@@ -15,7 +15,8 @@
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.2",
-    "react-bootstrap-icons": "^1.4.0"	
+    "react-bootstrap-icons": "^1.4.0",
+    "file-saver": "^2.0.5"
   },
   "scripts": {
     "start": "react-scripts start",
