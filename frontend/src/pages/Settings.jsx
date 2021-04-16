@@ -68,7 +68,7 @@ const Settings = () => {
       </Col>
     </div>,
     <div>
-      <ChangePass />
+      <ChangePass toggleCallback={toggleBack} />
     </div>,
     <div>
       <CreateProject toggleCallback={toggleBack} />
