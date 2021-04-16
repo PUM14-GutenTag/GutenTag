@@ -53,6 +53,20 @@ def test_create_user():
         assert user is None
 
 
+def test_change_password():
+    reset_db()
+
+    # Create user
+    user = try_add(User("Oscar", "Lonnqvist", "admin@gmail.com", "password",
+                        False))
+
+    # Test changing password
+    user.change_password("bassword")
+
+    assert user.check_password("password") is False
+    assert user.check_password("bassword") is True
+
+
 def test_create_project():
     reset_db()
 
@@ -70,6 +84,16 @@ def test_create_project():
         project = try_add(
             Project({"Project"}, ProjectType.IMAGE_CLASSIFICATION))
         assert project is None
+
+
+def test_get_all_projects():
+    reset_db()
+    try_add(User("first", "last", "user@gmail.com", "password", True))
+    try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
+    try_add(Project("Project2", ProjectType.DOCUMENT_CLASSIFICATION))
+
+    all_projects = Project.query.all()
+    assert all_projects is not None
 
 
 def test_authorize_user():

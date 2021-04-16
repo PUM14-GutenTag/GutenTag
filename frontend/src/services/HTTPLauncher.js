@@ -26,12 +26,51 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to create a user
+  static sendCreateUser(firstName, lastName, password, email, admin) {
+    return axiosInstance().post('create-user', {
+      first_name: firstName,
+      last_name: lastName,
+      password,
+      email,
+      admin,
+    });
+  }
+
   // Send HTTP-request to login a user.
   static sendLogin(email, password) {
     return axiosInstance().post('login', {
       email,
       password,
     });
+  }
+
+  // Send HTTP-request to change password
+  static sendChangePassword(oldPassword, newPassword) {
+    return axiosInstance().post(
+      'change-password',
+      {
+        old_password: oldPassword,
+        new_password: newPassword,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
+  }
+
+  static sendChangePasswordOther(email, newPassword) {
+    return axiosInstance().post(
+      'change-password',
+      {
+        old_password: 'old password',
+        new_password: newPassword,
+        email,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
   }
 
   // Send HTTP-request to refresh an access token.
@@ -90,6 +129,12 @@ class HTTPLauncher {
     return axiosInstance().delete('delete-project', {
       headers: authHeader(),
       data: { project_id: projectID },
+    });
+  }
+
+  static sendGetUserProjects() {
+    return axiosInstance().get('get-user-projects', {
+      headers: authHeader(),
     });
   }
 

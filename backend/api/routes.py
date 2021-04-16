@@ -51,7 +51,7 @@ def allowed_extension(filename, allowed):
 
 class Register(Resource):
     """
-    Endpoint for registering an user.
+    THIS ENDPOINT IS ONLY FOR DEVELOPMENT PURPOSES AND WILL BE REMOVED
     """
 
     def __init__(self):
@@ -69,6 +69,34 @@ class Register(Resource):
         user = User(args.first_name, args.last_name, args.email, args.password,
                     args.admin)
         return jsonify(try_add_response(user))
+
+
+class CreateUser(Resource):
+    """
+    Endpoint for creating an user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("first_name", type=str, required=True)
+        self.reqparse.add_argument("last_name", type=str, required=True)
+        self.reqparse.add_argument("email", type=str, required=True)
+        self.reqparse.add_argument("password", type=str, required=True)
+        self.reqparse.add_argument("admin", type=inputs.boolean,
+                                   required=False, default=False)
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+
+        if user.access_level >= AccessLevel.ADMIN:
+            new_user = User(args.first_name, args.last_name, args.email,
+                            args.password, args.admin)
+            return jsonify(try_add_response(new_user))
+
+        return jsonify({"id": None, "message":
+                        "You are not authorized to create other users."})
 
 
 class Login(Resource):
@@ -100,6 +128,49 @@ class Login(Resource):
             "message": msg,
             "access_token": access_token,
             "refresh_token": refresh_token
+        })
+
+
+class ChangePassword(Resource):
+    """
+    Endpoint for changing user password.
+    If email is present in request body,
+    change password of that user if the
+    sender is an admin. Otherwise, changes
+    the password of the authorized user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("old_password", type=str, required=False,
+                                   default=None)
+        self.reqparse.add_argument("new_password", type=str, required=True)
+        self.reqparse.add_argument(
+            "email", type=str, required=False, default=None)
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        msg = "Failed to change password: old password is invalid"
+
+        if not args.email:
+            if not args.old_password:
+                msg = "Missing parameter: 'old_password'"
+            elif user.check_password(args.old_password):
+                user.change_password(args.new_password)
+                msg = "Password changed succesfully"
+        else:
+            if user.access_level >= AccessLevel.ADMIN:
+                other_user = User.get_by_email(args.email)
+                if other_user:
+                    other_user.change_password(args.new_password)
+                    msg = f"Password of {args.email} was changed succesfully"
+            else:
+                msg = "User is unauthorized to change other users passwords."
+
+        return jsonify({
+            "message": msg
         })
 
 
@@ -492,6 +563,36 @@ class DeleteLabel(Resource):
         return jsonify({"message": msg})
 
 
+class FetchUserProjects(Resource):
+    """
+    Fetch all projects that a user is authorized to
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
+    @jwt_required()
+    def get(self):
+        current_user = User.get_by_email(get_jwt_identity())
+        user_projects = {}
+        projects = []
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            projects = Project.query.all()
+        else:
+            projects = current_user.projects
+
+        for project in projects:
+            user_projects[project.id] = {
+                "name": project.name,
+                "type": project.project_type,
+                "created": project.created
+            }
+
+        return jsonify({"msg": "Retrieved user projects",
+                        "projects": user_projects})
+
+
 class GetExportData(Resource):
     """
     Endpoint for exporting data from project according to filters.
@@ -565,7 +666,9 @@ class Reset(Resource):
 
 
 rest.add_resource(Register, "/register")
+rest.add_resource(CreateUser, "/create-user")
 rest.add_resource(Login, "/login")
+rest.add_resource(ChangePassword, "/change-password")
 rest.add_resource(RefreshToken, "/refresh-token")
 rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
@@ -579,6 +682,7 @@ rest.add_resource(CreateSequenceLabel, "/label-sequence")
 rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
 rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
+rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")
 rest.add_resource(Reset, "/reset")

@@ -88,6 +88,61 @@ describe('sendLogin request', () => {
   });
 });
 
+describe('sendChangePassword request', () => {
+  test('Succesfully change password of own user', async () => {
+    await resetDB();
+    await createUser();
+
+    const changePwResponse = await HTTPLauncher.sendChangePassword('pass', 'bass');
+    expect(changePwResponse.status).toBe(200);
+
+    const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
+    expect(failedLoginResponse.data.access_token).toBeNull();
+
+    const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass');
+    expect(successfulLoginResponse.data.access_token).toBeDefined();
+  });
+
+  test('Unsuccesfully change password of own user', async () => {
+    await resetDB();
+    await createUser();
+
+    await HTTPLauncher.sendChangePassword('bass', 'pass');
+
+    const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass');
+    expect(failedLoginResponse.data.access_token).toBeNull();
+
+    const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
+    expect(successfulLoginResponse.data.access_token).toBeDefined();
+  });
+});
+
+describe('sendChangePasswordOther request', () => {
+  test('Succesfully change password of own user', async () => {
+    await resetDB();
+    await createUser();
+
+    const email = 'normal@gmail.com';
+    const password = 'pass';
+    await HTTPLauncher.sendRegister('Reeman', 'Rus', password, email, true);
+
+    await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
+
+    const changePwResponse = await HTTPLauncher.sendChangePasswordOther(email, 'bass');
+    expect(changePwResponse.status).toBe(200);
+
+    const oldPasswordLoginResponse = await HTTPLauncher.sendLogin(email, 'pass');
+    expect(oldPasswordLoginResponse.data.access_token).toBeNull();
+
+    const normalLoginResponse = await HTTPLauncher.sendLogin(email, 'bass');
+    expect(normalLoginResponse.data.access_token).toBeDefined();
+
+    await HTTPLauncher.sendChangePasswordOther(email, 'bass');
+    const pwNotChangedLoginResponse = await HTTPLauncher.sendLogin(email, 'pass');
+    expect(pwNotChangedLoginResponse.data.access_token).toBeDefined();
+  });
+});
+
 describe('sendRefreshToken request', () => {
   test('Request without user', async () => {
     await resetDB();
@@ -141,6 +196,20 @@ describe('sendCreateProject', () => {
     const response = await HTTPLauncher.sendCreateProject('Project Exodus', 1);
     expect(response.status).toBe(200);
     expect(response.data.id).toBeDefined();
+  });
+});
+
+describe('sendGetUserProjects', () => {
+  test('Correct request', async () => {
+    await resetDB();
+    await createUser(true);
+    await createProject(1, 'Project 1');
+    await createProject(2, 'Project 2');
+
+    const response = await HTTPLauncher.sendGetUserProjects();
+    expect(response.status).toBe(200);
+    expect(response.data.projects['1'].type).toBe(1);
+    expect(response.data.projects['2'].type).toBe(2);
   });
 });
 
