@@ -19,11 +19,11 @@ function Header() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="navbar-collapse">
           <Nav className="m-auto">
-            <Nav.Link className="text-label" href="home">
+            <Nav.Link className="text-label" href="http://localhost:3000/home">
               <HouseFill className="icon-offset" /> Home
             </Nav.Link>
 
-            <Nav.Link className="text-label" href="settings">
+            <Nav.Link className="text-label" href="http://localhost:3000/settings">
               <GearFill className="icon-offset" /> Settings
             </Nav.Link>
           </Nav>

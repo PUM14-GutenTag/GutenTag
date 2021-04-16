@@ -9,23 +9,32 @@ import DocumentClassification from '../components/DocumentClassification';
 import '../css/Labeling.css';
 
 const Labeling = () => {
-  const [lastData, setLastData] = useState('');
-  const [lastLabel, setLastLabel] = useState('');
-  const [projectData, setProjectData] = useState('');
-  const [currentData, setCurrentData] = useState();
+  const [dataId, setDataId] = useState();
   const [label, setLabel] = useState('');
-  const type = useParams().projectType;
-
+  const [currentData, setCurrentData] = useState('');
+  const [dataCounter, setDataCounter] = useState(0);
   const projectId = useParams().id;
+  const type = useParams().projectType;
+  const [listOfDataPoints, setListOfDataPoints] = useState([]);
 
-  async function fetchProjectData() {
-    const response = await HTTPLauncher.sendGetData(projectId);
-    setProjectData(response.data);
-    setCurrentData(Object.keys(response.data)[0]);
+  async function fetchdata() {
+    const response = await HTTPLauncher.sendGetData(projectId, 5);
+
+    /*
+    const result = Object.keys(response.data).map((key) => [key, response.data[key]]);
+    setListOfDataPoints(result); // here we got all the relevant datapoints
+    */
+    setListOfDataPoints(response.data);
+
+    changeData(dataCounter);
+  }
+  function changeData(count) {
+    setCurrentData(listOfDataPoints[count]);
+    setDataId(Object.keys(listOfDataPoints)[count]);
+    setDataCounter(count);
   }
 
-  async function testAddProjectData() {
-    console.log('Adddddddd data');
+  async function testAdddata() {
     const response = await HTTPLauncher.sendAddNewTextData(
       projectId,
       JSON.stringify([
@@ -41,52 +50,97 @@ const Labeling = () => {
           text: 'Data nummer 3',
           labels: [],
         },
+        {
+          text: 'Data nummer 4',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 5',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 6',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 7',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 8',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 9',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 10',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 11',
+          labels: [],
+        },
+        {
+          text: 'Data nummer 12',
+          labels: [],
+        },
       ])
     );
     console.log(response);
   }
 
   useEffect(() => {
-    fetchProjectData();
+    fetchdata();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /*
-  fixa css
-  fixa hämta ny data när det är nödvändigt
-  fixa labeling
- */
-
   const renderAuthButton = (typeOfProject) => {
-    if (projectData[currentData]) {
+    if (listOfDataPoints[dataId]) {
       if (typeOfProject === '1') {
-        return <DocumentClassification data={projectData[currentData]} />;
+        return <DocumentClassification data={listOfDataPoints[dataId]} />;
       }
     }
 
     return <div>This data shouldn't be labeled</div>;
   };
+
   const nextData = () => {
-    setLastData(projectData);
-    fetchProjectData();
+    // change datacounter
+    const tempDataCounter = dataCounter + 1;
+
+    if (Object.keys(listOfDataPoints).length - 1 < tempDataCounter) {
+      fetchdata();
+    } else {
+      changeData(tempDataCounter);
+    }
+
+    // hur hämtar man ut en label?
   };
 
   const getLastData = () => {
-    const tempLastData = lastData;
-    const tempProjectData = projectData;
-    setLastData(tempProjectData);
-    setProjectData(tempLastData);
-    setCurrentData(Object.keys(tempLastData)[0]);
+    if (dataCounter - 1 >= 0) {
+      const tempDataCounter = dataCounter - 1;
+      changeData(tempDataCounter);
+    } else {
+      console.log('This is the first data');
+    }
+
+    // hur hämtar man ut en label?
   };
 
   const addLabel = async (event) => {
     event.preventDefault();
-    // eslint-disable-next-line radix
-    const dataId = parseInt(
-      Object.keys(projectData).find((key) => projectData[key] === projectData[currentData])
-    );
-    setLastData(projectData);
+    const currentDataPoint = currentData;
     const response = await HTTPLauncher.sendCreateDocumentClassificationLabel(dataId, label);
-    fetchProjectData();
+
+    const tempDataCounter = dataCounter + 1;
+    changeData(tempDataCounter);
+  };
+
+  const seeExportData = async () => {
+    console.log(listOfDataPoints);
   };
 
   return (
@@ -119,10 +173,13 @@ const Labeling = () => {
         </Form>
 
         <br />
-        <button type="button" className="btn btn-primary" onClick={testAddProjectData}>
+        <button type="button" className="btn btn-primary" onClick={testAdddata}>
           Add data
         </button>
       </div>
+      <button type="button" className="btn btn-primary" onClick={seeExportData}>
+        listOfDataPoints
+      </button>
     </div>
   );
 };
