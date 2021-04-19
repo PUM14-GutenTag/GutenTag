@@ -3,7 +3,6 @@
 }
 
 .content-container {
-  border: 1px #333 solid;
   margin-top: 50px;
   width: 100%;
 }
@@ -12,30 +11,26 @@
   padding: 0px 150px;
 }
 
-.left-align {
+.left-align-arrow {
   text-align: left;
+  height: 25rem;
 }
 
-.right-align {
+.right-align-arrow {
   text-align: left;
+  height: 25rem;
 }
 
 .display-content {
   width: 100%;
   margin: auto;
   text-align: center;
-  border: 1px #333 solid;
   position: absolute;
   top: 30%;
 }
 
 .data-content {
-  text-align: center;
-  margin: auto;
-  width: 480px;
-  border: 1px #333 solid;
-  padding: 0px;
-  display: inline-block;
+  flex-grow: 4;
 }
 
 .main-content {

@@ -1,0 +1,30 @@
+.classification-container {
+  height: 100%;
+}
+
+.text-container {
+  height: 50%;
+  text-align: center;
+  vertical-align: middle;
+  margin: 15px;
+  border: 1px #f4f4f4 solid;
+  font-size: 25px;
+  padding-top: 5rem;
+  overflow-y: scroll;
+}
+
+.input-box {
+  margin: 15px;
+}
+
+.amazing-button {
+  background: #3498db;
+  width: 180px;
+  padding: 4px 0;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  border-radius: 3px;
+}

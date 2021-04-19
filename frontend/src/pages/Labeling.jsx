@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useParams } from 'react-router-dom';
 import HTTPLauncher from '../services/HTTPLauncher';
@@ -10,7 +8,7 @@ import '../css/Labeling.css';
 
 const Labeling = () => {
   const [label, setLabel] = useState('');
-  //const [currentData, setCurrentData] = useState('');
+  // const [currentData, setCurrentData] = useState('');
   const [dataCounter, setDataCounter] = useState(0);
   const projectId = useParams().id;
   const type = useParams().projectType;
@@ -23,7 +21,6 @@ const Labeling = () => {
     const dataArray = Object.entries(response.data);
     setListOfDataPoints(dataArray);
 
-    
     /*
       TODO:
       Hämta label när man går tillbaka
@@ -31,8 +28,7 @@ const Labeling = () => {
       Fixa css med mer komponent specifikt UI
     */
 
-
-      /*
+    /*
       project id,
       datapoint id
       vill kunna använda ett user id (är det email) 
@@ -110,7 +106,13 @@ const Labeling = () => {
   const renderAuthButton = (typeOfProject) => {
     if (listOfDataPoints[dataCounter]) {
       if (typeOfProject === '1') {
-        return <DocumentClassification data={listOfDataPoints[dataCounter][1]} />;
+        return (
+          <DocumentClassification
+            data={listOfDataPoints[dataCounter][1]}
+            dataPointId={parseInt(listOfDataPoints[dataCounter][0])}
+            nextData={nextData}
+          />
+        );
       }
     }
 
@@ -119,9 +121,8 @@ const Labeling = () => {
 
   const nextData = async () => {
     // change datacounter
-    let tempDataCounter = dataCounter + 1;    
-    console.log("Before if: ", listOfDataPoints)
-
+    const tempDataCounter = dataCounter + 1;
+    console.log('Before if: ', listOfDataPoints);
 
     /* 
       If there are less than 5 datapoints ahead in the list get a new one.
@@ -129,10 +130,10 @@ const Labeling = () => {
     if (Object.keys(listOfDataPoints).length - 5 < tempDataCounter) {
       const response = await HTTPLauncher.sendGetData(projectId, 1);
       const newDataPoint = Object.entries(response.data);
-      const tempListOfDataPoints = listOfDataPoints.slice(); 
-  
+      const tempListOfDataPoints = listOfDataPoints.slice();
+
       const newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
-      console.log("Final After", newListOfDataPoints);
+      console.log('Final After', newListOfDataPoints);
       setListOfDataPoints(newListOfDataPoints);
       changeData(tempDataCounter);
     } else {
@@ -153,14 +154,6 @@ const Labeling = () => {
     // hur hämtar man ut en label?
   };
 
-  const addLabel = async (event) => {
-    event.preventDefault();
-    await HTTPLauncher.sendCreateDocumentClassificationLabel(parseInt(listOfDataPoints[dataCounter][0]), label);
-
-    const tempDataCounter = dataCounter + 1;
-    changeData(tempDataCounter);
-  };
-
   const seeExportData = async () => {
     console.log(listOfDataPoints);
   };
@@ -175,26 +168,19 @@ const Labeling = () => {
       <br />
       <div>
         <div className="main-content">
-          <ChevronLeft className="left-align make-large fa-10x arrow-btn" onClick={getLastData} />
-          <div className="data-content">{renderAuthButton(type)}</div>
-          <ChevronRight className="right-align make-large fa-10x arrow-btn" onClick={nextData} />
-        </div>
-        <br />
-        <Form onSubmit={addLabel}>
-          <Form.Group controlId="form.name">
-            <Form.Control
-              type="text"
-              onChange={(event) => setLabel(event.target.value)}
-              placeholder="Enter label..."
-              required
-            />
-          </Form.Group>
-          <Button className="submitButton" variant="primary" type="submit">
-            Label
-          </Button>
-        </Form>
+          <ChevronLeft
+            className="left-align-arrow make-large fa-10x arrow-btn"
+            onClick={getLastData}
+          />
 
-        <br />
+          <div className="data-content">{renderAuthButton(type)}</div>
+
+          <ChevronRight
+            className="right-align-arrow make-large fa-10x arrow-btn"
+            onClick={nextData}
+          />
+        </div>
+
         <button type="button" className="btn btn-primary" onClick={testAddData}>
           Add data
         </button>
