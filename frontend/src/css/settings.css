@@ -1,70 +1,105 @@
-div.row, #manage-btn-row, #account-btn-row {
+div.row,
+#manage-btn-row,
+#account-btn-row {
   margin-right: 0px;
   margin-left: 0px;
+  justify-content: center;
 }
 
 button.logout {
   color: #063954;
-  background-color: #FFEACC;
-  border-color: #FFEACC;
+  background-color: #fdd4e6;
+  border-color: #fdd4e6;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
-  margin: 1em
+  margin: 1em;
 }
 
 button.logout:hover {
   color: #063954;
-  background-color: #FFEACC;
-  border-color: #FFEACC;
+  background-color: #fdd4e6;
+  border-color: #fdd4e6;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
 }
 
-button.logout:not(:disabled):not(.disabled):active, button.logout:focus, button.logout:not(:disabled):not(.disabled):active:focus {
+button.logout:not(:disabled):not(.disabled):active,
+button.logout:focus,
+button.logout:not(:disabled):not(.disabled):active:focus {
   color: #063954;
-  background-color: #FFEACC;
-  border-color: #FFEACC;
+  background-color: #fdd4e6;
+  border-color: #fdd4e6;
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
 }
 
 button.pass {
   color: #063954;
-  background-color: #FDD4E6;
-  border-color: #FDD4E6;
+  background-color: #ffeacc;
+  border-color: #ffeacc;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
-  margin: 1em
+  margin: 1em;
 }
 
 button.pass:hover {
   color: #063954;
-  background-color: #FDD4E6;
-  border-color: #FDD4E6;
+  background-color: #ffeacc;
+  border-color: #ffeacc;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
 }
 
-button.pass:not(:disabled):not(.disabled):active, button.pass:focus, button.pass:not(:disabled):not(.disabled):active:focus {
+button.pass:not(:disabled):not(.disabled):active,
+button.pass:focus,
+button.pass:not(:disabled):not(.disabled):active:focus {
   color: #063954;
-  background-color: #FDD4E6;
-  border-color: #FDD4E6;
+  background-color: #ffeacc;
+  border-color: #ffeacc;
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
 }
 
 button.generic {
   color: #063954;
-  background-color: #CDFFFF;
-  border-color: #CDFFFF;
+  background-color: #cdffff;
+  border-color: #cdffff;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
-  margin: 1em
+  margin: 1em;
 }
 
 button.generic:hover {
   color: #063954;
-  background-color: #CDFFFF;
-  border-color: #CDFFFF;
+  background-color: #cdffff;
+  border-color: #cdffff;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
 }
 
-button.generic:not(:disabled):not(.disabled):active, button.generic:focus, button.generic:not(:disabled):not(.disabled):active:focus {
+button.generic:not(:disabled):not(.disabled):active,
+button.generic:focus,
+button.generic:not(:disabled):not(.disabled):active:focus {
   color: #063954;
-  background-color: #CDFFFF;
-  border-color: #CDFFFF;
+  background-color: #cdffff;
+  border-color: #cdffff;
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
+.red-text {
+  color: #f52882;
+}
+
+.pass-create-container {
+  margin-top: 1em;
+  display: flex;
+  justify-content: center;
+}
+
+.pass-create-container Form {
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.pass-titleLabel {
+  font-size: 30px;
+  width: max-content;
+}
+
+@media (min-width: 768px) {
+  .pass-create-container Form {
+    width: 30em;
+  }
 }

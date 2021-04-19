@@ -250,6 +250,17 @@ describe('sendCreateProject', () => {
   });
 });
 
+describe('sendGetUserName', () => {
+  test('Correct request', async () => {
+    await resetDB();
+    await createUser();
+
+    const response = await HTTPLauncher.sendGetUserName();
+    expect(response.status).toBe(200);
+    expect(response.data.name).toBe('Nameer Sur');
+  });
+});
+
 describe('sendGetUserProjects', () => {
   test('Correct request', async () => {
     await resetDB();

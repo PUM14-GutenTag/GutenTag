@@ -132,6 +132,13 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to get a users name.
+  static sendGetUserName() {
+    return axiosInstance().get('get-user-name', {
+      headers: authHeader(),
+    });
+  }
+
   static sendGetUserProjects() {
     return axiosInstance().get('get-user-projects', {
       headers: authHeader(),

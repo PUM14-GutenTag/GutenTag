@@ -546,6 +546,26 @@ class DeleteLabel(Resource):
         return jsonify({"message": msg})
 
 
+class FetchUserName(Resource):
+    """
+    Fetch the loged in users information.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
+    @jwt_required()
+    def get(self):
+        current_user = User.get_by_email(get_jwt_identity())
+        msg = "Succesfully got user information."
+        name = current_user.first_name + " " + current_user.last_name
+
+        return jsonify({
+            "name": name,
+            "message": msg
+        })
+
+
 class FetchUserProjects(Resource):
     """
     Fetch all projects that a user is authorized to
@@ -665,6 +685,7 @@ rest.add_resource(CreateSequenceLabel, "/label-sequence")
 rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
 rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
+rest.add_resource(FetchUserName, '/get-user-name')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")

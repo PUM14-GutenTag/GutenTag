@@ -11,7 +11,8 @@ const Settings = () => {
   const [name, setName] = useState('');
 
   async function fetchName() {
-    return 'John Doe';
+    const response = await HTTPLauncher.sendGetUserName();
+    return response.data.name;
   }
 
   useEffect(() => {

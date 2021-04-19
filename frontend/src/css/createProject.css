@@ -6,11 +6,11 @@
 
 button.submitButton {
   font-size: 18px;
-  width: 100%;
   color: white;
   background-color: #063954;
   border-color: #063954;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  margin-top: 0.4em;
 }
 
 button.submitButton:hover {
@@ -20,7 +20,9 @@ button.submitButton:hover {
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
 }
 
-button.submitButton:not(:disabled):not(.disabled):active, button.submitButton:focus, button.submitButton:not(:disabled):not(.disabled):active:focus {
+button.submitButton:not(:disabled):not(.disabled):active,
+button.submitButton:focus,
+button.submitButton:not(:disabled):not(.disabled):active:focus {
   color: white;
   background-color: #063954;
   border-color: #063954;
@@ -28,14 +30,17 @@ button.submitButton:not(:disabled):not(.disabled):active, button.submitButton:fo
 }
 
 .create-container Form {
-  padding: 10%;
   border-radius: 10px;
-  box-shadow: 4px 4px 4px rgb(0, 0, 0, 0.25);
-  background-color: #cdffff;
   width: fit-content;
 }
 
 .titleLabel {
   font-size: 30px;
   width: max-content;
+}
+
+@media (min-width: 768px) {
+  .create-container Form {
+    width: 30em;
+  }
 }
