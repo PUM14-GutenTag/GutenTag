@@ -139,6 +139,13 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to get all users info.
+  static sendGetUsers() {
+    return axiosInstance().get('get-users', {
+      headers: authHeader(),
+    });
+  }
+
   static sendGetUserProjects() {
     return axiosInstance().get('get-user-projects', {
       headers: authHeader(),

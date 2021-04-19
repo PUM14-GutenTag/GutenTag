@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Row, Col } from 'react-bootstrap';
 import CreateProject from '../components/CreateProject';
 import ChangePass from '../components/ChangePass';
+import ManageUsers from '../components/ManageUsers';
 import HTTPLauncher from '../services/HTTPLauncher';
 
 import '../css/settings.css';
@@ -75,7 +76,9 @@ const Settings = () => {
       <CreateProject toggleCallback={toggleBack} />
     </div>,
     <div />,
-    <div />,
+    <div>
+      <ManageUsers toggleCallback={toggleBack} />
+    </div>,
   ];
 
   return pages[showPage];
