@@ -166,6 +166,8 @@ class HTTPLauncher {
         ...
     ]
    */
+
+    
   static sendAddNewImageData(projectID, JSONData, images) {
     const formData = new FormData();
     formData.append('project_id', projectID);

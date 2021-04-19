@@ -9,9 +9,8 @@ import DocumentClassification from '../components/DocumentClassification';
 import '../css/Labeling.css';
 
 const Labeling = () => {
-  const [dataId, setDataId] = useState();
   const [label, setLabel] = useState('');
-  const [currentData, setCurrentData] = useState('');
+  //const [currentData, setCurrentData] = useState('');
   const [dataCounter, setDataCounter] = useState(0);
   const projectId = useParams().id;
   const type = useParams().projectType;
@@ -20,21 +19,33 @@ const Labeling = () => {
   async function fetchdata() {
     const response = await HTTPLauncher.sendGetData(projectId, 5);
 
+    // create Array of arrays from object with key and value pair
+    const dataArray = Object.entries(response.data);
+    setListOfDataPoints(dataArray);
+
+    
     /*
-    const result = Object.keys(response.data).map((key) => [key, response.data[key]]);
-    setListOfDataPoints(result); // here we got all the relevant datapoints
+      TODO:
+      Hämta label när man går tillbaka
+      Inte spara för mycket info bakåt, dvs. bara spara 
+      Fixa css med mer komponent specifikt UI
     */
-    setListOfDataPoints(response.data);
+
+
+      /*
+      project id,
+      datapoint id
+      vill kunna använda ett user id (är det email) 
+      också på något sätt för att hämta ut våra specifika labels för datapointen
+      */
 
     changeData(dataCounter);
   }
   function changeData(count) {
-    setCurrentData(listOfDataPoints[count]);
-    setDataId(Object.keys(listOfDataPoints)[count]);
     setDataCounter(count);
   }
 
-  async function testAdddata() {
+  async function testAddData() {
     const response = await HTTPLauncher.sendAddNewTextData(
       projectId,
       JSON.stringify([
@@ -97,21 +108,33 @@ const Labeling = () => {
   }, []);
 
   const renderAuthButton = (typeOfProject) => {
-    if (listOfDataPoints[dataId]) {
+    if (listOfDataPoints[dataCounter]) {
       if (typeOfProject === '1') {
-        return <DocumentClassification data={listOfDataPoints[dataId]} />;
+        return <DocumentClassification data={listOfDataPoints[dataCounter][1]} />;
       }
     }
 
     return <div>This data shouldn't be labeled</div>;
   };
 
-  const nextData = () => {
+  const nextData = async () => {
     // change datacounter
-    const tempDataCounter = dataCounter + 1;
+    let tempDataCounter = dataCounter + 1;    
+    console.log("Before if: ", listOfDataPoints)
 
-    if (Object.keys(listOfDataPoints).length - 1 < tempDataCounter) {
-      fetchdata();
+
+    /* 
+      If there are less than 5 datapoints ahead in the list get a new one.
+    */
+    if (Object.keys(listOfDataPoints).length - 5 < tempDataCounter) {
+      const response = await HTTPLauncher.sendGetData(projectId, 1);
+      const newDataPoint = Object.entries(response.data);
+      const tempListOfDataPoints = listOfDataPoints.slice(); 
+  
+      const newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
+      console.log("Final After", newListOfDataPoints);
+      setListOfDataPoints(newListOfDataPoints);
+      changeData(tempDataCounter);
     } else {
       changeData(tempDataCounter);
     }
@@ -132,8 +155,7 @@ const Labeling = () => {
 
   const addLabel = async (event) => {
     event.preventDefault();
-    const currentDataPoint = currentData;
-    const response = await HTTPLauncher.sendCreateDocumentClassificationLabel(dataId, label);
+    await HTTPLauncher.sendCreateDocumentClassificationLabel(parseInt(listOfDataPoints[dataCounter][0]), label);
 
     const tempDataCounter = dataCounter + 1;
     changeData(tempDataCounter);
@@ -173,7 +195,7 @@ const Labeling = () => {
         </Form>
 
         <br />
-        <button type="button" className="btn btn-primary" onClick={testAdddata}>
+        <button type="button" className="btn btn-primary" onClick={testAddData}>
           Add data
         </button>
       </div>
