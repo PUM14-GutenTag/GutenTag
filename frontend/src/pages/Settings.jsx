@@ -35,8 +35,7 @@ const Settings = () => {
   // 0: default page
   // 1: Change password
   // 2: Add new project
-  // 3: Manage projects
-  // 4: Manage users
+  // 3: Manage users
   const pages = [
     <div>
       <Col
@@ -57,9 +56,6 @@ const Settings = () => {
             Add new project
           </Button>
           <Button className="generic" onClick={() => setPageShow(3)}>
-            Manage projects
-          </Button>
-          <Button className="generic" onClick={() => setPageShow(4)}>
             Manage users
           </Button>
         </Row>
@@ -85,7 +81,6 @@ const Settings = () => {
       </Button>
       <CreateProject toggleCallback={toggleBack} />
     </div>,
-    <div />,
     <div>
       <ManageUsers toggleCallback={toggleBack} />
     </div>,
