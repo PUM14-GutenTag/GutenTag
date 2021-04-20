@@ -152,3 +152,14 @@ input.filter:focus {
 table.users-table {
   color: #063954;
 }
+
+svg.remove {
+  color: #f52882;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.2em;
+}
+
+td.right {
+  text-align: end;
+}

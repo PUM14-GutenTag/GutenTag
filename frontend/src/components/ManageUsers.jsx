@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Table } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { Trash } from 'react-bootstrap-icons';
 import HTTPLauncher from '../services/HTTPLauncher';
 
 const ManageUsers = ({ toggleCallback }) => {
@@ -70,8 +71,8 @@ const ManageUsers = ({ toggleCallback }) => {
                   <tr key={result}>
                     <td>{result[1]}</td>
                     <td>{result[0]}</td>
-                    <td>
-                      <Button onClick={() => removeUser(result)}>remove</Button>
+                    <td className="right">
+                      <Trash className="remove" onClick={() => removeUser(result)} />
                     </td>
                   </tr>
                 ))}
