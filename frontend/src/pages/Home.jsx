@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import CreateProject from '../components/CreateProject';
 import Project from '../components/Project';
 import HTTPLauncher from '../services/HTTPLauncher';
-import { UserContext } from '../stores/UserStore';
+import { useUser } from '../contexts/UserContext';
 
 import '../css/home.css';
 
@@ -12,7 +12,7 @@ const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
 const Home = () => {
   const [projectsShow, setProjectsShow] = useState(true);
   const [projects, setProjects] = useState([]);
-  const [userState] = useContext(UserContext);
+  const { state: userState } = useUser();
 
   const fetchData = async () => {
     const result = await HTTPLauncher.sendGetUserProjects();
@@ -32,7 +32,6 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      {userState}
       {projectsShow ? (
         <div className="projects-container">
           <Button className="toggleButton" variant="success" onClick={toggleProjects}>
@@ -47,6 +46,7 @@ const Home = () => {
                   name={result.name}
                   projectType={result.type}
                   selectedColor={colorList[i % colorList.length]}
+                  showEditButton={userState.isAdmin}
                 />
               </li>
             ))}

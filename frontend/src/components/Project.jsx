@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { GearFill } from 'react-bootstrap-icons';
 
-const Project = ({ id, name, created, projectType, selectedColor }) => {
+const Project = ({ id, name, created, projectType, selectedColor, showEditButton }) => {
   const [showInfo, setShowInfo] = useState(false);
   const projectTypeNames = [
     'Document classification',
@@ -34,19 +34,21 @@ const Project = ({ id, name, created, projectType, selectedColor }) => {
           </div>
         </div>
       ) : null}
-      <Link
-        className="edit-link"
-        to={{
-          pathname: '/edit-project',
-          state: {
-            id,
-            name,
-            projectType,
-          },
-        }}
-      >
-        <GearFill />
-      </Link>
+      {showEditButton && (
+        <Link
+          className="edit-link"
+          to={{
+            pathname: '/edit-project',
+            state: {
+              id,
+              name,
+              projectType,
+            },
+          }}
+        >
+          <GearFill />
+        </Link>
+      )}
     </div>
   );
 };
@@ -57,6 +59,10 @@ Project.propTypes = {
   created: PropTypes.string.isRequired,
   projectType: PropTypes.number.isRequired,
   selectedColor: PropTypes.string.isRequired,
+  showEditButton: PropTypes.bool,
+};
+Project.defaultProps = {
+  showEditButton: false,
 };
 
 export default Project;

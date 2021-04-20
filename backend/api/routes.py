@@ -1,5 +1,4 @@
 import json
-import io
 from flask import jsonify, send_file
 from flask_restful import Resource, reqparse, inputs, request
 from flask_jwt_extended import (
