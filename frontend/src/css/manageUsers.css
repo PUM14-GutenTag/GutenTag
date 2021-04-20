@@ -1,0 +1,23 @@
+button.generic {
+  color: #FFFFFF;
+  background-color: #063954;;
+  border-color: #063954;;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  margin: 1em;
+}
+
+button.generic:hover {
+  color: #FFFFFF;
+  background-color: #063954;;
+  border-color: #063954;;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+button.generic:not(:disabled):not(.disabled):active,
+button.generic:focus,
+button.generic:not(:disabled):not(.disabled):active:focus {
+  color: #FFFFFF;
+  background-color: #063954;;
+  border-color: #063954;;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
