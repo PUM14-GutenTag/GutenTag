@@ -167,7 +167,6 @@ class HTTPLauncher {
     ]
    */
 
-    
   static sendAddNewImageData(projectID, JSONData, images) {
     const formData = new FormData();
     formData.append('project_id', projectID);
@@ -183,6 +182,14 @@ class HTTPLauncher {
     return axiosInstance().get('get-data', {
       headers: authHeader(),
       params: { project_id: projectID, amount },
+    });
+  }
+
+  // Send HTTP-request to fetch datapoints to be labelled.
+  static sendGetLabel(projectID, dataID) {
+    return axiosInstance().get('get-label', {
+      headers: authHeader(),
+      params: { project_id: projectID, data_id: dataID },
     });
   }
 

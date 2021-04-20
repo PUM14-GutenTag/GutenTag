@@ -49,7 +49,7 @@ def allowed_image_extension(filename):
 
 class Register(Resource):
     """
-    Endpoint for registering an user.
+    THIS ENDPOINT IS ONLY FOR DEVELOPMENT PURPOSES AND WILL BE REMOVED
     """
 
     def __init__(self):
@@ -67,6 +67,34 @@ class Register(Resource):
         user = User(args.first_name, args.last_name, args.email, args.password,
                     args.admin)
         return jsonify(try_add_response(user))
+
+
+class CreateUser(Resource):
+    """
+    Endpoint for creating an user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("first_name", type=str, required=True)
+        self.reqparse.add_argument("last_name", type=str, required=True)
+        self.reqparse.add_argument("email", type=str, required=True)
+        self.reqparse.add_argument("password", type=str, required=True)
+        self.reqparse.add_argument("admin", type=inputs.boolean,
+                                   required=False, default=False)
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+
+        if user.access_level >= AccessLevel.ADMIN:
+            new_user = User(args.first_name, args.last_name, args.email,
+                            args.password, args.admin)
+            return jsonify(try_add_response(new_user))
+
+        return jsonify({"id": None, "message":
+                        "You are not authorized to create other users."})
 
 
 class Login(Resource):
@@ -89,7 +117,7 @@ class Login(Resource):
             response = user.login(args.password)
             if response is None:
                 msg = "Incorrect login credentials"
-                access_token, refresh_token = response
+                access_token, refresh_token = None, None
             else:
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
@@ -98,6 +126,49 @@ class Login(Resource):
             "message": msg,
             "access_token": access_token,
             "refresh_token": refresh_token
+        })
+
+
+class ChangePassword(Resource):
+    """
+    Endpoint for changing user password.
+    If email is present in request body,
+    change password of that user if the
+    sender is an admin. Otherwise, changes
+    the password of the authorized user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("old_password", type=str, required=False,
+                                   default=None)
+        self.reqparse.add_argument("new_password", type=str, required=True)
+        self.reqparse.add_argument(
+            "email", type=str, required=False, default=None)
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        msg = "Failed to change password: old password is invalid"
+
+        if not args.email:
+            if not args.old_password:
+                msg = "Missing parameter: 'old_password'"
+            elif user.check_password(args.old_password):
+                user.change_password(args.new_password)
+                msg = "Password changed succesfully"
+        else:
+            if user.access_level >= AccessLevel.ADMIN:
+                other_user = User.get_by_email(args.email)
+                if other_user:
+                    other_user.change_password(args.new_password)
+                    msg = f"Password of {args.email} was changed succesfully"
+            else:
+                msg = "User is unauthorized to change other users passwords."
+
+        return jsonify({
+            "message": msg
         })
 
 
@@ -174,8 +245,8 @@ class NewProject(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project_name', type=str, required=True)
-        self.reqparse.add_argument('project_type', type=int, required=True)
+        self.reqparse.add_argument("project_name", type=str, required=True)
+        self.reqparse.add_argument("project_type", type=int, required=True)
 
     @jwt_required()
     def post(self):
@@ -191,11 +262,6 @@ class NewProject(Resource):
                 msg = f"Could not create project: {e}"
         else:
             msg = "User is not authorized to create projects."
-
-        current_user = User.get_by_email(get_jwt_identity())
-
-        if current_user.access_level >= AccessLevel.ADMIN:
-            return Project(args.project_name, args.project_type)
 
         return jsonify({"message": msg})
 
@@ -327,6 +393,45 @@ class GetNewData(Resource):
         return jsonify({"message": msg})
 
 
+class GetLabel(Resource):
+    """
+    Endpoint to retrieve labels either
+    by userid and labelid, or all labels
+    by a user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+        self.reqparse.add_argument(
+            "data_id", type=int, required=False, default=None)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+
+        if args.data_id is not None:
+            label = Label.query.filter_by(
+                data_id=args.data_id, user_id=user.id).first()
+            # label = Label.query.filter_by(
+            #    data_id=args.data_id).first()
+
+            export_funcs = {
+                1: export_document_classification_data,
+                2: export_sequence_labeling_data,
+                3: export_sequence_to_sequence_data,
+                4: export_image_classification_data
+            }
+            try:
+                return export_funcs[project.project_type](args.project_id)
+            except Exception as e:
+                msg = f"Could not export data: {e}"
+        else:
+            return jsonify({"message": "Not implemented"})
+
+
 class CreateDocumentClassificationLabel(Resource):
     """
     Endpoint for creating a document classification label.
@@ -345,10 +450,6 @@ class CreateDocumentClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                print(try_add_response(
-                    DocumentClassificationLabel(
-                        args.data_id, user.id, args.label)
-                ))
                 return jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label)
@@ -506,7 +607,6 @@ class FetchUserProjects(Resource):
         for project in projects:
             user_projects[project.id] = {
                 "name": project.name,
-                "id": project.id,
                 "type": project.project_type,
                 "created": project.created
             }
@@ -588,7 +688,9 @@ class Reset(Resource):
 
 
 rest.add_resource(Register, "/register")
+rest.add_resource(CreateUser, "/create-user")
 rest.add_resource(Login, "/login")
+rest.add_resource(ChangePassword, "/change-password")
 rest.add_resource(RefreshToken, "/refresh-token")
 rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
@@ -597,6 +699,7 @@ rest.add_resource(RemoveProject, "/delete-project")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
 rest.add_resource(GetNewData, "/get-data")
+rest.add_resource(GetLabel, "/get-label")
 rest.add_resource(CreateDocumentClassificationLabel, "/label-document")
 rest.add_resource(CreateSequenceLabel, "/label-sequence")
 rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
