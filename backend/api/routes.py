@@ -597,13 +597,6 @@ class FetchUserProjects(Resource):
                         "projects": user_projects})
 
 
-def text_to_json_file(text):
-    file = io.BytesIO()
-    file.write(json.dumps(text).encode())
-    file.seek(0)
-    return file
-
-
 class GetExportData(Resource):
     """
     Endpoint for exporting data from project according to filters.
