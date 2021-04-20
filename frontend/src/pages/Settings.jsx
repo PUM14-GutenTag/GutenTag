@@ -49,7 +49,9 @@ const Settings = () => {
       >
         <h1>Name: {name}</h1>
         <h1>Personal records</h1>
-        <AchievementCarousel />
+        <div style={{ height: '100%', width: '90%' }}>
+          <AchievementCarousel />
+        </div>
         <Row id="manage-btn-row">
           <Button className="generic" onClick={() => setPageShow(2)}>
             Add new project

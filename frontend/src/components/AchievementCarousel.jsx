@@ -1,17 +1,15 @@
 import React from 'react';
 import Carousel from 'react-multi-carousel';
-import "react-multi-carousel/lib/styles.css";
+import 'react-multi-carousel/lib/styles.css';
+import '../css/achievementCarousel.css'
 
 const AchievementCarousel = () => {
+  const colors = [ '#E2D0F5', '#FDD4E6', '#FFEACC', '#CDFFFF' ];
+
   const responsive = {
-    superLargeDesktop: {
-      // the naming can be any, depends on you.
-      breakpoint: { max: 4000, min: 3000 },
-      items: 5,
-    },
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
-      items: 3,
+      items: 5,
     },
     tablet: {
       breakpoint: { max: 1024, min: 464 },
@@ -26,23 +24,24 @@ const AchievementCarousel = () => {
   return (
     <Carousel
       responsive={responsive}
-      swipeable={false}
-      draggable={false}
-      showDots={true}
+      infinate={true}
+      showDots={false}
       ssr={true} // means to render carousel on server-side.
       keyBoardControl={true}
-      customTransition="all .5"
-      transitionDuration={500}
-      containerClass="carousel-container"
       removeArrowOnDeviceType={["tablet", "mobile"]}
-      dotListClass="custom-dot-list-style"
-      itemClass="carousel-item-padding-40-px"
+      itemClass="carousel-item-custom"
+      centerMode={true}
     >
-      <div>Item 1</div>
-      <div>Item 2</div>
-      <div>Item 3</div>
-      <div>Item 4</div>
-      <div>Item 5</div>
+      <div style={{ background: colors[0] }}>Item 1</div>
+      <div style={{ background: colors[1] }}>Item 2</div>
+      <div style={{ background: colors[2] }}>Item 3</div>
+      <div style={{ background: colors[3] }}>Item 4</div>
+      <div style={{ background: colors[0] }}>Item 5</div>
+      <div style={{ background: colors[1] }}>Item 1</div>
+      <div style={{ background: colors[2] }}>Item 2</div>
+      <div style={{ background: colors[3] }}>Item 3</div>
+      <div style={{ background: colors[0] }}>Item 4</div>
+      <div style={{ background: colors[1] }}>Item 5</div>
     </Carousel>
   );
 };
