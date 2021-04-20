@@ -144,9 +144,9 @@ input.filter {
 input.filter:focus {
   color: #495057;
   background-color: #fff;
-  border-color: #80bdff;
+  border-color: #00C8C8;
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
+  box-shadow: 0 0 0 0.2rem rgb(0 200 200 / 25%);
 }
 
 table.users-table {

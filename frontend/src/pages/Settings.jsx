@@ -4,6 +4,7 @@ import CreateProject from '../components/CreateProject';
 import ChangePass from '../components/ChangePass';
 import ManageUsers from '../components/ManageUsers';
 import HTTPLauncher from '../services/HTTPLauncher';
+import AchievementCarousel from '../components/AchievementCarousel';
 
 import '../css/settings.css';
 
@@ -48,6 +49,7 @@ const Settings = () => {
       >
         <h1>Name: {name}</h1>
         <h1>Personal records</h1>
+        <AchievementCarousel />
         <Row id="manage-btn-row">
           <Button className="generic" onClick={() => setPageShow(2)}>
             Add new project
@@ -70,9 +72,15 @@ const Settings = () => {
       </Col>
     </div>,
     <div>
+      <Button className="dark" onClick={() => setPageShow(0)}>
+        Back
+      </Button>
       <ChangePass toggleCallback={toggleBack} />
     </div>,
     <div>
+      <Button className="dark" onClick={() => setPageShow(0)}>
+        Back
+      </Button>
       <CreateProject toggleCallback={toggleBack} />
     </div>,
     <div />,

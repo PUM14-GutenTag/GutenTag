@@ -5,11 +5,13 @@
   background: #e5e5e5;
   border-radius: 6px;
 }
-@media (max-width: 768px) {
-  .input-box {
-    height: 34px;
-    width: 150px !important;
-  }
+
+input.input-box:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #00C8C8;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgb(0 200 200 / 25%);
 }
 
 /* Big text style */
@@ -21,11 +23,6 @@
   line-height: 54px;
 
   color: #063954;
-}
-@media (max-width: 768px) {
-  .text-label-big {
-    font-size: 28px;
-  }
 }
 
 /* Center page and follow columndirection */
@@ -44,20 +41,49 @@
   top: 0%;
   bottom: 0%;
 }
+
+/* Makes button centered and styled */
+button.btn-login {
+  font-family: Roboto;
+  font-style: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  margin: 1em;
+  margin-left: 0px;
+  margin-right: 2em;
+}
+
+button.btn-login:hover {
+  color: #FFFFFF;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+button.btn-login:not(:disabled):not(.disabled):active,
+button.btn-login:focus,
+button.btn-login:not(:disabled):not(.disabled):active:focus {
+  color: #FFFFFF;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
 @media (max-width: 768px) {
+  .input-box {
+    height: 34px;
+    width: 150px !important;
+  }
+
+  .text-label-big {
+    font-size: 28px;
+  }
   .login-logo {
     width: 300px;
   }
-}
-
-/* Makes button centered and styled */
-.btn-login {
-  font-family: Roboto;
-  font-style: normal;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-
-  color: white !important;
-  background-color: #063954 !important;
 }
