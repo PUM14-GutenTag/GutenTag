@@ -304,6 +304,9 @@ def export_sequence_to_sequence_data(project_id, filters=None):
 
 
 def write_zip_entry(file_name, date_time, data, file):
+    """
+    Write an individual file to a zip archive.
+    """
     data_zip = zipfile.ZipInfo(file_name)
     data_zip.date_time = date_time
     data_zip.compress_type = zipfile.ZIP_DEFLATED
@@ -311,6 +314,10 @@ def write_zip_entry(file_name, date_time, data, file):
 
 
 def get_image_zip(project_id, project_name, json_data, filters=None):
+    """
+    Create a zip file in memory containing the project's images and a
+    descriptive JSON file.
+    """
     all_data = ProjectImageData.query.filter_by(project_id=project_id).all()
     date_time = time.localtime(time.time())[:6]
     memory_file = BytesIO()
