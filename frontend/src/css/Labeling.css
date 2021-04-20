@@ -11,14 +11,8 @@
   padding: 0px 150px;
 }
 
-.left-align-arrow {
-  text-align: left;
-  height: 25rem;
-}
-
-.right-align-arrow {
-  text-align: left;
-  height: 25rem;
+.right-left-arrow {
+  margin:auto;
 }
 
 .display-content {

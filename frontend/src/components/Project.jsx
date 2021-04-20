@@ -22,6 +22,7 @@ const Project = ({ name, id, created, projectType, selectedColor }) => {
     window.location.href = `http://localhost:3000/labeling/${projectType}/${id}`;
   };
 
+
   return (
     <div
       className="project-container"

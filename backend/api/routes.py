@@ -607,6 +607,7 @@ class FetchUserProjects(Resource):
         for project in projects:
             user_projects[project.id] = {
                 "name": project.name,
+                "id": project.id,
                 "type": project.project_type,
                 "created": project.created
             }
