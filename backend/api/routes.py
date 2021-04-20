@@ -333,6 +333,8 @@ class AddNewTextData(Resource):
                     args.project_id, json.load(json_file))
                 msg = "Data added."
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 msg = f"Could not add data: {e}"
 
         return jsonify({"message": msg})
@@ -594,13 +596,6 @@ class FetchUserProjects(Resource):
 
         return jsonify({"msg": "Retrieved user projects",
                         "projects": user_projects})
-
-
-def text_to_json_file(text):
-    file = io.BytesIO()
-    file.write(json.dumps(text).encode())
-    file.seek(0)
-    return file
 
 
 class GetExportData(Resource):

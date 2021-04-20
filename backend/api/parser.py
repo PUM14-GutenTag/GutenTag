@@ -2,8 +2,9 @@ from io import BytesIO
 import zipfile
 import time
 import json
-import io
-from api.database_handler import try_add, try_add_list
+from api.database_handler import (add_flush,
+                                  add_list_flush,
+                                  commit)
 from api.models import (Project,
                         ProjectData,
                         ProjectTextData,
@@ -43,7 +44,7 @@ def import_document_classification_data(project_id, json_data):
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
         project_data = ProjectTextData(project.id, text)
-        try_add(project_data)
+        add_flush(project_data)
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             prelabels = [
@@ -51,7 +52,8 @@ def import_document_classification_data(project_id, json_data):
                     project_data.id, None, lab, is_prelabel=True)
                 for lab in set(labels)
             ]
-            try_add_list(prelabels)
+            add_list_flush(prelabels)
+    commit()
 
 
 def import_sequence_labeling_data(project_id, json_data):
@@ -78,7 +80,7 @@ def import_sequence_labeling_data(project_id, json_data):
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
         project_data = ProjectTextData(project.id, text)
-        try_add(project_data)
+        add_flush(project_data)
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             prelabels = [
@@ -86,7 +88,8 @@ def import_sequence_labeling_data(project_id, json_data):
                               is_prelabel=True)
                 for begin, end, lab in labels
             ]
-            try_add_list(prelabels)
+            add_list_flush(prelabels)
+    commit()
 
 
 def import_sequence_to_sequence_data(project_id, json_data):
@@ -110,13 +113,14 @@ def import_sequence_to_sequence_data(project_id, json_data):
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
         project_data = ProjectTextData(project.id, text)
-        try_add(project_data)
+        add_flush(project_data)
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             prelabels = [SequenceToSequenceLabel(project_data.id, None, lab,
                                                  is_prelabel=True)
                          for lab in labels]
-            try_add_list(prelabels)
+            add_list_flush(prelabels)
+    commit()
 
 
 def import_image_classification_data(project_id, json_data, images):
@@ -136,9 +140,10 @@ def import_image_classification_data(project_id, json_data, images):
         ...
     ]
     """
+    # Validate that json_data matches images.
     if (len(images) != len(json_data)):
         raise ValueError(f"Number of data objects ({len(json_data)} must "
-                         f"match number of images ({len(images)}.")
+                         f"match number of images ({len(images)}).")
     image_names = {obj["file_name"] for obj in json_data}
     image_file_names = set(images.keys())
     image_names_difference = image_names.difference(image_file_names)
@@ -150,6 +155,16 @@ def import_image_classification_data(project_id, json_data, images):
         raise ValueError("Uploaded images contain unmached data objects "
                          + str(image_file_names_difference))
 
+    # Validate that uploaded images are not present in database.
+    # Could probably be done with custom database constraints.
+    existing_file_names = set([data.file_name for data in ProjectImageData
+                               .query.filter_by(project_id=project_id).all()])
+    existing_intersection = existing_file_names.intersection(image_file_names)
+    if (existing_intersection):
+        raise ValueError("Uploaded data contains filenames that are already "
+                         "present in the database. "
+                         + str(existing_intersection))
+
     project = get_project(project_id, ProjectType.IMAGE_CLASSIFICATION)
 
     for obj in json_data:
@@ -158,7 +173,7 @@ def import_image_classification_data(project_id, json_data, images):
             raise ValueError(f"'{obj}' is missing 'file_name' entry")
         project_data = ProjectImageData(project.id, file_name,
                                         images[file_name])
-        try_add(project_data)
+        add_flush(project_data)
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             prelabels = [
@@ -166,7 +181,8 @@ def import_image_classification_data(project_id, json_data, images):
                                          tuple(p2), is_prelabel=True)
                 for p1, p2, lab in labels
             ]
-            try_add_list(prelabels)
+            add_list_flush(prelabels)
+    commit()
 
 
 def get_standard_dict(project):
@@ -288,6 +304,9 @@ def export_sequence_to_sequence_data(project_id, filters=None):
 
 
 def write_zip_entry(file_name, date_time, data, file):
+    """
+    Write an individual file to a zip archive.
+    """
     data_zip = zipfile.ZipInfo(file_name)
     data_zip.date_time = date_time
     data_zip.compress_type = zipfile.ZIP_DEFLATED
@@ -295,6 +314,10 @@ def write_zip_entry(file_name, date_time, data, file):
 
 
 def get_image_zip(project_id, project_name, json_data, filters=None):
+    """
+    Create a zip file in memory containing the project's images and a
+    descriptive JSON file.
+    """
     all_data = ProjectImageData.query.filter_by(project_id=project_id).all()
     date_time = time.localtime(time.time())[:6]
     memory_file = BytesIO()

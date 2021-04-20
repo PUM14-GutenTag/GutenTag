@@ -40,7 +40,7 @@ const Home = () => {
           </Button>
           <ul>
             {projects.map((result, i) => (
-              <li key={result}>
+              <li key={result.name}>
                 <Project
                   id={result.id}
                   created={result.created}

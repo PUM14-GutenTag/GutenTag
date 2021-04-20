@@ -8,7 +8,7 @@ from api import db
 
 def try_add(object):
     """
-    Try to add the column 'object' to its table in the database.
+    Try to add the column 'object' to its table in the database and return it.
     """
     try:
         db.session.add(object)
@@ -38,17 +38,38 @@ def try_add_response(object):
         }
 
 
+def add_flush(object):
+    """
+    Add the column 'object' to its table in the database without
+    ending the current transacion and return it.
+    """
+    db.session.add(object)
+    db.session.flush()
+    return object
+
+
 def try_add_list(objects):
     """
     Try to add each column in 'objects' to its table in the database and then
-    commit.
+    commit. Returns objects.
     """
     try:
         db.session.add_all(objects)
         db.session.commit()
+        return objects
     except Exception:
         db.session.rollback()
         raise
+
+
+def add_list_flush(objects):
+    """
+    Add each column columnin 'objects' to its table in the database without
+    ending the current transacion. Returns objects.
+    """
+    db.session.add_all(objects)
+    db.session.flush()
+    return objects
 
 
 def try_delete(object):
@@ -82,6 +103,18 @@ def try_delete_response(object):
             "id": id,
             "message": msg
         }
+
+
+def commit():
+    """
+    Commits the latest transaction to the database. Roll back if an error
+    occurs.
+    """
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def check_types(arg_types):

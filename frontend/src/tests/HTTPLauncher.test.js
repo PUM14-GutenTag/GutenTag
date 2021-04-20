@@ -23,6 +23,12 @@ const getJSONObject = (filename) => {
   return JSON.parse(fs.readFileSync(filepath));
 };
 
+const arrayBufferToJSONObject = async (arrayBuffer) => {
+  const blob = new Blob([arrayBuffer]);
+  const text = await new Response(blob).text();
+  return JSON.parse(text);
+};
+
 const images = [
   'ILSVRC2012_val_00000001.JPEG',
   'ILSVRC2012_val_00000002.JPEG',
@@ -485,7 +491,7 @@ describe('sendRemoveLabel', () => {
   });
 });
 
-describe.only('sendGetExportData', () => {
+describe('sendGetExportData', () => {
   test('Document classification project', async () => {
     await resetDB();
     await createUser();
@@ -500,7 +506,8 @@ describe.only('sendGetExportData', () => {
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const texts = response.data.data.map((d) => d.text);
+    const responseObj = await arrayBufferToJSONObject(response.data);
+    const texts = responseObj.data.map((d) => d.text);
 
     getJSONObject('input_document_classification.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
@@ -518,7 +525,8 @@ describe.only('sendGetExportData', () => {
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const texts = response.data.data.map((d) => d.text);
+    const responseObj = await arrayBufferToJSONObject(response.data);
+    const texts = responseObj.data.map((d) => d.text);
 
     getJSONObject('input_sequence.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
@@ -539,7 +547,8 @@ describe.only('sendGetExportData', () => {
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const texts = response.data.data.map((d) => d.text);
+    const responseObj = await arrayBufferToJSONObject(response.data);
+    const texts = responseObj.data.map((d) => d.text);
 
     getJSONObject('input_sequence_to_sequence.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
@@ -561,10 +570,5 @@ describe.only('sendGetExportData', () => {
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const fileNames = response.data.data.map((d) => d.file_name);
-
-    getJSONObject('input_image_classification.json').forEach((obj) => {
-      expect(fileNames).toContain(obj.file_name);
-    });
   });
 });

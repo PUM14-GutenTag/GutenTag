@@ -131,21 +131,7 @@ def test_image_classification_import_export():
     import_image_classification_data(project.id, in_content, images)
 
     # Export and write from the database to the output file.
-    out_file = os.path.join(OUT_PATH, "output_image_classification.json")
-    with open(out_file, "w") as file:
-        out_content = export_image_classification_data(project.id)
-        json.dump(out_content, file)
-
-    validate_common(project, out_content, in_content)
-
-    # Write output images files to the 'out/' directory.
-    for project_data in project.data:
-        out_image = os.path.join(OUT_PATH, "output_" + project_data.file_name)
-        with open(out_image, "wb") as file:
-            file.write(project_data.image_data)
-
-        # Check that input image matches output image.
-        in_image = os.path.join(PATH, "res/images/", project_data.file_name)
-        with open(in_image, "rb") as in_file, \
-                open(out_image, "rb") as out_file:
-            assert in_file.read() == out_file.read()
+    out_file = os.path.join(OUT_PATH, "output_image_classification.zip")
+    with open(out_file, "wb") as file:
+        out_contents = export_image_classification_data(project.id)
+        file.write(out_contents.getbuffer())
