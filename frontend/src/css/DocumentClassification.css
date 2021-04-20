@@ -13,18 +13,33 @@
   overflow-y: scroll;
 }
 
+
+.form-group{
+  display: flex;
+  flex-direction: row;
+  margin:0 6rem;
+}
+
 .input-box {
-  margin: 15px;
+  background-color: white;
+  flex-grow: 2;
+  border-radius: 5px;
+  border: #dfdede solid 1px;
 }
 
-.amazing-button {
-  background: #3498db;
-  width: 180px;
-  padding: 4px 0;
-
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  border-radius: 3px;
+.input-box:focus {
+  outline: none;
+  border: #00c8c8 solid 2px;
 }
+
+
+.label-btn{
+  margin-left: 1rem;
+  flex-grow: 2;
+  background-color: #063954;
+  color:black;
+  }
+
+  .label-btn:hover{
+    border: black solid 2px;
+  }
