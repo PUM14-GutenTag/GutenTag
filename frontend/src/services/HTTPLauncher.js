@@ -28,13 +28,19 @@ class HTTPLauncher {
 
   // Send HTTP-request to create a user
   static sendCreateUser(firstName, lastName, password, email, admin) {
-    return axiosInstance().post('create-user', {
-      first_name: firstName,
-      last_name: lastName,
-      password,
-      email,
-      admin,
-    });
+    return axiosInstance().post(
+      'create-user',
+      {
+        first_name: firstName,
+        last_name: lastName,
+        password,
+        email,
+        admin,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
   }
 
   // Send HTTP-request to login a user.

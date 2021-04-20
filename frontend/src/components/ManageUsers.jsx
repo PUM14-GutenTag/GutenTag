@@ -3,6 +3,7 @@ import { Button, Table } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { Trash } from 'react-bootstrap-icons';
 import HTTPLauncher from '../services/HTTPLauncher';
+import AddUser from './AddUser';
 
 const ManageUsers = ({ toggleCallback }) => {
   const [showUsers, setShowUsers] = useState(true);
@@ -81,8 +82,8 @@ const ManageUsers = ({ toggleCallback }) => {
         </div>
       ) : (
         <div>
-          <div>Adding user</div>
           <Button onClick={toggleUsers}>Back</Button>
+          <AddUser></AddUser>
         </div>
       )}
     </div>
