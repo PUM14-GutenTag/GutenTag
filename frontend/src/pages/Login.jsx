@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Button, Col, Row, Form } from 'react-bootstrap';
 
 import '../css/login.css';
 
 import logoUnder from '../res/hat_dark_under.svg';
 import HTTPLauncher from '../services/HTTPLauncher';
+import { UserContext } from '../stores/UserStore';
 
 // Login-page redirects submitting login details, does not verify valid login credentials
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validated, setValidated] = useState(false);
+  const [userState, userDispatch] = useContext(UserContext);
 
   // Checks the email and password length to be over 0
   function validateForm() {
@@ -23,9 +25,10 @@ function Login() {
 
     setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
-    const token = responseLogin.data.access_token;
-
+    const { token, accessLevel } = responseLogin.data;
+    userDispatch({ type: 'SET_ACCESS_LEVEL', value: accessLevel });
     localStorage.setItem('gutentag-accesstoken', token);
+
     window.location.href = 'http://localhost:3000/home';
   }
 
