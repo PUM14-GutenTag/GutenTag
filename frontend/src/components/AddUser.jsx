@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import HTTPLauncher from '../services/HTTPLauncher';
 
-const AddUser = () => {
+const AddUser = ({ toggleBack }) => {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
@@ -13,6 +13,7 @@ const AddUser = () => {
     event.preventDefault();
     console.log(isAdmin);
     await HTTPLauncher.sendCreateUser(firstname, lastname, password, email, isAdmin);
+    toggleBack();
   };
   const handleChange = (event) => {
     setIsAdmin(event.target.checked);
