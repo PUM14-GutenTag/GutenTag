@@ -82,30 +82,30 @@ button.generic:not(:disabled):not(.disabled):active:focus {
   color: #f52882;
 }
 
-.pass-create-container {
+.create-container {
   margin-top: 1em;
   display: flex;
   justify-content: center;
 }
 
-.pass-create-container Form {
+.create-container Form {
   border-radius: 10px;
   width: fit-content;
 }
 
-.pass-titleLabel {
+.titleLabel {
   font-size: 30px;
   width: max-content;
 }
 
 @media (min-width: 768px) {
-  .pass-create-container Form {
+  .create-container Form {
     width: 30em;
   }
 }
 
 button.dark {
-  color: #FFFFFF;
+  color: #ffffff;
   background-color: #063954;
   border-color: #063954;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
@@ -115,7 +115,7 @@ button.dark {
 }
 
 button.dark:hover {
-  color: #FFFFFF;
+  color: #ffffff;
   background-color: #063954;
   border-color: #063954;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
@@ -124,7 +124,7 @@ button.dark:hover {
 button.dark:not(:disabled):not(.disabled):active,
 button.dark:focus,
 button.dark:not(:disabled):not(.disabled):active:focus {
-  color: #FFFFFF;
+  color: #ffffff;
   background-color: #063954;
   border-color: #063954;
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
@@ -135,16 +135,16 @@ input.filter {
   margin-bottom: 0.5em;
   border-radius: 0.3em;
   height: calc(1.5em + 1rem + 2px);
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   color: #495057;
   border: 1px solid #ced4da;
-  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 input.filter:focus {
   color: #495057;
   background-color: #fff;
-  border-color: #00C8C8;
+  border-color: #00c8c8;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgb(0 200 200 / 25%);
 }

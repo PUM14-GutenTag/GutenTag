@@ -82,7 +82,9 @@ const ManageUsers = ({ toggleCallback }) => {
         </div>
       ) : (
         <div>
-          <Button onClick={toggleUsers}>Back</Button>
+          <Button className="dark" onClick={toggleUsers}>
+            Back
+          </Button>
           <AddUser toggleBack={toggleUsers} />
         </div>
       )}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 import HTTPLauncher from '../services/HTTPLauncher';
 
 const AddUser = ({ toggleBack }) => {
@@ -11,7 +12,6 @@ const AddUser = ({ toggleBack }) => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    console.log(isAdmin);
     await HTTPLauncher.sendCreateUser(firstname, lastname, password, email, isAdmin);
     toggleBack();
   };
@@ -19,10 +19,10 @@ const AddUser = ({ toggleBack }) => {
     setIsAdmin(event.target.checked);
   };
   return (
-    <div className="addUser-container">
+    <div className="create-container">
       <Form onSubmit={submitHandler}>
         <Form.Group controlId="form.text">
-          <Form.Label className="firstname">Firstname:</Form.Label>
+          <Form.Label className="titleLabel">Firstname</Form.Label>
           <Form.Control
             type="text"
             name="firstname"
@@ -30,7 +30,7 @@ const AddUser = ({ toggleBack }) => {
             placeholder="Enter a name..."
             required
           />
-          <Form.Label className="lastname">Lastname:</Form.Label>
+          <Form.Label className="titleLabel">Lastname</Form.Label>
           <Form.Control
             type="text"
             name="lastname"
@@ -38,7 +38,7 @@ const AddUser = ({ toggleBack }) => {
             placeholder="Enter a lastname..."
             required
           />
-          <Form.Label className="email">Email:</Form.Label>
+          <Form.Label className="titleLabel">Email</Form.Label>
           <Form.Control
             type="email"
             name="email"
@@ -46,7 +46,7 @@ const AddUser = ({ toggleBack }) => {
             placeholder="Enter an email..."
             required
           />
-          <Form.Label className="password">Password:</Form.Label>
+          <Form.Label className="titleLabel">Password</Form.Label>
           <Form.Control
             type="password"
             name="password"
@@ -56,7 +56,7 @@ const AddUser = ({ toggleBack }) => {
           />
         </Form.Group>
         <Form.Group controlId="form.checkbox">
-          <Form.Check type="checkbox" label="Admin" onChange={handleChange}></Form.Check>
+          <Form.Check type="checkbox" label="Admin" onChange={handleChange} />
         </Form.Group>
         <Button className="submitButton" variant="primary" type="submit">
           Submit
@@ -64,5 +64,9 @@ const AddUser = ({ toggleBack }) => {
       </Form>
     </div>
   );
+};
+
+AddUser.propTypes = {
+  toggleBack: PropTypes.func.isRequired,
 };
 export default AddUser;

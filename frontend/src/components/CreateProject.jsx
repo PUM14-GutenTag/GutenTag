@@ -20,7 +20,7 @@ const CreateProject = ({ toggleCallback }) => {
         <div>
           <Form onSubmit={submitHandler}>
             <Form.Group controlId="form.name">
-              <Form.Label className="titleLabel">Project Name:</Form.Label>
+              <Form.Label className="titleLabel">Project Name</Form.Label>
               <Form.Control
                 type="text"
                 name="name"

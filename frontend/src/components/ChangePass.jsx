@@ -27,10 +27,10 @@ const ChangePass = ({ toggleCallback }) => {
 
   return (
     <div>
-      <div className="pass-create-container">
+      <div className="create-container">
         <Form onSubmit={submitHandler}>
           <Form.Group controlId="form.old">
-            <Form.Label className="pass-titleLabel">Current password</Form.Label>
+            <Form.Label className="titleLabel">Current password</Form.Label>
             <Form.Control
               type="password"
               onChange={(event) => setCurrentPass(event.target.value)}
@@ -40,7 +40,7 @@ const ChangePass = ({ toggleCallback }) => {
             {!passValid && <div className="red-text">Password invalid!</div>}
           </Form.Group>
           <Form.Group controlId="form.new">
-            <Form.Label className="pass-titleLabel">New password</Form.Label>
+            <Form.Label className="titleLabel">New password</Form.Label>
             <Form.Control
               type="password"
               onChange={(event) => setNewPass(event.target.value)}
