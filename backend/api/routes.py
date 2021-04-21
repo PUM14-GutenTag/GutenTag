@@ -293,6 +293,32 @@ class RemoveProject(Resource):
         return jsonify({"message": msg})
 
 
+class RemoveUser(Resource):
+    """
+    Endpoint for removing a user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("email", type=str, required=True)
+
+    @jwt_required()
+    def delete(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        deletion_candidate = User.get_by_email(args.email)
+
+        if user.access_level >= AccessLevel.ADMIN:
+            try:
+                return jsonify(try_delete_response(deletion_candidate))
+            except Exception as e:
+                msg = f"Could not remove user: {e}"
+        else:
+            msg = "User is not authorized to delete other users"
+
+        return jsonify({"message": msg})
+
+
 class AddNewTextData(Resource):
     """
     Endpoint to add one or more text data points.
@@ -708,6 +734,7 @@ rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
 rest.add_resource(NewProject, "/create-project")
 rest.add_resource(RemoveProject, "/delete-project")
+rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
 rest.add_resource(GetNewData, "/get-data")

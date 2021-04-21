@@ -138,6 +138,13 @@ class HTTPLauncher {
     });
   }
 
+  static sendDeleteUser(email) {
+    return axiosInstance().delete('delete-user', {
+      headers: authHeader(),
+      data: { email: email },
+    });
+  }
+
   // Send HTTP-request to get a users name.
   static sendGetUserName() {
     return axiosInstance().get('get-user-name', {

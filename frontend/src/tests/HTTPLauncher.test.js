@@ -287,6 +287,26 @@ describe('sendDeleteProject request', () => {
   });
 });
 
+describe('sendDeleteUser request', () => {
+  test('Correct request', async() => {
+    await resetDB();
+    await createUser();
+
+    const email = 'normal@gmail.com';
+    const password = 'pass';
+    await HTTPLauncher.sendRegister('Reeman', 'Rus', password, email, true);
+
+    const deleteResponse = await HTTPLauncher.sendDeleteUser(email);
+    expect(deleteResponse.status).toBe(200);
+
+    const loginResponse = await HTTPLauncher.sendLogin(email, password);
+    expect(loginResponse.access_token).not.toBeDefined();
+
+    const registerAgainResponse = await HTTPLauncher.sendRegister('Meeran', 'Urs', 'bassword', email, true);
+    expect(registerAgainResponse.status).toBe(200)
+  })
+});
+
 describe('sendAddNewTextData request', () => {
   test('Document classification request', async () => {
     await resetDB();
