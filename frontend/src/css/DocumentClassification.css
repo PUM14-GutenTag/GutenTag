@@ -1,38 +1,40 @@
 .classification-container {
   height: 100%;
+  margin: auto;
+  overflow-y: auto;
 }
 
-.small-text-container {
-  text-align: center;
-  margin:auto;
-  border: 2px black solid;
+.text-box-container {
+  display: inline;
+  height: 100%;
+  max-width: 700px;
+  margin: auto;
+  overflow-y: auto;
+}
+
+.small-text {
   font-size: 40px;
 }
 
-.medium-text-container{
-  text-align: center;
-  margin:auto;
-  border: 2px black solid;
+.medium-text {
   font-size: 20px;
 }
 
-.large-text-container{
-  text-align: center;
-  margin:auto;
-  border: 2px black solid;
-  font-size: 14px;
-  overflow-y: scroll;
+.large-text {
+  font-size: 15px;
 }
 
-.form-group{
+.form-container {
+}
+
+.form-group {
   display: flex;
   flex-direction: row;
-  margin:0 6rem;
 }
 
 .input-box {
   background-color: white;
-  flex-grow: 2;
+  flex-grow: 3;
   border-radius: 5px;
   border: #dfdede solid 1px;
 }
@@ -42,48 +44,46 @@
   border: #00c8c8 solid 2px;
 }
 
-
-.label-btn{
+.label-btn {
   margin-left: 1rem;
   flex-grow: 2;
   background-color: #063954;
-  color:black;
-  }
+  color: black;
+}
 
-  .label-btn:hover{
-    border: black solid 2px;
-  }
+.label-btn:hover {
+  border: black solid 2px;
+}
 
-  .hr-title {
-    line-height: 1em;
-    position: relative;
-    outline: 0;
-    border: 0;
-    color: black;
-    text-align: center;
-    height: 1.5em;
-    opacity: .5;}
+.hr-title {
+  line-height: 1em;
+  position: relative;
+  outline: 0;
+  border: 0;
+  color: black;
+  text-align: center;
+  height: 1.5em;
+  opacity: 0.5;
+}
 
+.hr-title:before {
+  content: '';
 
-    .hr-title:before {
-      content: '';
-  
-      background: linear-gradient(to right, transparent, #818078, transparent);
-      position: absolute;
-      left: 0;
-      top: 50%;
-      width: 100%;
-      height: 1px;
-    }
-    .hr-title:after {
-      content: attr(data-content);
-      position: relative;
-      display: inline-block;
-      color: black;
-  
-      padding: 0 .5em;
-      line-height: 1.5em;
-      color: #818078;
-      background-color: #fcfcfa;
-    }
-  
+  background: linear-gradient(to right, transparent, #818078, transparent);
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+}
+.hr-title:after {
+  content: attr(data-content);
+  position: relative;
+  display: inline-block;
+  color: black;
+
+  padding: 0 0.5em;
+  line-height: 1.5em;
+  color: #818078;
+  background-color: #fcfcfa;
+}

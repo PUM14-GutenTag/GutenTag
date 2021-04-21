@@ -12,7 +12,7 @@
 }
 
 .right-left-arrow {
-  margin:auto;
+  margin: auto;
 }
 
 .display-content {
@@ -24,7 +24,7 @@
 }
 
 .data-content {
-  flex-grow: 4;
+  width: 80%;
 }
 
 .main-content {
