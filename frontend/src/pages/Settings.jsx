@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Row, Col } from 'react-bootstrap';
+
 import CreateProject from '../components/CreateProject';
 import ChangePass from '../components/ChangePass';
 import ManageUsers from '../components/ManageUsers';
-import HTTPLauncher from '../services/HTTPLauncher';
 import AchievementCarousel from '../components/AchievementCarousel';
+
+import HTTPLauncher from '../services/HTTPLauncher';
 
 import '../css/settings.css';
 
+/**
+ * Page for user and admin settings. Users can from this page log out, view
+ * personal records and change password. Admin can additionally from this page add
+ * a new project and manage users.
+ */
 const Settings = () => {
   const [showPage, setPageShow] = useState(0);
   const [name, setName] = useState('');
 
-  async function fetchName() {
+  // Fetches the logged in users name from backend.
+  const fetchName = async () => {
     const response = await HTTPLauncher.sendGetUserName();
     return response.data.name;
-  }
+  };
 
   useEffect(() => {
     if (showPage === 0) {
@@ -23,6 +31,7 @@ const Settings = () => {
     }
   }, [showPage]);
 
+  // Sets the accesstoken to null and redirects to login page.
   const logout = () => {
     localStorage.setItem('gutentag-accesstoken', null);
     window.location.href = 'http://localhost:3000/';

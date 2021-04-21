@@ -4,31 +4,6 @@
   justify-content: center;
 }
 
-button.submitButton {
-  font-size: 18px;
-  color: white;
-  background-color: #063954;
-  border-color: #063954;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
-  margin-top: 0.4em;
-}
-
-button.submitButton:hover {
-  color: white;
-  background-color: #063954;
-  border-color: #063954;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
-}
-
-button.submitButton:not(:disabled):not(.disabled):active,
-button.submitButton:focus,
-button.submitButton:not(:disabled):not(.disabled):active:focus {
-  color: white;
-  background-color: #063954;
-  border-color: #063954;
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
-}
-
 .create-container Form {
   border-radius: 10px;
   width: fit-content;

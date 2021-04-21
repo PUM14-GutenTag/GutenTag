@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Button } from 'react-bootstrap';
-import HTTPLauncher from '../services/HTTPLauncher';
-import '../css/settings.css';
 
+import HTTPLauncher from '../services/HTTPLauncher';
+
+/**
+ * Component to change the logged in users password. user must
+ * provide current password and repeat the new password.
+ */
 const ChangePass = ({ toggleCallback }) => {
   const [currentPass, setCurrentPass] = useState('');
   const [newPass, setNewPass] = useState('');
   const [repeatNewPass, setRepeatNewPass] = useState('');
   const [passValid, setPassValid] = useState(true);
 
+  // Checks if the repeated new password matches the new password.
   const validateForm = () => {
     return newPass === repeatNewPass;
   };
 
+  // Sends change password request to backend.
   const submitHandler = async (event) => {
     event.preventDefault();
     if (validateForm) {
@@ -32,6 +38,7 @@ const ChangePass = ({ toggleCallback }) => {
           <Form.Group controlId="form.old">
             <Form.Label className="titleLabel">Current password</Form.Label>
             <Form.Control
+              className="text"
               type="password"
               onChange={(event) => setCurrentPass(event.target.value)}
               placeholder="Enter current password..."
@@ -42,6 +49,7 @@ const ChangePass = ({ toggleCallback }) => {
           <Form.Group controlId="form.new">
             <Form.Label className="titleLabel">New password</Form.Label>
             <Form.Control
+              className="text"
               type="password"
               onChange={(event) => setNewPass(event.target.value)}
               placeholder="Enter new password..."
@@ -50,6 +58,7 @@ const ChangePass = ({ toggleCallback }) => {
           </Form.Group>
           <Form.Group controlId="form.repeat">
             <Form.Control
+              className="text"
               type="password"
               onChange={(event) => setRepeatNewPass(event.target.value)}
               placeholder="Repeat new password..."

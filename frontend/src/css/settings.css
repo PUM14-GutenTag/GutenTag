@@ -12,6 +12,10 @@ button.logout {
   border-color: #fdd4e6;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   margin: 1em;
+  padding: 0.7em;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  font-size: 18px;
 }
 
 button.logout:hover {
@@ -36,6 +40,10 @@ button.pass {
   border-color: #ffeacc;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   margin: 1em;
+  padding: 0.7em;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  font-size: 18px;
 }
 
 button.pass:hover {
@@ -60,6 +68,10 @@ button.generic {
   border-color: #cdffff;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   margin: 1em;
+  padding: 0.7em;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  font-size: 18px;
 }
 
 button.generic:hover {
@@ -104,49 +116,9 @@ button.generic:not(:disabled):not(.disabled):active:focus {
   }
 }
 
-button.dark {
-  color: #ffffff;
-  background-color: #063954;
-  border-color: #063954;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
-  margin: 1em;
+#button-margin {
   margin-left: 0px;
   margin-right: 2em;
-}
-
-button.dark:hover {
-  color: #ffffff;
-  background-color: #063954;
-  border-color: #063954;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
-}
-
-button.dark:not(:disabled):not(.disabled):active,
-button.dark:focus,
-button.dark:not(:disabled):not(.disabled):active:focus {
-  color: #ffffff;
-  background-color: #063954;
-  border-color: #063954;
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
-}
-
-input.filter {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-  border-radius: 0.3em;
-  height: calc(1.5em + 1rem + 2px);
-  padding: 0.5rem 1rem;
-  color: #495057;
-  border: 1px solid #ced4da;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-input.filter:focus {
-  color: #495057;
-  background-color: #fff;
-  border-color: #00c8c8;
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgb(0 200 200 / 25%);
 }
 
 table.users-table {

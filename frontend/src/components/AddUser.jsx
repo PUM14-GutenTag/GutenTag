@@ -24,6 +24,7 @@ const AddUser = ({ toggleBack }) => {
         <Form.Group controlId="form.text">
           <Form.Label className="titleLabel">Firstname</Form.Label>
           <Form.Control
+            className="text"
             type="text"
             name="firstname"
             onChange={(event) => setFirstname(event.target.value)}
@@ -32,6 +33,7 @@ const AddUser = ({ toggleBack }) => {
           />
           <Form.Label className="titleLabel">Lastname</Form.Label>
           <Form.Control
+            className="text"
             type="text"
             name="lastname"
             onChange={(event) => setLastname(event.target.value)}
@@ -40,6 +42,7 @@ const AddUser = ({ toggleBack }) => {
           />
           <Form.Label className="titleLabel">Email</Form.Label>
           <Form.Control
+            className="text"
             type="email"
             name="email"
             onChange={(event) => setEmail(event.target.value)}
@@ -48,6 +51,7 @@ const AddUser = ({ toggleBack }) => {
           />
           <Form.Label className="titleLabel">Password</Form.Label>
           <Form.Control
+            className="text"
             type="password"
             name="password"
             onChange={(event) => setPassword(event.target.value)}
@@ -58,7 +62,7 @@ const AddUser = ({ toggleBack }) => {
         <Form.Group controlId="form.checkbox">
           <Form.Check type="checkbox" label="Admin" onChange={handleChange} />
         </Form.Group>
-        <Button className="submitButton" variant="primary" type="submit">
+        <Button className="dark" variant="primary" type="submit">
           Submit
         </Button>
       </Form>

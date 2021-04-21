@@ -1,10 +1,12 @@
 import React from 'react';
 import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
-import '../css/achievementCarousel.css'
 
+import 'react-multi-carousel/lib/styles.css';
+import '../css/achievementCarousel.css';
+
+// Carousel for users achievements.
 const AchievementCarousel = () => {
-  const colors = [ '#E2D0F5', '#FDD4E6', '#FFEACC', '#CDFFFF' ];
+  const colors = ['#E2D0F5', '#FDD4E6', '#FFEACC', '#CDFFFF'];
 
   const responsive = {
     desktop: {
@@ -24,13 +26,13 @@ const AchievementCarousel = () => {
   return (
     <Carousel
       responsive={responsive}
-      infinate={true}
+      infinate
       showDots={false}
-      ssr={true} // means to render carousel on server-side.
-      keyBoardControl={true}
-      removeArrowOnDeviceType={["tablet", "mobile"]}
+      ssr // means to render carousel on server-side.
+      keyBoardControl
+      removeArrowOnDeviceType={['tablet', 'mobile']}
       itemClass="carousel-item-custom"
-      centerMode={true}
+      centerMode
     >
       <div style={{ background: colors[0] }}>Item 1</div>
       <div style={{ background: colors[1] }}>Item 2</div>
