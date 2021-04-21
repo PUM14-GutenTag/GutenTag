@@ -4,14 +4,20 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useParams } from 'react-router-dom';
 import HTTPLauncher from '../services/HTTPLauncher';
 import DocumentClassification from '../components/DocumentClassification';
+import FinishedPopUp from '../components/FinishedPopUp';
 import '../css/Labeling.css';
 
 const Labeling = () => {
   const [dataCounter, setDataCounter] = useState(0);
+  const [finished, setFinished] = useState(false);
+
   const projectId = useParams().id;
   const type = useParams().projectType;
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
 
+  function changeData(count) {
+    setDataCounter(count);
+  }
   async function fetchdata() {
     console.log(projectId);
     const response = await HTTPLauncher.sendGetData(1, 5);
@@ -20,10 +26,6 @@ const Labeling = () => {
     const dataArray = Object.entries(response.data);
     setListOfDataPoints(dataArray);
     changeData(dataCounter);
-  }
-
-  function changeData(count) {
-    setDataCounter(count);
   }
 
   async function testAddData() {
@@ -45,7 +47,7 @@ const Labeling = () => {
         {
           text: 'Data nummer 4',
           labels: [],
-        },
+        } /*
         {
           text: 'Data nummer 5',
           labels: [],
@@ -77,7 +79,7 @@ const Labeling = () => {
         {
           text: 'Data nummer 12',
           labels: [],
-        },
+        }, */,
       ])
     );
     console.log(response);
@@ -85,8 +87,36 @@ const Labeling = () => {
 
   useEffect(() => {
     fetchdata();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, []);
+
+  const nextData = async () => {
+    // change datacounter
+
+    // Add check label, if label exist then delete already from list
+
+    const tempDataCounter = dataCounter + 1;
+
+    /* 
+      If there are less than 5 datapoints ahead in the list get a new one.
+    */
+    if (Object.keys(listOfDataPoints).length - 5 < tempDataCounter) {
+      const response = await HTTPLauncher.sendGetData(projectId, 1);
+      console.log(typeof response.data);
+      if (Object.keys(response.data).length === 0) {
+        console.log('done');
+        setFinished(true);
+      }
+      console.log('response: ', response);
+      const newDataPoint = Object.entries(response.data);
+      const tempListOfDataPoints = listOfDataPoints.slice();
+      const newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
+      setListOfDataPoints(newListOfDataPoints);
+      changeData(tempDataCounter);
+    } else {
+      changeData(tempDataCounter);
+    }
+  };
 
   const selectProjectComponent = (typeOfProject) => {
     if (listOfDataPoints[dataCounter]) {
@@ -104,37 +134,19 @@ const Labeling = () => {
     return <div>This data shouldn't be labeled</div>;
   };
 
-  const nextData = async () => {
-    // change datacounter
-    const tempDataCounter = dataCounter + 1;
-
-    /* 
-      If there are less than 5 datapoints ahead in the list get a new one.
-    */
-    if (Object.keys(listOfDataPoints).length - 5 < tempDataCounter) {
-      const response = await HTTPLauncher.sendGetData(projectId, 1);
-      const newDataPoint = Object.entries(response.data);
-      const tempListOfDataPoints = listOfDataPoints.slice();
-
-      const newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
-      setListOfDataPoints(newListOfDataPoints);
-      changeData(tempDataCounter);
-    } else {
-      changeData(tempDataCounter);
-    }
-
-  };
-
   const getLastData = async () => {
     if (dataCounter - 1 >= 0) {
       const tempDataCounter = dataCounter - 1;
       changeData(tempDataCounter);
-      console.log("Going back!")
-      console.log("This is the data that we are displaying: ", listOfDataPoints[tempDataCounter])
-      console.log("Data ID", listOfDataPoints[tempDataCounter][0])
-      console.log("Project ID: ", projectId)
-      const response = await HTTPLauncher.sendGetLabel(projectId, listOfDataPoints[tempDataCounter][0]);
-      console.log("REPSONSE: ", response)
+      console.log('Going back!');
+      console.log('This is the data that we are displaying: ', listOfDataPoints[tempDataCounter]);
+      console.log('Data ID', listOfDataPoints[tempDataCounter][0]);
+      console.log('Project ID: ', projectId);
+      const response = await HTTPLauncher.sendGetLabel(
+        projectId,
+        listOfDataPoints[tempDataCounter][0]
+      );
+      console.log('REPSONSE: ', response);
     } else {
       console.log('This is the first data');
     }
@@ -145,12 +157,10 @@ const Labeling = () => {
   const seelistOfDataPoints = () => {
     console.log(listOfDataPoints);
   };
-  
-
 
   const seeExportData = async () => {
     const response = await HTTPLauncher.sendGetExportData(projectId);
-    console.log(response)
+    console.log(response);
   };
 
   return (
@@ -161,30 +171,35 @@ const Labeling = () => {
         <ProgressBar striped variant="warning" now={25} />
       </div>
       <br />
-      <div>
-        <div className="main-content">
-          <ChevronLeft
-            className="right-left-arrow  make-large fa-10x arrow-btn"
-            onClick={getLastData}
-          />
+      {finished ? (
+        <div>
+          <div className="main-content">
+            <ChevronLeft
+              className="right-left-arrow  make-large fa-10x arrow-btn"
+              onClick={getLastData}
+            />
 
-          <div className="data-content">{selectProjectComponent(type)}</div>
+            <div className="data-content">{selectProjectComponent(type)}</div>
 
-          <ChevronRight
-            className="right-left-arrow  make-large fa-10x arrow-btn"
-            onClick={nextData}
-          />
+            <ChevronRight
+              className="right-left-arrow  make-large fa-10x arrow-btn"
+              onClick={nextData}
+            />
+          </div>
         </div>
-      </div>
-      {/* <button type="button" className="btn btn-primary" onClick={testAddData}>
-          Add data
-        </button>
+      ) : (
+        <FinishedPopUp />
+      )}
+
+      <button type="button" className="btn btn-primary" onClick={testAddData}>
+        Add data
+      </button>
       <button type="button" className="btn btn-primary" onClick={seelistOfDataPoints}>
         CurrentDataPoints
       </button>
       <button type="button" className="btn btn-primary" onClick={seeExportData}>
         See exported data
-      </button> */}
+      </button>
     </div>
   );
 };

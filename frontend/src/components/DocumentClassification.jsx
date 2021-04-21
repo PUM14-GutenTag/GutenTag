@@ -13,32 +13,31 @@ const DocumentClassification = ({ data, dataPointId, nextData }) => {
     event.preventDefault();
     await HTTPLauncher.sendCreateDocumentClassificationLabel(dataPointId, label);
     nextData();
-    inputRef.current.value="";
-    inputRef.current.focus();
   };
 
   useEffect(() => {
+    inputRef.current.value = '';
     inputRef.current.focus();
   }, [dataPointId]);
 
-  //should perhaps also vary depending on screen size
+  // should perhaps also vary depending on screen size
   const textBoxSize = () => {
-    if(data.length < 14){
-    return "small-text-container"}
-    else if(data.length<20)
-    {return "medium-text-container"}
-    return "large-text-container"
-
+    if (data.length < 14) {
+      return 'small-text-container';
+    }
+    if (data.length < 20) {
+      return 'medium-text-container';
+    }
+    return 'large-text-container';
   };
-
 
   return (
     <div className="classification-container">
       <p className={`${textBoxSize()}`}>{data}</p>
 
-    <hr className="hr-title" data-content="Suggestions"/>  
-    <h4>Display label suggestions</h4>
-    <hr className="hr-title" data-content="Add new label"/>
+      <hr className="hr-title" data-content="Suggestions" />
+      <h4>Display label suggestions</h4>
+      <hr className="hr-title" data-content="Add new label" />
       <Form onSubmit={addLabel} className="form">
         <Form.Group controlId="form.name" className="form-group">
           <input
@@ -49,12 +48,13 @@ const DocumentClassification = ({ data, dataPointId, nextData }) => {
             className="input-box"
             ref={inputRef}
           />
-         <button className="btn btn-primary label-btn" type="submit">Label</button>
+          <button className="btn btn-primary label-btn" type="submit">
+            Label
+          </button>
         </Form.Group>
-       
-        </Form>
-        <hr className="hr-title" data-content="Old labels"/>
-        <h4>Display old labels</h4>
+      </Form>
+      <hr className="hr-title" data-content="Old labels" />
+      <h4>Display old labels</h4>
     </div>
   );
 };
