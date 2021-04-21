@@ -7,7 +7,9 @@ import DocumentClassification from '../components/DocumentClassification';
 import FinishedPopUp from '../components/FinishedPopUp';
 import '../css/Labeling.css';
 
-// Labeling-page handles labeling functionality
+/* 
+Labeling-page handles labeling functionality
+*/
 const Labeling = () => {
   const [dataCounter, setDataCounter] = useState(0);
   const [finished, setFinished] = useState(false);
@@ -150,8 +152,7 @@ const Labeling = () => {
     if (dataCounter - 1 >= 0) {
       const tempDataCounter = dataCounter - 1;
       changeData(tempDataCounter);
-      console.log('Going back!');
-      console.log('This is the data that we are displaying: ', listOfDataPoints[tempDataCounter]);
+      console.log('Displaying this data: ', listOfDataPoints[tempDataCounter]);
       console.log('Data ID', listOfDataPoints[tempDataCounter][0]);
       console.log('Project ID: ', projectId);
       const response = await HTTPLauncher.sendGetLabel(
@@ -162,8 +163,6 @@ const Labeling = () => {
     } else {
       console.log('This is the first data');
     }
-
-    // hur hämtar man ut en label?
   };
 
   // temporary help function
