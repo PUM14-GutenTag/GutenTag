@@ -18,6 +18,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
   const toggleInfo = () => {
     setShowInfo((previousValue) => !previousValue);
   };
+
   return (
     <div className="project-container" style={{ backgroundColor: selectedColor }}>
       <div className="title-container" onClick={toggleInfo} aria-hidden="true">
@@ -61,6 +62,7 @@ Project.propTypes = {
   selectedColor: PropTypes.string.isRequired,
   showEditButton: PropTypes.bool,
 };
+
 Project.defaultProps = {
   showEditButton: false,
 };

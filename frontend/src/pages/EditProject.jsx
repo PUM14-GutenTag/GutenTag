@@ -29,6 +29,7 @@ const EditProject = ({ location }) => {
     </div>
   );
 };
+
 EditProject.propTypes = {
   location: PropTypes.shape({
     state: PropTypes.shape({

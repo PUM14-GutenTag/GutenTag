@@ -20,10 +20,12 @@ const Layout = ({ children, title }) => (
     <Footer />
   </>
 );
+
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
   title: PropTypes.string,
 };
+
 Layout.defaultProps = {
   title: null,
 };

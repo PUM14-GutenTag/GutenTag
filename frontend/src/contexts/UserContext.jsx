@@ -32,6 +32,7 @@ const UserProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   return <UserContext.Provider value={{ state, dispatch }}>{children}</UserContext.Provider>;
 };
+
 UserProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

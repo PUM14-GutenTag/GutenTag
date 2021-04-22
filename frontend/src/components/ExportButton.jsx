@@ -17,6 +17,7 @@ const ExportButton = ({ projectID, projectType, fileName }) => {
 
   return <Button onClick={handleExport}>Export all data</Button>;
 };
+
 ExportButton.propTypes = {
   projectID: PropTypes.number.isRequired,
   projectType: PropTypes.number.isRequired,
