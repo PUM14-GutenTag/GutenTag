@@ -17,6 +17,7 @@ const EditProject = ({ location }) => {
   return (
     <Layout title="Edit project">
       <h1>{name}</h1>
+      <br />
       <Row>
         <Col>
           <h2>Import</h2>
