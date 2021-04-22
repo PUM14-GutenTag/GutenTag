@@ -39,7 +39,7 @@ const AddUser = ({ toggleBack }) => {
             type="text"
             name="lastname"
             onChange={(event) => setLastname(event.target.value)}
-            placeholder="Enter a lastname..."
+            placeholder="Enter a last name..."
             required
           />
           <Form.Label className="titleLabel">Email</Form.Label>
