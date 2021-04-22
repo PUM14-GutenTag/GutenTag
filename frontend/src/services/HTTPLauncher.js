@@ -141,7 +141,7 @@ class HTTPLauncher {
   static sendDeleteUser(email) {
     return axiosInstance().delete('delete-user', {
       headers: authHeader(),
-      data: { email: email },
+      data: { email },
     });
   }
 
@@ -168,7 +168,7 @@ class HTTPLauncher {
   /* Send HTTP-request to add one or more text data points to an existing project.
 
     Below is the expected structure of JSONFile's content for the different project types:
-     
+
     Document classification:
     JSON shape, where labels may be omitted:
     [
@@ -216,7 +216,7 @@ class HTTPLauncher {
 
   /* Send HTTP-request to add one or more text data points to an existing project.
     Below is the expected structure of JSONFile's content:
-    
+
     JSON shape, where labels may be omitted:
     [
         {
@@ -332,7 +332,7 @@ class HTTPLauncher {
             ...
         ]
     }
-    
+
     Sequence labeling:
     {
         project_id: 0,
