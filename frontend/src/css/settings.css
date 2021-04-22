@@ -90,6 +90,43 @@ button.generic:not(:disabled):not(.disabled):active:focus {
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
 }
 
+button.red {
+  color: white;
+  background-color: #f52882;
+  border-color: #f52882;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  margin: 1em;
+  padding: 0.7em;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  font-size: 18px;
+}
+
+button.red:hover {
+  color: white;
+  background-color: #f52882;
+  border-color: #f52882;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+button.red:not(:disabled):not(.disabled):active,
+button.red:focus,
+button.red:not(:disabled):not(.disabled):active:focus {
+  color: white;
+  background-color: #f52882;
+  border-color: #f52882;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
+#small {
+  padding: 0.4em;
+  padding-right: 1em;
+  padding-left: 1em;
+  font-size: medium;
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+
 .red-text {
   color: #f52882;
 }

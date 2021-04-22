@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table } from 'react-bootstrap';
+import { Button, Table, Modal } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { Trash } from 'react-bootstrap-icons';
 
@@ -15,6 +15,14 @@ const ManageUsers = ({ toggleCallback }) => {
   const [showUsers, setShowUsers] = useState(true);
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('');
+  const [showWarning, setShowWarning] = useState(false);
+  const [userRemove, setUserRemove] = useState('');
+
+  const handleClose = () => setShowWarning(false);
+  const handleShow = (u) => {
+    setShowWarning(true);
+    setUserRemove(u[0]);
+  };
 
   // Fetches all users from beckend and sorts them in an array.
   const fetchData = async () => {
@@ -44,8 +52,10 @@ const ManageUsers = ({ toggleCallback }) => {
   };
 
   // Sends request to backend to remove user.
-  const removeUser = (u) => {
-    console.log(u[0]);
+  const removeUser = async () => {
+    const result = await HTTPLauncher.sendDeleteUser(userRemove);
+    fetchData();
+    handleClose();
   };
 
   return (
@@ -82,12 +92,27 @@ const ManageUsers = ({ toggleCallback }) => {
                     <td>{result[1]}</td>
                     <td>{result[0]}</td>
                     <td className="right">
-                      <Trash className="remove" onClick={() => removeUser(result)} />
+                      <Trash className="remove" onClick={() => handleShow(result)} />
                     </td>
                   </tr>
                 ))}
             </tbody>
           </Table>
+
+          <Modal show={showWarning} onHide={handleClose} backdrop="static" keyboard={false}>
+            <Modal.Header closeButton>
+              <Modal.Title>Warning</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Are you sure you want to delete {userRemove}?</Modal.Body>
+            <Modal.Footer>
+              <Button className="dark" id="small" onClick={handleClose}>
+                No
+              </Button>
+              <Button className="red" id="small" onClick={removeUser}>
+                Yes
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       ) : (
         <div>
