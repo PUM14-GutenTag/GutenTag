@@ -24,7 +24,7 @@ const AddUser = ({ toggleBack }) => {
     <div className="create-container">
       <Form onSubmit={submitHandler}>
         <Form.Group controlId="form.text">
-          <Form.Label className="titleLabel">Firstname</Form.Label>
+          <Form.Label className="titleLabel">First name</Form.Label>
           <Form.Control
             className="text"
             type="text"
