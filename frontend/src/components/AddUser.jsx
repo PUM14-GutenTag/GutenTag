@@ -75,4 +75,5 @@ const AddUser = ({ toggleBack }) => {
 AddUser.propTypes = {
   toggleBack: PropTypes.func.isRequired,
 };
+
 export default AddUser;
