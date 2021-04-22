@@ -412,25 +412,35 @@ class GetLabel(Resource):
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
-        if args.data_id is not None:
-            label = Label.query.filter_by(
-                data_id=args.data_id, user_id=user.id).first()
+        msg = "No matching labels found"
 
-            if label:
+        if args.data_id is not None:
+            labels = Label.query.filter_by(
+                data_id=args.data_id, user_id=user.id).all()
+
+            res = {}
+
+            if labels and project:
                 if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-                    return jsonify(self.format_document_classification(label))
+                    for label in labels:
+                        res.update(self.format_document_classification(label))
                 if project.project_type == ProjectType.SEQUENCE_LABELING:
-                    return jsonify(self.format_sequence_labeling(label))
+                    for label in labels:
+                        res.update(self.format_sequence_labeling(label))
                 if project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-                    return jsonify(self.format_sequence_to_sequence(label))
+                    for label in labels:
+                        res.update(self.format_sequence_to_sequence(label))
                 if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
-                    return jsonify(self.format_image_classification(label))
+                    for label in labels:
+                        res.update(self.format_image_classification(label))
+
+                return res
         else:
             return jsonify({"message": "Not implemented"})
 
     def format_document_classification(self, label):
         return {
-            "label": {
+            label.id: {
                 "label_id": label.id,
                 "data_id": label.data_id,
                 "user_id": label.user_id,
@@ -440,7 +450,7 @@ class GetLabel(Resource):
 
     def format_sequence_labeling(self, label):
         return {
-            "label": {
+            label.id: {
                 "label_id": label.id,
                 "data_id": label.data_id,
                 "user_id": label.user_id,
@@ -452,7 +462,7 @@ class GetLabel(Resource):
 
     def format_sequence_to_sequence(self, label):
         return {
-            "label": {
+            label.id: {
                 "label_id": label.id,
                 "data_id": label.data_id,
                 "user_id": label.user_id,
@@ -462,7 +472,7 @@ class GetLabel(Resource):
 
     def format_image_classification(self, label):
         return {
-            "label": {
+            label.id: {
                 "label_id": label.id,
                 "data_id": label.data_id,
                 "user_id": label.user_id,
