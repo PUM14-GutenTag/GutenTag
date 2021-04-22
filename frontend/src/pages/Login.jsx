@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Button, Col, Row, Form } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
 
 import '../css/login.css';
 
 import logoUnder from '../res/hat_dark_under.svg';
 import HTTPLauncher from '../services/HTTPLauncher';
+import { useUser } from '../contexts/UserContext';
 
 // Login-page redirects submitting login details, does not verify valid login credentials
 function Login() {
@@ -12,21 +14,26 @@ function Login() {
   const [password, setPassword] = useState('');
   const [validated, setValidated] = useState(false);
 
+  const { dispatch: userDispatch } = useUser();
+  const history = useHistory();
+
   // Checks the email and password length to be over 0
-  function validateForm() {
+  const validateForm = () => {
     return email.length > 0 && password.length > 0;
-  }
+  };
 
   // Gets acesstoken from database and saves in localstorage, then redirects
-  async function handleSubmit(event) {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
-    const token = responseLogin.data.access_token;
+    const { access_token: token, access_level: accessLevel } = responseLogin.data;
+    userDispatch({ type: 'SET_IS_ADMIN', value: accessLevel >= 5 });
     localStorage.setItem('gutentag-accesstoken', token);
-    window.location.href = 'http://localhost:3000/home';
-  }
+
+    history.push('/home');
+  };
 
   return (
     <div className="login-wrapper">

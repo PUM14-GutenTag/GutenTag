@@ -3,14 +3,12 @@ import pathlib
 import json
 from api.database_handler import reset_db, try_add
 from api.models import Project, ProjectType
-from api.parser import (import_document_classification_data,
-                        import_image_classification_data,
-                        import_sequence_labeling_data,
-                        import_sequence_to_sequence_data,
-                        export_document_classification_data,
-                        export_image_classification_data,
-                        export_sequence_labeling_data,
-                        export_sequence_to_sequence_data)
+from api.parser import (
+    import_text_data,
+    import_image_data,
+    export_text_data,
+    export_image_data
+)
 
 
 PATH = os.path.dirname(__file__)
@@ -58,16 +56,16 @@ def test_document_classification_import_export():
     text_file = os.path.join(
         PATH, "res/text/input_document_classification.json")
     with open(text_file) as file:
-        in_content = file.read()
-        import_document_classification_data(project.id, in_content)
+        in_content = json.load(file)
+        import_text_data(project.id, in_content)
 
     # Export and write from the database to the output file.
     out_file = os.path.join(OUT_PATH, "output_document_classification.json")
     with open(out_file, "w") as file:
-        out_content = export_document_classification_data(project.id)
-        file.write(out_content)
+        out_content = export_text_data(project.id)
+        json.dump(out_content, file)
 
-    validate_common(project, json.loads(out_content), json.loads(in_content))
+    validate_common(project, out_content, in_content)
 
 
 def test_sequence_import_export():
@@ -79,16 +77,16 @@ def test_sequence_import_export():
     # Read and import from the input file into the database.
     text_file = os.path.join(PATH, "res/text/input_sequence.json")
     with open(text_file) as file:
-        in_content = file.read()
-        import_sequence_labeling_data(project.id, in_content)
+        in_content = json.load(file)
+        import_text_data(project.id, in_content)
 
     # Export and write from the database to the output file.
     out_file = os.path.join(OUT_PATH, "output_sequence.json")
     with open(out_file, "w") as file:
-        out_content = export_sequence_labeling_data(project.id)
-        file.write(out_content)
+        out_content = export_text_data(project.id)
+        json.dump(out_content, file)
 
-    validate_common(project, json.loads(out_content), json.loads(in_content))
+    validate_common(project, out_content, in_content)
 
 
 def test_sequence_to_sequence_import_export():
@@ -100,16 +98,16 @@ def test_sequence_to_sequence_import_export():
     # Read and import from the input file into the database.
     text_file = os.path.join(PATH, "res/text/input_sequence_to_sequence.json")
     with open(text_file) as file:
-        in_content = file.read()
-        import_sequence_to_sequence_data(project.id, in_content)
+        in_content = json.load(file)
+        import_text_data(project.id, in_content)
 
     # Export and write from the database to the output file.
     out_file = os.path.join(OUT_PATH, "output_sequence_to_sequence.json")
     with open(out_file, "w") as file:
-        out_content = export_sequence_to_sequence_data(project.id)
-        file.write(out_content)
+        out_content = export_text_data(project.id)
+        json.dump(out_content, file)
 
-    validate_common(project, json.loads(out_content), json.loads(in_content))
+    validate_common(project, out_content, in_content)
 
 
 def test_image_classification_import_export():
@@ -122,31 +120,16 @@ def test_image_classification_import_export():
     text_file = os.path.join(
         PATH, "res/text/input_image_classification.json")
     with open(text_file) as file:
-        in_content = file.read()
-        data = json.loads(in_content)
+        in_content = json.load(file)
     images = {}
-    for obj in data:
+    for obj in in_content:
         image_file = os.path.join(PATH, "res/images/", obj["file_name"])
         with open(image_file, "rb") as file:
             images[obj["file_name"]] = file.read()
-    import_image_classification_data(project.id, in_content, images)
+    import_image_data(project.id, in_content, images)
 
     # Export and write from the database to the output file.
-    out_file = os.path.join(OUT_PATH, "output_image_classification.json")
-    with open(out_file, "w") as file:
-        out_content = export_image_classification_data(project.id)
-        file.write(out_content)
-
-    validate_common(project, json.loads(out_content), json.loads(in_content))
-
-    # Write output images files to the 'out/' directory.
-    for project_data in project.data:
-        out_image = os.path.join(OUT_PATH, "output_" + project_data.file_name)
-        with open(out_image, "wb") as file:
-            file.write(project_data.image_data)
-
-        # Check that input image matches output image.
-        in_image = os.path.join(PATH, "res/images/", project_data.file_name)
-        with open(in_image, "rb") as in_file, \
-                open(out_image, "rb") as out_file:
-            assert in_file.read() == out_file.read()
+    out_file = os.path.join(OUT_PATH, "output_image_classification.zip")
+    with open(out_file, "wb") as file:
+        out_contents = export_image_data(project.id)
+        file.write(out_contents.getbuffer())

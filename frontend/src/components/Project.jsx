@@ -1,29 +1,27 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import '../css/project.css';
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import { GearFill } from 'react-bootstrap-icons';
 
-const Project = ({ name, created, projectType, selectedColor }) => {
+const Project = ({ id, name, created, projectType, selectedColor, showEditButton }) => {
   const [showInfo, setShowInfo] = useState(false);
   const projectTypeNames = [
     'Document classification',
     'Sequence labeling',
     'Sequence to sequence labeling',
-    'Image Classification',
+    'Image classification',
   ];
 
   const toggleInfo = () => {
     setShowInfo((previousValue) => !previousValue);
   };
+
   return (
-    <div
-      className="project-container"
-      style={{ backgroundColor: selectedColor }}
-      onClick={toggleInfo}
-      aria-hidden="true"
-    >
-      <div className="title-container">
+    <div className="project-container" style={{ backgroundColor: selectedColor }}>
+      <div className="title-container" onClick={toggleInfo} aria-hidden="true">
         <h1>{name}</h1>
         <ProgressBar now={50} striped id="progress-bar-project" />
       </div>
@@ -37,15 +35,36 @@ const Project = ({ name, created, projectType, selectedColor }) => {
           </div>
         </div>
       ) : null}
+      {showEditButton && (
+        <Link
+          className="edit-link"
+          to={{
+            pathname: '/edit-project',
+            state: {
+              id,
+              name,
+              projectType,
+            },
+          }}
+        >
+          <GearFill />
+        </Link>
+      )}
     </div>
   );
 };
 
 Project.propTypes = {
+  id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   created: PropTypes.string.isRequired,
   projectType: PropTypes.number.isRequired,
   selectedColor: PropTypes.string.isRequired,
+  showEditButton: PropTypes.bool,
+};
+
+Project.defaultProps = {
+  showEditButton: false,
 };
 
 export default Project;

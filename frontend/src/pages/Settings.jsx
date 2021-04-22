@@ -5,8 +5,11 @@ import CreateProject from '../components/CreateProject';
 import ChangePass from '../components/ChangePass';
 import ManageUsers from '../components/ManageUsers';
 import AchievementCarousel from '../components/AchievementCarousel';
+import Layout from '../components/Layout';
 
 import HTTPLauncher from '../services/HTTPLauncher';
+
+import { useUser } from '../contexts/UserContext';
 
 import '../css/settings.css';
 
@@ -18,6 +21,7 @@ import '../css/settings.css';
 const Settings = () => {
   const [showPage, setPageShow] = useState(0);
   const [name, setName] = useState('');
+  const { state: userState } = useUser();
 
   // Fetches the logged in users name from backend.
   const fetchName = async () => {
@@ -62,14 +66,18 @@ const Settings = () => {
           <AchievementCarousel />
         </div>
         <br />
-        <Row id="manage-btn-row">
-          <Button className="generic" onClick={() => setPageShow(2)}>
-            Add new project
-          </Button>
-          <Button className="generic" onClick={() => setPageShow(3)}>
-            Manage users
-          </Button>
-        </Row>
+        {userState.isAdmin ? (
+          <Row id="manage-btn-row">
+            <Button className="generic" onClick={() => setPageShow(2)}>
+              Add new project
+            </Button>
+            <Button className="generic" onClick={() => setPageShow(3)}>
+              Manage users
+            </Button>
+          </Row>
+        ) : (
+          <div />
+        )}
         <Row id="account-btn-row">
           <Button id="logoutbtn" className="red" onClick={logout}>
             Log out
@@ -97,7 +105,7 @@ const Settings = () => {
     </div>,
   ];
 
-  return pages[showPage];
+  return <Layout title="Settings">{pages[showPage]}</Layout>;
 };
 
 export default Settings;
