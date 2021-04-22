@@ -33,7 +33,7 @@ const AddUser = ({ toggleBack }) => {
             placeholder="Enter a name..."
             required
           />
-          <Form.Label className="titleLabel">Lastname</Form.Label>
+          <Form.Label className="titleLabel">Last name</Form.Label>
           <Form.Control
             className="text"
             type="text"
