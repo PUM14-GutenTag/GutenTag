@@ -66,7 +66,7 @@ const ChangePass = ({ toggleCallback }) => {
             />
             {!validateForm() && <div className="red-text">Passwords do not match!</div>}
           </Form.Group>
-          <Button className="submitButton" type="submit">
+          <Button className="dark" type="submit">
             Save
           </Button>
         </Form>

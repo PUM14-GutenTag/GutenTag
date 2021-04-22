@@ -34,16 +34,16 @@ const AchievementCarousel = () => {
       itemClass="carousel-item-custom"
       centerMode
     >
-      <div style={{ background: colors[0] }}>Item 1</div>
-      <div style={{ background: colors[1] }}>Item 2</div>
-      <div style={{ background: colors[2] }}>Item 3</div>
-      <div style={{ background: colors[3] }}>Item 4</div>
-      <div style={{ background: colors[0] }}>Item 5</div>
-      <div style={{ background: colors[1] }}>Item 1</div>
-      <div style={{ background: colors[2] }}>Item 2</div>
-      <div style={{ background: colors[3] }}>Item 3</div>
-      <div style={{ background: colors[0] }}>Item 4</div>
-      <div style={{ background: colors[1] }}>Item 5</div>
+      <div style={{ height: '10em', background: colors[0] }}>Item 1</div>
+      <div style={{ height: '10em', background: colors[1] }}>Item 2</div>
+      <div style={{ height: '10em', background: colors[2] }}>Item 3</div>
+      <div style={{ height: '10em', background: colors[3] }}>Item 4</div>
+      <div style={{ height: '10em', background: colors[0] }}>Item 5</div>
+      <div style={{ height: '10em', background: colors[1] }}>Item 1</div>
+      <div style={{ height: '10em', background: colors[2] }}>Item 2</div>
+      <div style={{ height: '10em', background: colors[3] }}>Item 3</div>
+      <div style={{ height: '10em', background: colors[0] }}>Item 4</div>
+      <div style={{ height: '10em', background: colors[1] }}>Item 5</div>
     </Carousel>
   );
 };

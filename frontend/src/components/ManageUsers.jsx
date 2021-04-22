@@ -21,7 +21,7 @@ const ManageUsers = ({ toggleCallback }) => {
   const handleClose = () => setShowWarning(false);
   const handleShow = (u) => {
     setShowWarning(true);
-    setUserRemove(u[0]);
+    setUserRemove(u[1]);
   };
 
   // Fetches all users from beckend and sorts them in an array.
@@ -29,7 +29,17 @@ const ManageUsers = ({ toggleCallback }) => {
     const result = await HTTPLauncher.sendGetUsers();
     const dataArray = Object.values(result.data.users);
     const mapedDataArray = dataArray.map((userObject) => Object.values(userObject));
-    mapedDataArray.sort();
+    mapedDataArray.sort((a, b) => {
+      const nameA = a[2].toUpperCase();
+      const nameB = b[2].toUpperCase();
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+      return 0;
+    });
     setUsers(mapedDataArray);
   };
 
@@ -46,14 +56,14 @@ const ManageUsers = ({ toggleCallback }) => {
   // Filters users based on input.
   const filterFunc = (u) => {
     return (
-      u[1].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
-      u[0].toUpperCase().indexOf(filter.toUpperCase()) > -1
+      u[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
+      u[1].toUpperCase().indexOf(filter.toUpperCase()) > -1
     );
   };
 
   // Sends request to backend to remove user.
   const removeUser = async () => {
-    const result = await HTTPLauncher.sendDeleteUser(userRemove);
+    await HTTPLauncher.sendDeleteUser(userRemove);
     fetchData();
     handleClose();
   };
@@ -62,12 +72,11 @@ const ManageUsers = ({ toggleCallback }) => {
     <div>
       {showUsers ? (
         <div>
-          <h1>Manage users</h1>
-          <Button className="dark" id="button-margin" onClick={toggleUsers}>
-            Add user
-          </Button>
-          <Button className="dark" onClick={toggleCallback}>
+          <Button className="dark" id="button-margin" onClick={toggleCallback}>
             Back
+          </Button>
+          <Button className="dark" onClick={toggleUsers}>
+            Add user
           </Button>
           <br />
           <input
@@ -82,6 +91,7 @@ const ManageUsers = ({ toggleCallback }) => {
               <tr>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Admin</th>
               </tr>
             </thead>
             <tbody>
@@ -89,8 +99,9 @@ const ManageUsers = ({ toggleCallback }) => {
                 .filter((u) => filterFunc(u))
                 .map((result) => (
                   <tr key={result}>
+                    <td>{result[2]}</td>
                     <td>{result[1]}</td>
-                    <td>{result[0]}</td>
+                    <td>{result[0] === 5 ? 'yes' : 'no'}</td>
                     <td className="right">
                       <Trash className="remove" onClick={() => handleShow(result)} />
                     </td>

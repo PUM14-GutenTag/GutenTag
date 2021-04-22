@@ -288,7 +288,7 @@ describe('sendDeleteProject request', () => {
 });
 
 describe('sendDeleteUser request', () => {
-  test('Correct request', async() => {
+  test('Correct request', async () => {
     await resetDB();
     await createUser();
 
@@ -302,9 +302,15 @@ describe('sendDeleteUser request', () => {
     const loginResponse = await HTTPLauncher.sendLogin(email, password);
     expect(loginResponse.access_token).not.toBeDefined();
 
-    const registerAgainResponse = await HTTPLauncher.sendRegister('Meeran', 'Urs', 'bassword', email, true);
-    expect(registerAgainResponse.status).toBe(200)
-  })
+    const registerAgainResponse = await HTTPLauncher.sendRegister(
+      'Meeran',
+      'Urs',
+      'bassword',
+      email,
+      true
+    );
+    expect(registerAgainResponse.status).toBe(200);
+  });
 });
 
 describe('sendAddNewTextData request', () => {

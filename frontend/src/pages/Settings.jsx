@@ -56,10 +56,12 @@ const Settings = () => {
         }}
       >
         <h1>Name: {name}</h1>
+        <br />
         <h1>Personal records</h1>
         <div style={{ height: '100%', width: '90%' }}>
           <AchievementCarousel />
         </div>
+        <br />
         <Row id="manage-btn-row">
           <Button className="generic" onClick={() => setPageShow(2)}>
             Add new project
@@ -69,7 +71,7 @@ const Settings = () => {
           </Button>
         </Row>
         <Row id="account-btn-row">
-          <Button id="logoutbtn" className="logout" onClick={logout}>
+          <Button id="logoutbtn" className="red" onClick={logout}>
             Log out
           </Button>
           <Button className="pass" onClick={() => setPageShow(1)}>

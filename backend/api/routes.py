@@ -612,14 +612,15 @@ class FetchUsers(Resource):
             for user in users:
                 user_info[user.id] = {
                     "name": user.first_name + " " + user.last_name,
-                    "email": user.email
+                    "email": user.email,
+                    "admin": user.access_level
                 }
 
             return jsonify({"msg": "Retrieved user information",
                             "users": user_info})
 
         else:
-            msg = "User is not authorized to create projects."
+            msg = "User is not authorized to fetch users."
             return jsonify({"msg": msg})
 
 
