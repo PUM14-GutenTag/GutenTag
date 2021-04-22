@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+import Layout from '../components/Layout';
 import ImportForm from '../components/ImportForm';
 import ExportButton from '../components/ExportButton';
 
@@ -14,7 +15,7 @@ const EditProject = ({ location }) => {
   const { id, name, projectType } = location.state;
 
   return (
-    <div>
+    <Layout title="Edit project">
       <h1>{name}</h1>
       <Row>
         <Col>
@@ -26,7 +27,7 @@ const EditProject = ({ location }) => {
           <ExportButton projectID={id} projectType={projectType} fileName={name} />
         </Col>
       </Row>
-    </div>
+    </Layout>
   );
 };
 

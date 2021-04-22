@@ -19,7 +19,7 @@ const UserContext = createContext();
 
 /*
  * Returns a {state, dispatch} which can be used to read and update the user state, respectively.
- * dispatch takes an { type, value } argument. Ex: dispatch({type: 'SET_IS_ADMIN, value: true});
+ * dispatch takes an { type, value } argument. Ex: dispatch({type: 'SET_IS_ADMIN', value: true});
  */
 const useUser = () => {
   const context = useContext(UserContext);
