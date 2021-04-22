@@ -15,9 +15,11 @@ const AddUser = ({ toggleBack }) => {
     await HTTPLauncher.sendCreateUser(firstname, lastname, password, email, isAdmin);
     toggleBack();
   };
+  
   const handleChange = (event) => {
     setIsAdmin(event.target.checked);
   };
+  
   return (
     <div className="create-container">
       <Form onSubmit={submitHandler}>
