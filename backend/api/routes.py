@@ -27,14 +27,10 @@ from api.database_handler import (
     try_delete_response
 )
 from api.parser import (
-    import_document_classification_data,
-    import_sequence_labeling_data,
-    import_sequence_to_sequence_data,
-    import_image_classification_data,
-    export_document_classification_data,
-    export_sequence_labeling_data,
-    export_sequence_to_sequence_data,
-    export_image_classification_data
+    import_text_data,
+    import_image_data,
+    export_text_data,
+    export_image_data
 )
 """
 This file contains the routes to the database.
@@ -309,6 +305,7 @@ class AddNewTextData(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
 
         if "json_file" not in request.files:
             msg = "No JSON file uploaded."
@@ -321,15 +318,9 @@ class AddNewTextData(Resource):
                                 ("Invalid file extension for "
                                  f"{json_file.filename}. Must be in "
                                  f"{TEXT_EXTENSIONS}")})
-            import_funcs = {
-                1: import_document_classification_data,
-                2: import_sequence_labeling_data,
-                3: import_sequence_to_sequence_data,
-            }
             try:
-                project = Project.query.get(args.project_id)
-                import_funcs[project.project_type](
-                    args.project_id, json.load(json_file))
+                project = Project.query.get(project.id)
+                import_text_data(project.id, json.load(json_file))
                 msg = "Data added."
             except Exception as e:
                 import traceback
@@ -352,6 +343,7 @@ class AddNewImageData(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
 
         if user.access_level < AccessLevel.ADMIN:
             msg = "User is not authorized to add data."
@@ -377,8 +369,7 @@ class AddNewImageData(Resource):
             image_dict = {secure_filename(
                 file.filename): file.read() for file in image_files}
             try:
-                import_image_classification_data(
-                    args.project_id, json.load(json_file), image_dict)
+                import_image_data(project.id, json.load(json_file), image_dict)
                 msg = "Data added."
             except Exception as e:
                 msg = f"Could not add data: {e}"
@@ -619,20 +610,12 @@ class GetExportData(Resource):
             try:
                 if (project.project_type == ProjectType.IMAGE_CLASSIFICATION):
                     return send_file(
-                        export_image_classification_data(args.project_id),
+                        export_image_data(project.id),
                         attachment_filename=f"{project.name}.zip",
                         as_attachment=True
                     )
                 else:
-                    export_funcs = {
-                        1: export_document_classification_data,
-                        2: export_sequence_labeling_data,
-                        3: export_sequence_to_sequence_data,
-                    }
-                    return export_funcs[project.project_type](
-                        args.project_id)
-
-                    return export_funcs[project.project_type](args.project_id)
+                    return export_text_data(project.id)
             except Exception as e:
                 msg = f"Could not export data: {e}"
         else:
