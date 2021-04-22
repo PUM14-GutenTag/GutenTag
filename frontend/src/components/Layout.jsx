@@ -5,14 +5,11 @@ import { Helmet } from 'react-helmet';
 import Header from './Header';
 import Footer from './Footer';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../css/global.css';
-
-// Default page layout. The content is sandwiches by a header and footer.
-const Layout = ({ children }) => (
+// Default page layout. The content is sandwiched by a header and footer.
+const Layout = ({ children, title }) => (
   <>
     <Helmet>
-      <title>GutenTag</title>
+      <title>{`GutenTag${title == null ? '' : ` | ${title}`}`}</title>
     </Helmet>
     <Header />
     <article>
@@ -26,6 +23,11 @@ const Layout = ({ children }) => (
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
+  title: PropTypes.string,
+};
+
+Layout.defaultProps = {
+  title: null,
 };
 
 export default Layout;

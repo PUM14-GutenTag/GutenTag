@@ -27,3 +27,7 @@ p {
   margin: 0;
   width: 50%;
 }
+
+.edit-link {
+  font-size: 1.75rem;
+}
