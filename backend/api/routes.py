@@ -698,8 +698,8 @@ class GetImageData(Resource):
     def get(self):
         args = self.reqparse.parse_args()
         data = ProjectData.query.get(args.data_id)
-        if not data or (data.project.project_type !=
-                        ProjectType.IMAGE_CLASSIFICATION):
+        if not data or (
+                data.project.project_type != ProjectType.IMAGE_CLASSIFICATION):
             msg = "Data is not an image."
             status = 406
         else:
