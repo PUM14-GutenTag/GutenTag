@@ -20,12 +20,14 @@ const Labeling = () => {
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
 
   async function getSetLabels(dataPoints = listOfDataPoints, tempDataCounter = dataCounter) {
-    const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[tempDataCounter][0]);
-    if (response.data != null) {
-      setLabels(Object.values(response.data));
-      console.log(Object.values(response.data));
-    } else {
-      setLabels([]);
+    if (typeof dataPoints[tempDataCounter] !== 'undefined') {
+      const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[tempDataCounter][0]);
+      if (response.data != null) {
+        setLabels(Object.values(response.data));
+        console.log(Object.values(response.data));
+      } else {
+        setLabels([]);
+      }
     }
   }
 
@@ -98,26 +100,26 @@ const Labeling = () => {
           text: 'Data nummer 7',
           labels: [],
         },
-        {
-          text: 'Data nummer 8',
-          labels: [],
-        },
-        {
-          text: 'Data nummer 9',
-          labels: [],
-        },
-        {
-          text: 'Data nummer 10',
-          labels: [],
-        },
-        {
-          text: 'Data nummer 11',
-          labels: [],
-        },
-        {
-          text: 'Data nummer 12',
-          labels: [],
-        },
+        // {
+        //   text: 'Data nummer 8',
+        //   labels: [],
+        // },
+        // {
+        //   text: 'Data nummer 9',
+        //   labels: [],
+        // },
+        // {
+        //   text: 'Data nummer 10',
+        //   labels: [],
+        // },
+        // {
+        //   text: 'Data nummer 11',
+        //   labels: [],
+        // },
+        // {
+        //   text: 'Data nummer 12',
+        //   labels: [],
+        // },
       ])
     );
     console.log(response);
@@ -159,7 +161,7 @@ const Labeling = () => {
       if (Object.keys(response.data).length === 0) {
         setFinished(true);
       } else {
-        console.log('reeesponse: ', response);
+        // console.log('reeesponse: ', response);
         const newDataPoint = Object.entries(response.data);
         const tempListOfDataPoints = listOfDataPoints.slice();
         const newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
@@ -181,12 +183,12 @@ const Labeling = () => {
     const currentDataPoint = listOfDataPoints[dataCounter];
     let dataPointExists = false;
     const indexList = [];
+    // iterate listOfDataPoints and see if currentDataPoint already exist
     for (let i = tempDataCounter; i < listOfDataPoints.length; i++) {
-      console.log('currentdatapoint: ', currentDataPoint);
-      console.log('Check this element: ', listOfDataPoints[i]);
       if (JSON.stringify(currentDataPoint) === JSON.stringify(listOfDataPoints[i])) {
-        console.log('Found a match at index: ', i);
         dataPointExists = true;
+        console.log('This value is duplicate: ', listOfDataPoints[i]);
+        console.log('Index: ', i);
         indexList.push(i); // list of all index in the future which has to be removed
         // 1 2 3 4! 5 6 4 4
       }
@@ -196,17 +198,19 @@ const Labeling = () => {
     // then check if dataPoint has already been labeled
     if (dataPointExists) {
       const response = await HTTPLauncher.sendGetLabel(projectId, currentDataPoint[0]);
+      // console.log('response: ', response);
       if (response.data != null) {
         // remove already labeled datapoint from list
         const tempListOfDataPoints = listOfDataPoints.slice();
-        for (let i = 0; indexList.length; i++) {
+        // console.log('before: ', tempListOfDataPoints);
+        for (let i = 0; i < indexList.length; i++) {
           tempListOfDataPoints.splice(indexList.reverse()[i], 1);
         }
+        // console.log('after: ', tempListOfDataPoints);
         setListOfDataPoints(tempListOfDataPoints);
       }
     }
   };
-
   const selectProjectComponent = (typeOfProject) => {
     if (listOfDataPoints[dataCounter]) {
       if (typeOfProject === '1') {
