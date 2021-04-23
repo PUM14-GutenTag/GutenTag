@@ -1,4 +1,4 @@
-/* Integrations tests for HTTPLauncher.js, and in turn api.routes.py. */
+/* Integration tests for HTTPLauncher.js, and in turn api.routes.py. */
 
 import fs from 'fs';
 import path from 'path';
