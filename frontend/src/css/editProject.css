@@ -1,0 +1,27 @@
+div.col,
+#center {
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.center-importform {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+svg.add {
+  color: #32cd32;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.2em;
+}
+
+svg.remove {
+  color: #f52882;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.2em;
+}

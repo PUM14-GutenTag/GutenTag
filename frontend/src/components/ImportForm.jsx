@@ -51,31 +51,30 @@ const ImportForm = ({ projectID, projectType }) => {
   };
 
   return (
-    <Form>
-      <Form.Row>
+    <Form className="center-importform">
+      <Form.File
+        id="text-upload"
+        ref={textRef}
+        label="Upload text file (json)"
+        accept=".json"
+        onChange={(e) => setTextFiles(e.target.files)}
+      />
+      <br />
+      <br />
+      {projectType === ProjectType.IMAGE_CLASSIFICATION && (
         <Form.File
-          id="text-upload"
-          ref={textRef}
-          label="Upload text file (json)"
-          accept=".json"
-          onChange={(e) => setTextFiles(e.target.files)}
+          id="image-upload"
+          ref={imageRef}
+          label="Upload image file (jpg, png)"
+          accept=".jpg, .jpeg, .png"
+          multiple
+          onChange={(e) => setImageFiles(e.target.files)}
         />
-        {projectType === ProjectType.IMAGE_CLASSIFICATION && (
-          <Form.File
-            id="image-upload"
-            ref={imageRef}
-            label="Upload image file (jpg, png)"
-            accept=".jpg, .jpeg, .png"
-            multiple
-            onChange={(e) => setImageFiles(e.target.files)}
-          />
-        )}
-      </Form.Row>
-      <Form.Row>
-        <Button className="dark" disabled={!importEnabled} onClick={handleImport}>
-          Submit
-        </Button>
-      </Form.Row>
+      )}
+      <br />
+      <Button className="dark" margin-bottom="1em" disabled={!importEnabled} onClick={handleImport}>
+        Submit
+      </Button>
       {/* Probably should switch this out for built-in form validation. */}
       <Form.Label>{error}</Form.Label>
     </Form>

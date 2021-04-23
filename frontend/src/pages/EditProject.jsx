@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 
+import { Row, Col } from 'react-bootstrap';
 import Layout from '../components/Layout';
 import ImportForm from '../components/ImportForm';
 import ExportButton from '../components/ExportButton';
+import ManageProjectUsers from '../components/ManageProjectUsers';
+
+import '../css/editProject.css';
 
 /*
  * Page for editing project settings, adding members and importing/exporting
@@ -16,18 +18,19 @@ const EditProject = ({ location }) => {
 
   return (
     <Layout title="Edit project">
-      <h1>{name}</h1>
+      <h1>Project: {name}</h1>
       <br />
       <Row>
-        <Col>
+        <Col id="center">
           <h2>Import</h2>
           <ImportForm projectID={id} projectType={projectType} />
         </Col>
-        <Col>
+        <Col id="center">
           <h2>Export</h2>
           <ExportButton projectID={id} projectType={projectType} fileName={name} />
         </Col>
       </Row>
+      <ManageProjectUsers projectID={id} />
     </Layout>
   );
 };
