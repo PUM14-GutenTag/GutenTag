@@ -7,14 +7,14 @@ import '../css/DocumentClassification.css';
 /* 
 Component that shows the specifics for document classification 
 */
-const DocumentClassification = ({ data, dataPointId, nextData }) => {
+const DocumentClassification = ({ data, dataPointId, nextData, labels }) => {
   const [label, setLabel] = useState('');
   const inputRef = useRef();
 
   const addLabel = async (event) => {
     event.preventDefault();
     await HTTPLauncher.sendCreateDocumentClassificationLabel(dataPointId, label);
-    nextData();
+    // nextData();
   };
 
   useEffect(() => {
@@ -58,11 +58,31 @@ const DocumentClassification = ({ data, dataPointId, nextData }) => {
           </Form.Group>
         </Form>
       </div>
-      <hr className="hr-title" data-content="Old labels" />
-      <h6>Display old labels</h6>
+      <hr className="hr-title" data-content="Your Labels" />
+      {labels.map((oneLabel) => (
+        <li key={oneLabel.label_id}>
+          <h1> {oneLabel.label} </h1>
+        </li>
+      ))}
     </div>
   );
 };
+
+{
+  /* <ul>
+{projects.map((result) => (
+  <li key={result}>
+    <Project
+      created={result[0]}
+      id={result[1]}
+      name={result[2]}
+      projectType={result[3]}
+      selectedColor={setColorCounter()}
+    />
+  </li>
+))}
+</ul> */
+}
 
 DocumentClassification.propTypes = {
   data: PropTypes.string.isRequired,
