@@ -20,25 +20,12 @@ const Labeling = () => {
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
 
   async function getSetLabels(dataPoints = listOfDataPoints, tempDataCounter = dataCounter) {
-    console.log('Calling getSetLabels()');
-    console.log('tempDataCounter: ', tempDataCounter);
-    console.log('datapoints: ', dataPoints);
     const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[tempDataCounter][0]);
-    console.log('Response data', response.data);
     if (response.data != null) {
       setLabels(Object.values(response.data));
-      const lista = Object.values(response.data);
-      console.log('list: ', lista);
-
-      console.log('Dirty object data', Object.values(response.data));
-      /* for (let i = 0; i < Object.values(response.data).length; i++) {
-        const obj = Object.values(response.data)[i];
-        console.log('values: ', Object.values(response.data)[i]);
-        const tempLabels = labels.slice();
-        tempLabels.push(obj);
-        console.log('obj: ', tempLabels);
-        setLabels(tempLabels);
-      } */
+    }
+    else{
+      setLabels([]);
     }
   }
   /*
@@ -47,6 +34,12 @@ const Labeling = () => {
   lägg upp labels på snyggt sätt
 
   */
+
+  //function which can be called through callbacks to remove label
+  const deleteLabel = async (labelId) => {
+    await HTTPLauncher.sendRemoveLabel(labelId);
+    getSetLabels();
+  }
 
   // Gets 5 new datapoints from database, runs when entering a project
   async function fetchdata() {
@@ -64,7 +57,7 @@ const Labeling = () => {
     getSetLabels(dataArray, 0);
   }
 
-  // Temporary function to add testdata to projects *TODO*: delete
+  // Temporary function to add testdata to projects
   async function testAddData() {
     const response = await HTTPLauncher.sendAddNewTextData(
       projectId,
@@ -131,7 +124,6 @@ const Labeling = () => {
   }
 
   useEffect(() => {
-    console.log('whhhhhhaaat  ');
     fetchdata();
     // eslint-disable-next-line
   }, []);
@@ -145,13 +137,10 @@ const Labeling = () => {
 
   // Go to next datapoint, and get a new one
   const nextData = async () => {
-    console.log('next');
     // Add check label, if label exist then delete already from list
 
     // change datacounter
     const tempDataCounter = dataCounter + 1;
-    console.log('length: ', Object.keys(listOfDataPoints).length);
-    console.log('counter: ', tempDataCounter);
     // If there are less than 5 datapoints ahead in the list get a new one
     if (Object.keys(listOfDataPoints).length - 5 < tempDataCounter) {
       const response = await HTTPLauncher.sendGetData(projectId, 1);
@@ -175,8 +164,9 @@ const Labeling = () => {
           <DocumentClassification
             data={listOfDataPoints[dataCounter][1]}
             dataPointId={parseInt(listOfDataPoints[dataCounter][0])}
-            nextData={nextData}
             labels={labels}
+            deleteLabel={deleteLabel}
+            getSetLabels = {getSetLabels}
           />
         );
       }
@@ -187,7 +177,6 @@ const Labeling = () => {
 
   // Go to the data before in listOfDataPoints (last shown data)
   const getLastData = async () => {
-    console.log('bakåt');
     if (dataCounter - 1 >= 0) {
       const tempDataCounter = dataCounter - 1;
       setDataCounter(tempDataCounter);
