@@ -139,78 +139,82 @@ const Labeling = () => {
 
   // Go to next datapoint, and get a new one
   const nextData = async () => {
-    /*
-    kolla data id
-    finns det id i listan redan och det är markerat så ta bort den från listan
-    hämta ny datapunkt om det är mindre än 5 kvar
-    kolla att counter är rätt hela tiden
-    hoppas till nästa datapunkt
-    */
-    // Add check label, if label exist then delete already from list
-
-    // change datacounter
     const tempDataCounter = dataCounter + 1;
+    let newListOfDataPoints=listOfDataPoints;
     // If there are less than 5 datapoints ahead in the list
     if (Object.keys(listOfDataPoints).length - 5 < tempDataCounter) {
-      // Make sure there are always 5 datapoints ahead in the queue
+      // adjust so there is always 5 datapoints ahead in the queue
       const diff = Object.keys(listOfDataPoints).length - tempDataCounter;
       const addToQueue = 5 - diff;
       const response = await HTTPLauncher.sendGetData(projectId, addToQueue);
 
-      // check if there are no data points left
+      // check if labeling is done
       if (Object.keys(response.data).length === 0) {
         setFinished(true);
       } else {
-        // console.log('reeesponse: ', response);
+        // add new data to list of data points
         const newDataPoint = Object.entries(response.data);
         const tempListOfDataPoints = listOfDataPoints.slice();
-        const newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
+        newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
         setListOfDataPoints(newListOfDataPoints);
       }
     }
-    setDataCounter(tempDataCounter);
-    handleLabeledData();
+    dataCounterLogic(1, newListOfDataPoints);
   };
 
-  // Handle already labeled data points
-
-  // 1 2 3 4 5 6 4 true -> plocka bort
-  // 1 2 3 4 4 4 5
-  // 1 2 3 4! 5 6 4 false
-
-  const handleLabeledData = async () => {
-    const tempDataCounter = dataCounter + 1;
-    const currentDataPoint = listOfDataPoints[dataCounter];
+  const dataCounterLogic = async (incrementDataPoint, newListOfDataPoints=listOfDataPoints) => {
+    /* 
+    If current data point has been labeled check if there exist data points 
+    with the same data and higher index in the list, then remove them.
+    */
+    const currentDataPoint = newListOfDataPoints[dataCounter];
     let dataPointExists = false;
-    const indexList = [];
-    // iterate listOfDataPoints and see if currentDataPoint already exist
-    for (let i = tempDataCounter; i < listOfDataPoints.length; i++) {
-      if (JSON.stringify(currentDataPoint) === JSON.stringify(listOfDataPoints[i])) {
-        dataPointExists = true;
-        console.log('This value is duplicate: ', listOfDataPoints[i]);
-        console.log('Index: ', i);
-        indexList.push(i); // list of all index in the future which has to be removed
-        // 1 2 3 4! 5 6 4 4
+    let removeIndexList = [];
+    let counterAdjust = 0;
+    let newDataCounter = 0;
+    // iterate list of data points with higher index than current data point
+    // and check if there exist data points with the same data
+    for (let i = 0; i < newListOfDataPoints.length; i++) {
+      //skip current data point
+      if (i===dataCounter){
       }
-      // [5, 7, 9]
-      // [9, 7, 5];
+      else if (JSON.stringify(currentDataPoint) === JSON.stringify(newListOfDataPoints[i])) {
+        dataPointExists = true;
+        removeIndexList.push(i); // list of all index in the future which has to be removed
+        
+        //if index less then current data point then add tp counter adjustment
+        if (i<dataCounter){
+          counterAdjust = counterAdjust + 1;
+        }
+      }
     }
-    // then check if dataPoint has already been labeled
+    //check if current data point has been labeled
     if (dataPointExists) {
       const response = await HTTPLauncher.sendGetLabel(projectId, currentDataPoint[0]);
-      // console.log('response: ', response);
       if (response.data != null) {
-        // remove already labeled datapoint from list
-        const tempListOfDataPoints = listOfDataPoints.slice();
-        // console.log('before: ', tempListOfDataPoints);
-        for (let i = 0; i < indexList.length; i++) {
-          tempListOfDataPoints.splice(indexList.reverse()[i], 1);
+        setDataCounter(dataCounter-counterAdjust+incrementDataPoint);
+        newDataCounter=dataCounter-counterAdjust+incrementDataPoint;
+        //create copy of list of data points
+        const tempListOfDataPoints = newListOfDataPoints.slice();
+        removeIndexList.reverse()
+        for (let i = 0; i < removeIndexList.length; i++) {
+          tempListOfDataPoints.splice(removeIndexList[i], 1);
         }
-        // console.log('after: ', tempListOfDataPoints);
         setListOfDataPoints(tempListOfDataPoints);
+        newListOfDataPoints=tempListOfDataPoints;
+      }
+      else{
+        setDataCounter(dataCounter+incrementDataPoint);
+        newDataCounter = dataCounter+incrementDataPoint;
       }
     }
+    else{
+      setDataCounter(dataCounter+incrementDataPoint);
+      newDataCounter = dataCounter+incrementDataPoint;
+    }
+    getSetLabels(newListOfDataPoints, newDataCounter);
   };
+
   const selectProjectComponent = (typeOfProject) => {
     if (listOfDataPoints[dataCounter]) {
       if (typeOfProject === '1') {
@@ -230,10 +234,9 @@ const Labeling = () => {
   };
 
   // Go to the data before in listOfDataPoints (last shown data)
-  const getLastData = async () => {
+  const getLastData = () => {
     if (dataCounter - 1 >= 0) {
-      const tempDataCounter = dataCounter - 1;
-      setDataCounter(tempDataCounter);
+      dataCounterLogic(-1, listOfDataPoints);
     } else {
       console.log('This is the first data');
     }
