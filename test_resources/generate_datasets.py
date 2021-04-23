@@ -9,8 +9,8 @@ for integration tests.
 Run it with python, with an optional argument for project type if you only want
 a single type. Otherwise, all 4 will be created.
 
-The script requires that you have copied the large dataset files from the
-'datasets' folder in the OneDrive into ./images/ and ./text/ respectively.
+The script requires that you have copied the dataset directories from the
+'datasets' folder in the OneDrive into /test_resources/extra/.
 """
 
 DOCUMENT_CLASSIFICATION_LABELS = [["positive"], ["negative"]]
