@@ -1,5 +1,4 @@
 /* Integrations tests for HTTPLauncher.js, and in turn api.routes.py. */
-
 import fs from 'fs';
 import path from 'path';
 
@@ -41,7 +40,9 @@ const images = [
 const createUser = async (admin = true) => {
   const email = 'mail@gmail.com';
   const password = 'pass';
-  await HTTPLauncher.sendRegister('Nameer', 'Sur', password, email, admin);
+  const initialAdminLogin = await HTTPLauncher.sendLogin('admin@admin', 'password');
+  localStorage.setItem('gutentag-accesstoken', initialAdminLogin.data.access_token);
+  await HTTPLauncher.sendCreateUser('Nameer', 'Sur', password, email, admin);
   const response = await HTTPLauncher.sendLogin(email, password);
   localStorage.setItem('gutentag-accesstoken', response.data.access_token);
   localStorage.setItem('gutentag-refreshtoken', response.data.refresh_token);
@@ -58,36 +59,12 @@ const resetDB = async () => {
   await HTTPLauncher.sendResetDatabase();
 };
 
-describe('sendRegister request', () => {
+describe('sendCreateUser and sendLogin requests', () => {
   test('Correct admin', async () => {
     await resetDB();
-    const response = await HTTPLauncher.sendRegister(
-      'Nameer',
-      'Sur',
-      'pass',
-      'mail@gmail.com',
-      true
-    );
-    expect(response.status).toBe(200);
-  });
-});
+    await createUser();
 
-describe('sendLogin request', () => {
-  test('Correct login', async () => {
-    await resetDB();
-    const email = 'mail@gmail.com';
-    const password = 'pass';
-    const registerResponse = await HTTPLauncher.sendRegister(
-      'Nameer',
-      'Sur',
-      password,
-      email,
-      true
-    );
-    expect(registerResponse.status).toBe(200);
-    expect(registerResponse.data.id).toBeDefined();
-
-    const loginResponse = await HTTPLauncher.sendLogin(email, password);
+    const loginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
     expect(loginResponse.status).toBe(200);
     expect(loginResponse.data.access_token).toBeDefined();
     expect(loginResponse.data.refresh_token).toBeDefined();
@@ -102,10 +79,14 @@ describe('sendChangePassword request', () => {
     const changePwResponse = await HTTPLauncher.sendChangePassword('pass', 'bass');
     expect(changePwResponse.status).toBe(200);
 
-    const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
-    expect(failedLoginResponse.data.access_token).toBeNull();
+    try {
+      await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
+    } catch (e) {
+      expect(e.response.status).toBe(401);
+    }
 
     const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass');
+    expect(changePwResponse.status).toBe(200);
     expect(successfulLoginResponse.data.access_token).toBeDefined();
   });
 
@@ -113,10 +94,19 @@ describe('sendChangePassword request', () => {
     await resetDB();
     await createUser();
 
-    await HTTPLauncher.sendChangePassword('bass', 'pass');
+    try {
+      await HTTPLauncher.sendChangePassword('bass', 'pass');
+    } catch (e) {
+      expect(e.response.status).toBe(401);
+    }
 
-    const failedLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'bass');
-    expect(failedLoginResponse.data.access_token).toBeNull();
+    try {
+      await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
+    } catch (e) {
+      expect(e.response.status).toBe(401);
+      expect(e.response.data.access_token).toBeNull();
+      expect(e.response.data.refresh_token).toBeNull();
+    }
 
     const successfulLoginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
     expect(successfulLoginResponse.data.access_token).toBeDefined();
@@ -130,22 +120,34 @@ describe('sendChangePasswordOther request', () => {
 
     const email = 'normal@gmail.com';
     const password = 'pass';
-    await HTTPLauncher.sendRegister('Reeman', 'Rus', password, email, true);
+    await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, false);
 
     await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
 
     const changePwResponse = await HTTPLauncher.sendChangePasswordOther(email, 'bass');
     expect(changePwResponse.status).toBe(200);
 
-    const oldPasswordLoginResponse = await HTTPLauncher.sendLogin(email, 'pass');
-    expect(oldPasswordLoginResponse.data.access_token).toBeNull();
+    try {
+      await HTTPLauncher.sendLogin(email, 'pass');
+    } catch (e) {
+      expect(e.response.status).toBe(401);
+      expect(e.response.data.access_token).toBeNull();
+      expect(e.response.data.refresh_token).toBeNull();
+    }
 
     const normalLoginResponse = await HTTPLauncher.sendLogin(email, 'bass');
+    expect(normalLoginResponse.status).toBe(200);
     expect(normalLoginResponse.data.access_token).toBeDefined();
 
-    await HTTPLauncher.sendChangePasswordOther(email, 'bass');
-    const pwNotChangedLoginResponse = await HTTPLauncher.sendLogin(email, 'pass');
-    expect(pwNotChangedLoginResponse.data.access_token).toBeDefined();
+    try {
+      await HTTPLauncher.sendChangePasswordOther(email, 'pass');
+    } catch (e) {
+      expect(e.response.status).toBe(401);
+    }
+
+    const pwNotChangedResponse = await HTTPLauncher.sendLogin(email, 'pass');
+    expect(pwNotChangedResponse.status).toBe(200);
+    expect(pwNotChangedResponse.data.access_token).toBeDefined();
   });
 });
 
@@ -174,9 +176,12 @@ describe('sendRefreshToken request', () => {
 describe('sendAuthorizeUser request', () => {
   test('Correct request', async () => {
     await resetDB();
-    const email = await createUser();
-    const projectID = await createProject(1);
+    await createUser();
 
+    const email = 'normal@gmail.com';
+    const password = 'pass';
+    await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, false);
+    const projectID = await createProject(1);
     const response = await HTTPLauncher.sendAuthorizeUser(projectID, email);
     expect(response.status).toBe(200);
   });
@@ -185,7 +190,10 @@ describe('sendAuthorizeUser request', () => {
 describe('sendDeauthorizeUser request', () => {
   test('Correct request', async () => {
     await resetDB();
-    const email = await createUser();
+    await createUser();
+    const email = 'normal@gmail.com';
+    const password = 'pass';
+    await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, false);
     const projectID = await createProject(1);
 
     await HTTPLauncher.sendAuthorizeUser(projectID, email);

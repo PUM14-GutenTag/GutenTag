@@ -15,26 +15,21 @@ class HTTPLauncher {
     apiURL = URL;
   }
 
-  // Send HTTP-request to register a user.
-  static sendRegister(firstName, lastName, password, email, admin) {
-    return axiosInstance().post('register', {
-      first_name: firstName,
-      last_name: lastName,
-      password,
-      email,
-      admin,
-    });
-  }
-
   // Send HTTP-request to create a user
   static sendCreateUser(firstName, lastName, password, email, admin) {
-    return axiosInstance().post('create-user', {
-      first_name: firstName,
-      last_name: lastName,
-      password,
-      email,
-      admin,
-    });
+    return axiosInstance().post(
+      'create-user',
+      {
+        first_name: firstName,
+        last_name: lastName,
+        password,
+        email,
+        admin,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
   }
 
   // Send HTTP-request to login a user.
