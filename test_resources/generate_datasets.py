@@ -88,6 +88,7 @@ def sequence_to_sequence_dataset(data_path, label_path, output_path):
 def image_classification_dataset(image_dir, file_output_path):
     print("Indexing input...")
     image_names = [p.name for p in Path(image_dir).iterdir() if p.is_file()]
+    image_names = cut_list(image_names, 1)
     data_list = [{
         "file_name": name,
         "label": rolling_item(IMAGE_CLASSIFICATION_LABELS, i)
