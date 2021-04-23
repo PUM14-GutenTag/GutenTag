@@ -23,23 +23,23 @@ const Labeling = () => {
     const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[tempDataCounter][0]);
     if (response.data != null) {
       setLabels(Object.values(response.data));
-    }
-    else{
+      console.log(Object.values(response.data));
+    } else {
       setLabels([]);
     }
   }
+
   /*
   TODO:
   En framför har labels ta bort ur listan
-  lägg upp labels på snyggt sätt
-
+  error vid slutet när allt är labelat (vänta)
   */
 
-  //function which can be called through callbacks to remove label
+  // function which can be called through callbacks to remove label
   const deleteLabel = async (labelId) => {
     await HTTPLauncher.sendRemoveLabel(labelId);
     getSetLabels();
-  }
+  };
 
   // Gets 5 new datapoints from database, runs when entering a project
   async function fetchdata() {
@@ -137,17 +137,29 @@ const Labeling = () => {
 
   // Go to next datapoint, and get a new one
   const nextData = async () => {
+    /*
+    kolla data id
+    finns det id i listan redan och det är markerat så ta bort den från listan
+    hämta ny datapunkt om det är mindre än 5 kvar
+    kolla att counter är rätt hela tiden
+    hoppas till nästa datapunkt
+    */
     // Add check label, if label exist then delete already from list
 
     // change datacounter
     const tempDataCounter = dataCounter + 1;
-    // If there are less than 5 datapoints ahead in the list get a new one
+    // If there are less than 5 datapoints ahead in the list
     if (Object.keys(listOfDataPoints).length - 5 < tempDataCounter) {
-      const response = await HTTPLauncher.sendGetData(projectId, 1);
+      // Make sure there are always 5 datapoints ahead in the queue
+      const diff = Object.keys(listOfDataPoints).length - tempDataCounter;
+      const addToQueue = 5 - diff;
+      const response = await HTTPLauncher.sendGetData(projectId, addToQueue);
+
       // check if there are no data points left
       if (Object.keys(response.data).length === 0) {
         setFinished(true);
       } else {
+        console.log('reeesponse: ', response);
         const newDataPoint = Object.entries(response.data);
         const tempListOfDataPoints = listOfDataPoints.slice();
         const newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
@@ -155,6 +167,44 @@ const Labeling = () => {
       }
     }
     setDataCounter(tempDataCounter);
+    handleLabeledData();
+  };
+
+  // Handle already labeled data points
+
+  // 1 2 3 4 5 6 4 true -> plocka bort
+  // 1 2 3 4 4 4 5
+  // 1 2 3 4! 5 6 4 false
+
+  const handleLabeledData = async () => {
+    const tempDataCounter = dataCounter + 1;
+    const currentDataPoint = listOfDataPoints[dataCounter];
+    let dataPointExists = false;
+    const indexList = [];
+    for (let i = tempDataCounter; i < listOfDataPoints.length; i++) {
+      console.log('currentdatapoint: ', currentDataPoint);
+      console.log('Check this element: ', listOfDataPoints[i]);
+      if (JSON.stringify(currentDataPoint) === JSON.stringify(listOfDataPoints[i])) {
+        console.log('Found a match at index: ', i);
+        dataPointExists = true;
+        indexList.push(i); // list of all index in the future which has to be removed
+        // 1 2 3 4! 5 6 4 4
+      }
+      // [5, 7, 9]
+      // [9, 7, 5];
+    }
+    // then check if dataPoint has already been labeled
+    if (dataPointExists) {
+      const response = await HTTPLauncher.sendGetLabel(projectId, currentDataPoint[0]);
+      if (response.data != null) {
+        // remove already labeled datapoint from list
+        const tempListOfDataPoints = listOfDataPoints.slice();
+        for (let i = 0; indexList.length; i++) {
+          tempListOfDataPoints.splice(indexList.reverse()[i], 1);
+        }
+        setListOfDataPoints(tempListOfDataPoints);
+      }
+    }
   };
 
   const selectProjectComponent = (typeOfProject) => {
@@ -166,7 +216,7 @@ const Labeling = () => {
             dataPointId={parseInt(listOfDataPoints[dataCounter][0])}
             labels={labels}
             deleteLabel={deleteLabel}
-            getSetLabels = {getSetLabels}
+            getSetLabels={getSetLabels}
           />
         );
       }

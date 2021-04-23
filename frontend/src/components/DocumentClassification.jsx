@@ -3,19 +3,20 @@ import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/DocumentClassification.css';
-import Label from "./Label";
+import Label from './Label';
 
 /* 
 Component that shows the specifics for document classification 
 */
 const DocumentClassification = ({ data, dataPointId, labels, deleteLabel, getSetLabels }) => {
-  const [label, setLabel] = useState('');
   const inputRef = useRef();
 
   const addLabel = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateDocumentClassificationLabel(dataPointId, label);
+    await HTTPLauncher.sendCreateDocumentClassificationLabel(dataPointId, inputRef.current.value);
     getSetLabels();
+    inputRef.current.value = '';
+    inputRef.current.focus();
   };
 
   useEffect(() => {
@@ -47,7 +48,6 @@ const DocumentClassification = ({ data, dataPointId, labels, deleteLabel, getSet
           <Form.Group controlId="form.name" className="form-group">
             <input
               type="text"
-              onChange={(event) => setLabel(event.target.value)}
               placeholder="Enter label..."
               required
               className="input-box"
@@ -61,15 +61,12 @@ const DocumentClassification = ({ data, dataPointId, labels, deleteLabel, getSet
       </div>
       <hr className="hr-title" data-content="Your Labels" />
       <div className="your-labels-container">
-      {labels.map((oneLabel) => (
-        <div key={oneLabel.label_id}>
-          <Label label_id={oneLabel.label_id}
-           label={oneLabel.label} deleteLabel={deleteLabel}/>
-        </div>
-      ))}
+        {labels.map((oneLabel) => (
+          <div key={oneLabel.label_id}>
+            <Label labelId={oneLabel.label_id} label={oneLabel.label} deleteLabel={deleteLabel} />
+          </div>
+        ))}
       </div>
-      
-
     </div>
   );
 };
@@ -79,5 +76,6 @@ DocumentClassification.propTypes = {
   dataPointId: PropTypes.number.isRequired,
   deleteLabel: PropTypes.func.isRequired,
   getSetLabels: PropTypes.func.isRequired,
+  labels: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 export default DocumentClassification;
