@@ -72,7 +72,7 @@ const ImportForm = ({ projectID, projectType }) => {
         )}
       </Form.Row>
       <Form.Row>
-        <Button disabled={!importEnabled} onClick={handleImport}>
+        <Button className="dark" disabled={!importEnabled} onClick={handleImport}>
           Submit
         </Button>
       </Form.Row>
