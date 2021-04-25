@@ -6,7 +6,7 @@ import io
 import random
 from enum import IntEnum
 from api import db
-from api.database_handler import check_types
+from api.database_handler import check_types, commit
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -27,6 +27,31 @@ class ProjectType(IntEnum):
         Returns true if value is one of the project types.
         """
         return value in cls._value2member_map_
+
+
+class TransactionStatus(IntEnum):
+    """
+
+    """
+    INITIALIZING = 1
+    CREATING_DATA_OBJECTS = 2
+    ADDING_DATA_OBJECTS = 3
+    CREATING_LABEL_OBJECTS = 4
+    ADDING_LABEL_OBJECTS = 5
+    FINISHED = 6
+
+    @classmethod
+    def has_value(cls, value):
+        """
+        Returns true if value is one of the project types.
+        """
+        return value in cls._value2member_map_
+
+    def printable(self):
+        """
+        Return a printable name.
+        """
+        return self.name.replace("_", " ").capitalize()
 
 
 class AccessLevel(IntEnum):
@@ -452,3 +477,56 @@ class ImageClassificationLabel(Label):
         self.x2 = coord2[0]
         self.y2 = coord2[1]
         self.is_prelabel = is_prelabel
+
+
+class ProjectTransaction(db.Model):
+    """
+
+    """
+    __tablename__ = "project_data_transaction"
+
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer,
+                           db.ForeignKey("project.id"),
+                           nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("user.id"),
+                        nullable=False)
+    status = db.Column(db.Integer,
+                       default=TransactionStatus.INITIALIZING,
+                       nullable=False)
+    created = db.Column(db.DateTime, nullable=False,
+                        default=datetime.datetime.now())
+    modified = db.Column(db.DateTime)
+
+    def __init__(self, project_id, user_id, status=None):
+        self.project_id = project_id
+        self.user_id = user_id
+        if status is not None:
+            self.status = status
+
+    def set_status(self, status, run_commit=True):
+        if not TransactionStatus.has_value(status):
+            raise ValueError("Incorrect TransactionStatus value: "
+                             f"{status}")
+        self.status = status
+        self.modified = datetime.datetime.now()
+        if run_commit:
+            commit()
+        print(f"object status: {self.status}")
+
+    @staticmethod
+    def get_active(project_id, user_id=None):
+        if user_id is not None:
+            transactions = db.session.query(ProjectTransaction).filter(
+                ProjectTransaction.status < TransactionStatus.FINISHED,
+                project_id == project_id,
+                user_id == user_id
+            )
+        else:
+            transactions = db.session.query(ProjectTransaction).filter(
+                ProjectTransaction.status < TransactionStatus.FINISHED,
+                project_id=project_id,
+                user_id=user_id
+            )
+        return transactions.first()

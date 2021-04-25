@@ -29,12 +29,29 @@ const ImportForm = ({ projectID, projectType }) => {
     }
   }, [textFiles, imageFiles, projectType]);
 
+  const handleUploadProgress = (e) => {
+    if (e.loaded === e.total) {
+      const interval = setInterval(async () => {
+        const response = await HTTPLauncher.sendGetActiveTransaction(projectID);
+        console.log(response.data.status);
+      }, 5000);
+    } else {
+      const percentCompleted = Math.round((e.loaded * 100) / e.total);
+      console.log(`Complete: ${percentCompleted}%`);
+    }
+  };
+
   // Upload imported files and reset form if successful.
   const handleImport = async () => {
     try {
       if (projectType === ProjectType.IMAGE_CLASSIFICATION)
-        await HTTPLauncher.sendAddNewImageData(projectID, textFiles[0], imageFiles);
-      else await HTTPLauncher.sendAddNewTextData(projectID, textFiles[0]);
+        await HTTPLauncher.sendAddNewImageData(
+          projectID,
+          textFiles[0],
+          imageFiles,
+          handleUploadProgress
+        );
+      else await HTTPLauncher.sendAddNewTextData(projectID, textFiles[0], handleUploadProgress);
     } catch (e) {
       setError(e.toString());
       return;

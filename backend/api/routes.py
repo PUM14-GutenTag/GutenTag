@@ -13,6 +13,8 @@ from api.models import (
     Project,
     ProjectData,
     ProjectType,
+    ProjectTransaction,
+    TransactionStatus,
     Label,
     DocumentClassificationLabel,
     SequenceLabel,
@@ -305,7 +307,6 @@ class AddNewTextData(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
-        project = Project.query.get(args.project_id)
 
         if "json_file" not in request.files:
             msg = "No JSON file uploaded."
@@ -319,12 +320,10 @@ class AddNewTextData(Resource):
                                  f"{json_file.filename}. Must be in "
                                  f"{TEXT_EXTENSIONS}")})
             try:
-                project = Project.query.get(project.id)
-                import_text_data(project.id, json.load(json_file))
+                trans = try_add(ProjectTransaction(args.project_id, user.id))
+                import_text_data(args.project_id, json.load(json_file), trans)
                 msg = "Data added."
             except Exception as e:
-                import traceback
-                traceback.print_exc()
                 msg = f"Could not add data: {e}"
 
         return jsonify({"message": msg})
@@ -343,7 +342,6 @@ class AddNewImageData(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
-        project = Project.query.get(args.project_id)
 
         if user.access_level < AccessLevel.ADMIN:
             msg = "User is not authorized to add data."
@@ -369,12 +367,36 @@ class AddNewImageData(Resource):
             image_dict = {secure_filename(
                 file.filename): file.read() for file in image_files}
             try:
-                import_image_data(project.id, json.load(json_file), image_dict)
+                import_image_data(args.project_id, json.load(json_file),
+                                  image_dict)
                 msg = "Data added."
             except Exception as e:
                 msg = f"Could not add data: {e}"
 
         return jsonify({"message": msg})
+
+
+class GetActiveTransaction(Resource):
+    """
+
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        transaction = ProjectTransaction.get_active(args.project_id, user.id)
+        print(f"transaction {transaction.status}")
+        if transaction:
+            status = TransactionStatus(transaction.status)
+            response = status.printable()
+        else:
+            response = "No active transactions."
+        return jsonify({"status": response})
 
 
 class GetNewData(Resource):
@@ -672,6 +694,7 @@ rest.add_resource(NewProject, "/create-project")
 rest.add_resource(RemoveProject, "/delete-project")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
+rest.add_resource(GetActiveTransaction, "/get-transaction")
 rest.add_resource(GetNewData, "/get-data")
 rest.add_resource(CreateDocumentClassificationLabel, "/label-document")
 rest.add_resource(CreateSequenceLabel, "/label-sequence")

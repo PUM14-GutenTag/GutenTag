@@ -178,12 +178,13 @@ class HTTPLauncher {
         },
     ]
   */
-  static sendAddNewTextData(projectID, JSONFile) {
+  static sendAddNewTextData(projectID, JSONFile, onUploadProgress) {
     const formData = new FormData();
     formData.append('project_id', projectID);
     formData.append('json_file', JSONFile);
     return axiosInstance().post('add-text-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
+      onUploadProgress,
     });
   }
 
@@ -201,13 +202,21 @@ class HTTPLauncher {
         ...
     ]
    */
-  static sendAddNewImageData(projectID, JSONFile, imageFiles) {
+  static sendAddNewImageData(projectID, JSONFile, imageFiles, onUploadProgress) {
     const formData = new FormData();
     formData.append('project_id', projectID);
     formData.append('json_file', JSONFile);
     [...imageFiles].forEach((img) => formData.append('images', img));
     return axiosInstance().post('add-image-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
+      onUploadProgress,
+    });
+  }
+
+  static sendGetActiveTransaction(projectID) {
+    return axiosInstance().get('get-transaction', {
+      headers: authHeader(),
+      params: { project_id: projectID },
     });
   }
 

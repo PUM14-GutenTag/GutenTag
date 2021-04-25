@@ -4,19 +4,23 @@ import time
 import json
 from api.database_handler import (add_flush,
                                   add_list_flush,
+                                  try_add_list,
+                                  db,
                                   commit)
 from api.models import (Project,
                         ProjectData,
                         ProjectTextData,
                         ProjectImageData,
                         ProjectType,
+                        ProjectTransaction,
+                        TransactionStatus,
                         DocumentClassificationLabel,
                         ImageClassificationLabel,
                         SequenceLabel,
                         SequenceToSequenceLabel)
 
 
-def import_text_data(project_id, json_data):
+def import_text_data(project_id, json_data, transaction):
     """
     Import the given json_data to a project of the given id and type.
 
@@ -59,37 +63,75 @@ def import_text_data(project_id, json_data):
     if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Incorrect project type.")
 
+    print("Setting status")
+    transaction.set_status(
+        TransactionStatus.CREATING_DATA_OBJECTS, run_commit=False)
+    print("Creating objects")
+    data_list = []
+    label_list = []
+
+    length = len(json_data)
+    t = time.perf_counter()
+    t_last = t
+    chunk_size = 1000
+    i = 0
     for obj in json_data:
+        if not (i % chunk_size):
+            t_now = time.perf_counter()
+            print(f"{i}/{length} -- time/{chunk_size}: "
+                  f"{t_now - t_last}")
+            t_last = t_now
         text = obj.get("text")
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
         project_data = ProjectTextData(project.id, text)
-        add_flush(project_data)
+        data_list.append(project_data)
+
+        i += 1
+    print(f"Time elapsed, create objects: {time.perf_counter() - t}")
+    transaction.set_status(TransactionStatus.ADDING_DATA_OBJECTS)
+    try_add_list(data_list)
+    print(f"Time elapsed, add data: {time.perf_counter() - t}")
+
+    transaction.set_status(TransactionStatus.CREATING_LABEL_OBJECTS)
+    for i in range(length):
+        obj = json_data[i]
+        data = data_list[i]
+        if not (i % chunk_size):
+            t_now = time.perf_counter()
+            print(f"{i}/{length} -- time/{chunk_size}: "
+                  f"{t_now - t_last}")
+            t_last = t_now
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
                 prelabels = [
                     DocumentClassificationLabel(
-                        project_data.id, None, lab, is_prelabel=True)
+                        data.id, None, lab, is_prelabel=True)
                     for lab in set(labels)
                 ]
             elif project.project_type == ProjectType.SEQUENCE_LABELING:
                 prelabels = [
-                    SequenceLabel(project_data.id, None, lab, begin, end,
+                    SequenceLabel(data.id, None, lab, begin, end,
                                   is_prelabel=True)
                     for begin, end, lab in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
                 prelabels = [
-                    SequenceToSequenceLabel(project_data.id, None, lab,
+                    SequenceToSequenceLabel(data.id, None, lab,
                                             is_prelabel=True)
                     for lab in labels]
             else:
                 raise ValueError(
                     f"Invalid project type: {project.project_type}.")
 
-            add_list_flush(prelabels)
-    commit()
+        label_list += prelabels
+
+    transaction.set_status(TransactionStatus.ADDING_LABEL_OBJECTS)
+    try_add_list(label_list)
+    print(f"Time elapsed, add labels: {time.perf_counter() - t}")
+    transaction.set_status(TransactionStatus.FINISHED)
+    print(f"Total time: {time.perf_counter() - t}")
 
 
 def import_image_data(project_id, json_data, images):
