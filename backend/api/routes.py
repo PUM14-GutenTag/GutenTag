@@ -585,7 +585,7 @@ class DeleteLabel(Resource):
 
 class FetchUserName(Resource):
     """
-    Fetch the loged in users information.
+    Fetch the logged in users information.
     """
 
     def __init__(self):
