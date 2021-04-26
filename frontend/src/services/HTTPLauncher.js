@@ -138,6 +138,7 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to delete a user.
   static sendDeleteUser(email) {
     return axiosInstance().delete('delete-user', {
       headers: authHeader(),

@@ -64,7 +64,7 @@ const Settings = () => {
           <AchievementCarousel />
         </div>
         <br />
-        {userState.isAdmin ? (
+        {userState.isAdmin && (
           <Row id="manage-btn-row">
             <Button className="generic" onClick={() => setPageShow(SettingPages.ADD_NEW_PROJECT)}>
               Add new project
@@ -73,8 +73,6 @@ const Settings = () => {
               Manage users
             </Button>
           </Row>
-        ) : (
-          <div />
         )}
         <Row id="account-btn-row">
           <Button id="logoutbtn" className="red" onClick={logout}>
