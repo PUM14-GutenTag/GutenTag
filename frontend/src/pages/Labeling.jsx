@@ -4,6 +4,7 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useParams } from 'react-router-dom';
 import HTTPLauncher from '../services/HTTPLauncher';
 import DocumentClassification from '../components/DocumentClassification';
+import SequenceToSequence from '../components/SequenceToSequence';
 import FinishedPopUp from '../components/FinishedPopUp';
 import '../css/Labeling.css';
 import Label from '../components/Label';
@@ -223,12 +224,20 @@ const Labeling = () => {
           <DocumentClassification
             data={listOfDataPoints[dataCounter][1]}
             dataPointId={parseInt(listOfDataPoints[dataCounter][0])}
-            labels={labels}
-            deleteLabel={deleteLabel}
             getSetLabels={getSetLabels}
           />
         );
       }
+      else if (typeOfProject === '3') {
+        console.log("seqtoseq")
+        return (
+        <SequenceToSequence
+            data={listOfDataPoints[dataCounter][1]}
+            dataPointId={parseInt(listOfDataPoints[dataCounter][0])}
+            getSetLabels={getSetLabels}
+          />);
+      }
+
     }
 
     return <div>This should not show</div>;
@@ -256,7 +265,7 @@ const Labeling = () => {
 
   const suggestionLabels = (typeOfProject) => {
     /* Seq to Seq should not display suggestions*/ 
-    if (typeOfProject !== "2"){
+    if (typeOfProject !== "3"){
       return (<> <hr className="hr-title" data-content="Suggestions" />
       <h6> [Insert suggestions from admin]</h6> </>);
     }
