@@ -32,6 +32,8 @@ from api.parser import (
     export_text_data,
     export_image_data
 )
+
+
 """
 This file contains the routes to the database.
 """
@@ -175,10 +177,12 @@ class RefreshToken(Resource):
     """
     Endpoint for refreshing JWT-tokens.
     """
+
     @jwt_required(refresh=True)
     def post(self):
         current_user = get_jwt_identity()
-        access_token = create_access_token(identity=current_user)
+        access_token = create_access_token(
+            identity=current_user)
 
         return jsonify({"access_token": access_token})
 
