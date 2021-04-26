@@ -16,7 +16,6 @@ import Label from '../components/Label';
 Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
-  console.log('Location state', location.state);
   const { projectType, id } = location.state;
   const [dataCounter, setDataCounter] = useState(0);
   const [finished, setFinished] = useState(false);
@@ -46,7 +45,6 @@ const Labeling = ({ location }) => {
   // Gets 5 new datapoints from database, runs when entering a project
   async function fetchdata() {
     const response = await HTTPLauncher.sendGetData(projectId, 5);
-    console.log(response);
 
     // check if project has data left to label otherwise get data for label
     if (Object.keys(response.data).length === 0) {
@@ -62,7 +60,7 @@ const Labeling = ({ location }) => {
 
   // Temporary function to add testdata to projects
   async function testAddData() {
-    const response = await HTTPLauncher.sendAddNewTextData(
+    await HTTPLauncher.sendAddNewTextData(
       projectId,
       new Blob([
         JSON.stringify([
@@ -85,7 +83,6 @@ const Labeling = ({ location }) => {
         ]),
       ])
     );
-    console.log(response);
   }
 
   useEffect(() => {
@@ -109,6 +106,7 @@ const Labeling = ({ location }) => {
     const removeIndexList = [];
     let counterAdjust = 0;
     let newDataCounter = 0;
+    let slicedListOfDataPoints = [];
     // iterate list of data points with higher index than current data point
     // and check if there exist data points with the same data
     for (let i = 0; i < newListOfDataPoints.length; i++) {
@@ -139,7 +137,7 @@ const Labeling = ({ location }) => {
         for (let i = 0; i < removeIndexList.length; i++) {
           tempListOfDataPoints.splice(removeIndexList[i], 1);
         }
-        newListOfDataPoints = tempListOfDataPoints;
+        slicedListOfDataPoints = tempListOfDataPoints;
         setListOfDataPoints(tempListOfDataPoints);
       } else {
         newDataCounter = dataCounter + incrementDataPoint;
@@ -149,7 +147,7 @@ const Labeling = ({ location }) => {
       setDataCounter(dataCounter + incrementDataPoint);
       newDataCounter = dataCounter + incrementDataPoint;
     }
-    getSetLabels(newListOfDataPoints, newDataCounter);
+    getSetLabels(slicedListOfDataPoints, newDataCounter);
   };
 
   // Go to next datapoint, and get a new one
@@ -235,6 +233,7 @@ const Labeling = ({ location }) => {
         </>
       );
     }
+    return <></>;
   };
 
   return (
