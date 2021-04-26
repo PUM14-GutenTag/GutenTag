@@ -62,10 +62,10 @@ const ManageUsers = ({ toggleCallback }) => {
   };
 
   // Filters users based on input.
-  const filterFunc = (u) => {
+  const filterFunc = (user) => {
     return (
-      u[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
-      u[1].toUpperCase().indexOf(filter.toUpperCase()) > -1
+      user[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
+      user[1].toUpperCase().indexOf(filter.toUpperCase()) > -1
     );
   };
 

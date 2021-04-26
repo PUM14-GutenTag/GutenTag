@@ -249,7 +249,7 @@ describe('sendDeleteUser request', () => {
 
     const email = 'normal@gmail.com';
     const password = 'pass';
-    await HTTPLauncher.sendRegister('Reeman', 'Rus', password, email, true);
+    await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, true);
 
     const deleteResponse = await HTTPLauncher.sendDeleteUser(email);
     expect(deleteResponse.status).toBe(200);
@@ -257,7 +257,7 @@ describe('sendDeleteUser request', () => {
     const loginResponse = await HTTPLauncher.sendLogin(email, password);
     expect(loginResponse.access_token).not.toBeDefined();
 
-    const registerAgainResponse = await HTTPLauncher.sendRegister(
+    const registerAgainResponse = await HTTPLauncher.sendCreateUser(
       'Meeran',
       'Urs',
       'bassword',
