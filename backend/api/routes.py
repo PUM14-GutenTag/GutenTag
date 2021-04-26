@@ -13,8 +13,6 @@ from api.models import (
     Project,
     ProjectData,
     ProjectType,
-    ProjectTransaction,
-    TransactionStatus,
     Label,
     DocumentClassificationLabel,
     SequenceLabel,
@@ -320,8 +318,7 @@ class AddNewTextData(Resource):
                                  f"{json_file.filename}. Must be in "
                                  f"{TEXT_EXTENSIONS}")})
             try:
-                trans = try_add(ProjectTransaction(args.project_id, user.id))
-                import_text_data(args.project_id, json.load(json_file), trans)
+                import_text_data(args.project_id, json.load(json_file))
                 msg = "Data added."
             except Exception as e:
                 msg = f"Could not add data: {e}"
@@ -374,29 +371,6 @@ class AddNewImageData(Resource):
                 msg = f"Could not add data: {e}"
 
         return jsonify({"message": msg})
-
-
-class GetActiveTransaction(Resource):
-    """
-
-    """
-
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("project_id", type=int, required=True)
-
-    @jwt_required()
-    def get(self):
-        args = self.reqparse.parse_args()
-        user = User.get_by_email(get_jwt_identity())
-        transaction = ProjectTransaction.get_active(args.project_id, user.id)
-        print(f"transaction {transaction.status}")
-        if transaction:
-            status = TransactionStatus(transaction.status)
-            response = status.printable()
-        else:
-            response = "No active transactions."
-        return jsonify({"status": response})
 
 
 class GetNewData(Resource):
@@ -694,7 +668,6 @@ rest.add_resource(NewProject, "/create-project")
 rest.add_resource(RemoveProject, "/delete-project")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
-rest.add_resource(GetActiveTransaction, "/get-transaction")
 rest.add_resource(GetNewData, "/get-data")
 rest.add_resource(CreateDocumentClassificationLabel, "/label-document")
 rest.add_resource(CreateSequenceLabel, "/label-sequence")

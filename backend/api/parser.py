@@ -5,15 +5,12 @@ import json
 from api.database_handler import (add_flush,
                                   add_list_flush,
                                   try_add_list,
-                                  db,
                                   commit)
 from api.models import (Project,
                         ProjectData,
                         ProjectTextData,
                         ProjectImageData,
                         ProjectType,
-                        ProjectTransaction,
-                        TransactionStatus,
                         DocumentClassificationLabel,
                         ImageClassificationLabel,
                         SequenceLabel,
@@ -63,9 +60,6 @@ def import_text_data(project_id, json_data, transaction):
     if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Incorrect project type.")
 
-    print("Setting status")
-    transaction.set_status(
-        TransactionStatus.CREATING_DATA_OBJECTS, run_commit=False)
     print("Creating objects")
     data_list = []
     label_list = []
@@ -89,11 +83,9 @@ def import_text_data(project_id, json_data, transaction):
 
         i += 1
     print(f"Time elapsed, create objects: {time.perf_counter() - t}")
-    transaction.set_status(TransactionStatus.ADDING_DATA_OBJECTS)
     try_add_list(data_list)
     print(f"Time elapsed, add data: {time.perf_counter() - t}")
 
-    transaction.set_status(TransactionStatus.CREATING_LABEL_OBJECTS)
     for i in range(length):
         obj = json_data[i]
         data = data_list[i]
@@ -127,10 +119,8 @@ def import_text_data(project_id, json_data, transaction):
 
         label_list += prelabels
 
-    transaction.set_status(TransactionStatus.ADDING_LABEL_OBJECTS)
     try_add_list(label_list)
     print(f"Time elapsed, add labels: {time.perf_counter() - t}")
-    transaction.set_status(TransactionStatus.FINISHED)
     print(f"Total time: {time.perf_counter() - t}")
 
 
