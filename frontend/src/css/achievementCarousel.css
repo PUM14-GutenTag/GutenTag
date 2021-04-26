@@ -1,0 +1,6 @@
+.carousel-item-custom {
+  margin: 1em;
+  transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}

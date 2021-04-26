@@ -1,0 +1,149 @@
+div.row,
+#manage-btn-row,
+#account-btn-row {
+  margin-right: 0px;
+  margin-left: 0px;
+  justify-content: center;
+}
+
+button.pass {
+  color: white;
+  background-color: #FF9800;
+  border-color: #FF9800;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  margin: 1em;
+  padding: 0.7em;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  font-size: 18px;
+}
+
+button.pass:hover {
+  color: white;
+  background-color: #FF9800;
+  border-color: #FF9800;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+button.pass:not(:disabled):not(.disabled):active,
+button.pass:focus,
+button.pass:not(:disabled):not(.disabled):active:focus {
+  color: white;
+  background-color: #FF9800;
+  border-color: #FF9800;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
+button.generic {
+  color: white;
+  background-color: #00C8C8;
+  border-color: #00C8C8;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  margin: 1em;
+  padding: 0.7em;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  font-size: 18px;
+}
+
+button.generic:hover {
+  color: white;
+  background-color: #00C8C8;
+  border-color: #00C8C8;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+button.generic:not(:disabled):not(.disabled):active,
+button.generic:focus,
+button.generic:not(:disabled):not(.disabled):active:focus {
+  color: white;
+  background-color: #00C8C8;
+  border-color: #00C8C8;
+  color: #063954;
+  background-color: #cdffff;
+  border-color: #cdffff;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
+button.red {
+  color: white;
+  background-color: #f52882;
+  border-color: #f52882;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  margin: 1em;
+  padding: 0.7em;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  font-size: 18px;
+}
+
+button.red:hover {
+  color: white;
+  background-color: #f52882;
+  border-color: #f52882;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+button.red:not(:disabled):not(.disabled):active,
+button.red:focus,
+button.red:not(:disabled):not(.disabled):active:focus {
+  color: white;
+  background-color: #f52882;
+  border-color: #f52882;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
+#small {
+  padding: 0.4em;
+  padding-right: 1em;
+  padding-left: 1em;
+  font-size: medium;
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+
+.red-text {
+  color: #f52882;
+}
+
+.create-container {
+  margin-top: 1em;
+  display: flex;
+  justify-content: center;
+}
+
+.create-container Form {
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.titleLabel {
+  font-size: 30px;
+  width: max-content;
+}
+
+@media (min-width: 768px) {
+  .create-container Form {
+    width: 30em;
+  }
+}
+
+#button-margin {
+  margin-left: 0px;
+  margin-right: 2em;
+}
+
+table.users-table {
+  color: #063954;
+}
+
+svg.remove {
+  color: #f52882;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.2em;
+}
+
+td.right {
+  text-align: end;
+}

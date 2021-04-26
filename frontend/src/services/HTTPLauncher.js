@@ -133,6 +133,28 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to delete a user.
+  static sendDeleteUser(email) {
+    return axiosInstance().delete('delete-user', {
+      headers: authHeader(),
+      data: { email },
+    });
+  }
+
+  // Send HTTP-request to get a users name.
+  static sendGetUserName() {
+    return axiosInstance().get('get-user-name', {
+      headers: authHeader(),
+    });
+  }
+
+  // Send HTTP-request to get all users info.
+  static sendGetUsers() {
+    return axiosInstance().get('get-users', {
+      headers: authHeader(),
+    });
+  }
+
   static sendGetUserProjects() {
     return axios.get('get-user-projects', {
       headers: authHeader(),
@@ -142,7 +164,7 @@ class HTTPLauncher {
   /* Send HTTP-request to add one or more text data points to an existing project.
 
     Below is the expected structure of JSONFile's content for the different project types:
-     
+
     Document classification:
     JSON shape, where labels may be omitted:
     [
@@ -190,7 +212,7 @@ class HTTPLauncher {
 
   /* Send HTTP-request to add one or more text data points to an existing project.
     Below is the expected structure of JSONFile's content:
-    
+
     JSON shape, where labels may be omitted:
     [
         {
@@ -306,7 +328,7 @@ class HTTPLauncher {
             ...
         ]
     }
-    
+
     Sequence labeling:
     {
         project_id: 0,

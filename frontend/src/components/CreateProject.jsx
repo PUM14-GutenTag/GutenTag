@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import { Form, Button } from 'react-bootstrap';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/createProject.css';
 
@@ -21,8 +20,9 @@ const CreateProject = ({ toggleCallback }) => {
         <div>
           <Form onSubmit={submitHandler}>
             <Form.Group controlId="form.name">
-              <Form.Label className="titleLabel">Project Name:</Form.Label>
+              <Form.Label className="titleLabel">Project Name</Form.Label>
               <Form.Control
+                className="text"
                 type="text"
                 name="name"
                 onChange={(event) => setProjectName(event.target.value)}
@@ -33,6 +33,7 @@ const CreateProject = ({ toggleCallback }) => {
             <Form.Group controlId="form.select">
               <Form.Label className="titleLabel">Select Project Type</Form.Label>
               <Form.Control
+                className="text"
                 as="select"
                 name="type"
                 onChange={(event) => setProjectType(event.target.value)}
@@ -43,7 +44,7 @@ const CreateProject = ({ toggleCallback }) => {
                 <option value={4}>Image classification</option>
               </Form.Control>
             </Form.Group>
-            <Button className="submitButton" variant="primary" type="submit">
+            <Button className="dark" variant="primary" type="submit">
               Submit
             </Button>
           </Form>
