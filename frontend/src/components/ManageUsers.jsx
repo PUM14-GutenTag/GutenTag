@@ -20,9 +20,9 @@ const ManageUsers = ({ toggleCallback }) => {
   const [userName, setUserName] = useState('');
 
   const handleClose = () => setShowWarning(false);
-  const handleShow = (u) => {
+  const handleShow = (user) => {
     setShowWarning(true);
-    setUserRemove(u[1]);
+    setUserRemove(user[1]);
   };
 
   // Fetches the logged in users name from backend.
