@@ -1,29 +1,28 @@
 import React from 'react';
-import { HouseFill, GearFill } from 'react-bootstrap-icons';
-
-import '../css/Header.css';
+import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
-
+import { HouseFill, GearFill } from 'react-bootstrap-icons';
 import logo from '../res/hat_dark.svg';
+import '../css/header.css';
+
 /**
  * Header to be used across all pages.
  */
-
 function Header() {
   return (
     <Navbar className="sticky-top" expand="md">
-      <Container className="navbar-container">
+      <Container id="navbar-content" className="navbar-container">
         <Navbar.Brand className="logo" href="https://github.com/th3tard1sparadox/GutenTag">
           <img src={logo} alt="logo" className="logo" />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="navbar-collapse">
           <Nav className="m-auto">
-            <Nav.Link className="text-label" href="http://localhost:3000/home">
+            <Nav.Link id="home-link" className="text-label" as={Link} to="/home">
               <HouseFill className="icon-offset" /> Home
             </Nav.Link>
 
-            <Nav.Link className="text-label" href="http://localhost:3000/settings">
+            <Nav.Link id="settings-link" className="text-label" as={Link} to="/settings">
               <GearFill className="icon-offset" /> Settings
             </Nav.Link>
           </Nav>

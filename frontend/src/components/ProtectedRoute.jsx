@@ -3,8 +3,6 @@
 import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
-import Layout from './Layout';
-
 // Checks for token in localstorage
 function isLoggedIn() {
   const token = localStorage.getItem('gutentag-accesstoken');
@@ -18,11 +16,7 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
       {...rest}
       render={(props) => {
         if (isLoggedIn()) {
-          return (
-            <Layout>
-              <Component {...props} />
-            </Layout>
-          );
+          return <Component {...props} />;
         }
         return (
           <Redirect

@@ -1,3 +1,4 @@
+import json
 from flask import jsonify, send_file
 from flask_restful import Resource, reqparse, inputs, request
 from flask_jwt_extended import (
@@ -26,25 +27,22 @@ from api.database_handler import (
     try_delete_response
 )
 from api.parser import (
-    import_document_classification_data,
-    import_sequence_labeling_data,
-    import_sequence_to_sequence_data,
-    import_image_classification_data,
-    export_document_classification_data,
-    export_sequence_labeling_data,
-    export_sequence_to_sequence_data,
-    export_image_classification_data
+    import_text_data,
+    import_image_data,
+    export_text_data,
+    export_image_data
 )
 """
 This file contains the routes to the database.
 """
 
-IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+IMAGE_EXTENSIONS = {"png", "jpg", "jpeg"}
+TEXT_EXTENSIONS = {"json"}
 
 
-def allowed_image_extension(filename):
+def allowed_extension(filename, allowed):
     return "." in filename and \
-           filename.rsplit(".", 1)[1].lower() in IMAGE_EXTENSIONS
+           filename.rsplit(".", 1)[1].lower() in allowed
 
 
 class Register(Resource):
@@ -110,22 +108,23 @@ class Login(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(args.email)
+        access_token, refresh_token, access_level = None, None, None
         if user is None:
             msg = "Incorrect login credentials"
-            access_token, refresh_token = None, None
         else:
             response = user.login(args.password)
             if response is None:
                 msg = "Incorrect login credentials"
-                access_token, refresh_token = None, None
             else:
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
+                access_level = user.access_level
 
         return jsonify({
             "message": msg,
             "access_token": access_token,
-            "refresh_token": refresh_token
+            "refresh_token": refresh_token,
+            "access_level": access_level
         })
 
 
@@ -293,6 +292,32 @@ class RemoveProject(Resource):
         return jsonify({"message": msg})
 
 
+class RemoveUser(Resource):
+    """
+    Endpoint for removing a user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("email", type=str, required=True)
+
+    @jwt_required()
+    def delete(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        deletion_candidate = User.get_by_email(args.email)
+
+        if user.access_level >= AccessLevel.ADMIN:
+            try:
+                return jsonify(try_delete_response(deletion_candidate))
+            except Exception as e:
+                msg = f"Could not remove user: {e}"
+        else:
+            msg = "User is not authorized to delete other users"
+
+        return jsonify({"message": msg})
+
+
 class AddNewTextData(Resource):
     """
     Endpoint to add one or more text data points.
@@ -301,7 +326,6 @@ class AddNewTextData(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument("json_data", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -309,20 +333,25 @@ class AddNewTextData(Resource):
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
-        if user.access_level >= AccessLevel.ADMIN:
-            import_funcs = {
-                1: import_document_classification_data,
-                2: import_sequence_labeling_data,
-                3: import_sequence_to_sequence_data,
-            }
+        if "json_file" not in request.files:
+            msg = "No JSON file uploaded."
+        elif user.access_level < AccessLevel.ADMIN:
+            msg = "User is not authorized to add data."
+        else:
+            json_file = request.files["json_file"]
+            if not allowed_extension(json_file.filename, TEXT_EXTENSIONS):
+                return jsonify({"message":
+                                ("Invalid file extension for "
+                                 f"{json_file.filename}. Must be in "
+                                 f"{TEXT_EXTENSIONS}")})
             try:
-                import_funcs[project.project_type](
-                    args.project_id, args.json_data)
+                project = Project.query.get(project.id)
+                import_text_data(project.id, json.load(json_file))
                 msg = "Data added."
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 msg = f"Could not add data: {e}"
-        else:
-            msg = "User is not authorized to add data."
 
         return jsonify({"message": msg})
 
@@ -335,34 +364,42 @@ class AddNewImageData(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument("json_data", type=str, required=True)
 
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
 
-        if "images" not in request.files:
+        if user.access_level < AccessLevel.ADMIN:
+            msg = "User is not authorized to add data."
+        elif "images" not in request.files:
             msg = "No images uploaded."
+        elif "json_file" not in request.files:
+            msg = "No JSON file uploaded."
         else:
+            msg = None
+            json_file = request.files.get("json_file")
+            if not allowed_extension(json_file.filename, TEXT_EXTENSIONS):
+                msg = (f"Invalid file extension for {json_file.filename}. "
+                       f"Must be in {TEXT_EXTENSIONS}.")
+
             image_files = request.files.getlist("images")
             for file in image_files:
-                if not allowed_image_extension(file.filename):
-                    return jsonify(
-                        {"message": ("Invalid file extension. "
-                                     f"must be one of {IMAGE_EXTENSIONS}")}
-                    )
+                if not allowed_extension(file.filename, IMAGE_EXTENSIONS):
+                    msg = (f"Invalid file extension for {file.filename}. "
+                           f"Must be in {IMAGE_EXTENSIONS}.")
+            if msg is not None:
+                return jsonify({"message": msg})
+
             image_dict = {secure_filename(
                 file.filename): file.read() for file in image_files}
-            user = User.get_by_email(get_jwt_identity())
-            if user.access_level >= AccessLevel.ADMIN:
-                try:
-                    import_image_classification_data(
-                        args.project_id, args.json_data, image_dict)
-                    msg = "Data added."
-                except Exception as e:
-                    msg = f"Could not add data: {e}"
-            else:
-                msg = "User is not authorized to add data."
+            try:
+                import_image_data(project.id, json.load(json_file), image_dict)
+                msg = "Data added."
+            except Exception as e:
+                msg = f"Could not add data: {e}"
+
         return jsonify({"message": msg})
 
 
@@ -411,8 +448,6 @@ class GetLabel(Resource):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
-
-        msg = "No matching labels found"
 
         if args.data_id is not None:
             labels = Label.query.filter_by(
@@ -640,6 +675,58 @@ class DeleteLabel(Resource):
         return jsonify({"message": msg})
 
 
+class FetchUserName(Resource):
+    """
+    Fetch the logged in users information.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
+    @jwt_required()
+    def get(self):
+        current_user = User.get_by_email(get_jwt_identity())
+        msg = "Succesfully got user information."
+        name = current_user.first_name + " " + current_user.last_name
+
+        return jsonify({
+            "name": name,
+            "message": msg
+        })
+
+
+class FetchUsers(Resource):
+    """
+    Fetch all users email.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
+    @jwt_required()
+    def get(self):
+        user = User.get_by_email(get_jwt_identity())
+
+        if user.access_level >= AccessLevel.ADMIN:
+            users = []
+            user_info = {}
+
+            users = User.query.all()
+            for user in users:
+                user_info[user.id] = {
+                    "name": user.first_name + " " + user.last_name,
+                    "email": user.email,
+                    "admin": user.access_level
+                }
+
+            return jsonify({"msg": "Retrieved user information",
+                            "users": user_info})
+
+        else:
+            msg = "User is not authorized to fetch users."
+            return jsonify({"msg": msg})
+
+
 class FetchUserProjects(Resource):
     """
     Fetch all projects that a user is authorized to
@@ -661,8 +748,8 @@ class FetchUserProjects(Resource):
 
         for project in projects:
             user_projects[project.id] = {
-                "name": project.name,
                 "id": project.id,
+                "name": project.name,
                 "type": project.project_type,
                 "created": project.created
             }
@@ -690,14 +777,15 @@ class GetExportData(Resource):
         project = Project.query.get(args.project_id)
 
         if user.access_level >= AccessLevel.ADMIN:
-            export_funcs = {
-                1: export_document_classification_data,
-                2: export_sequence_labeling_data,
-                3: export_sequence_to_sequence_data,
-                4: export_image_classification_data
-            }
             try:
-                return export_funcs[project.project_type](args.project_id)
+                if (project.project_type == ProjectType.IMAGE_CLASSIFICATION):
+                    return send_file(
+                        export_image_data(project.id),
+                        attachment_filename=f"{project.name}.zip",
+                        as_attachment=True
+                    )
+                else:
+                    return export_text_data(project.id)
             except Exception as e:
                 msg = f"Could not export data: {e}"
         else:
@@ -752,6 +840,7 @@ rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
 rest.add_resource(NewProject, "/create-project")
 rest.add_resource(RemoveProject, "/delete-project")
+rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
 rest.add_resource(GetNewData, "/get-data")
@@ -761,6 +850,8 @@ rest.add_resource(CreateSequenceLabel, "/label-sequence")
 rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
 rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
+rest.add_resource(FetchUserName, '/get-user-name')
+rest.add_resource(FetchUsers, '/get-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")

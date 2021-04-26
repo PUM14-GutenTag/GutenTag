@@ -90,7 +90,22 @@ class User(db.Model):
         self._password = bcrypt.generate_password_hash(
             new_password).decode('utf-8')
 
+    def change_password(self, new_password):
+        """
+        Change password of a user
+        """
+        try:
+            self.password = new_password
+            db.session.commit()
+        except Exception:
+            db.session.rollback
+            raise
+
     def check_password(self, password):
+        """
+        Compare a password candidate to current password hash
+        Return result.
+        """
         return bcrypt.check_password_hash(self._password, password)
 
     def login(self, password):
@@ -138,6 +153,9 @@ class User(db.Model):
             raise
 
     def is_authorized(self, project_id):
+        """
+        Check if user is authorized to a project.
+        """
         check_types([(project_id, int)])
         project = Project.query.get(project_id)
         if project is None:

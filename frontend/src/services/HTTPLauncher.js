@@ -26,12 +26,57 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to create a user
+  static sendCreateUser(firstName, lastName, password, email, admin) {
+    return axiosInstance().post(
+      'create-user',
+      {
+        first_name: firstName,
+        last_name: lastName,
+        password,
+        email,
+        admin,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
+  }
+
   // Send HTTP-request to login a user.
   static sendLogin(email, password) {
     return axiosInstance().post('login', {
       email,
       password,
     });
+  }
+
+  // Send HTTP-request to change password
+  static sendChangePassword(oldPassword, newPassword) {
+    return axiosInstance().post(
+      'change-password',
+      {
+        old_password: oldPassword,
+        new_password: newPassword,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
+  }
+
+  static sendChangePasswordOther(email, newPassword) {
+    return axiosInstance().post(
+      'change-password',
+      {
+        old_password: 'old password',
+        new_password: newPassword,
+        email,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
   }
 
   // Send HTTP-request to refresh an access token.
@@ -93,6 +138,28 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to delete a user.
+  static sendDeleteUser(email) {
+    return axiosInstance().delete('delete-user', {
+      headers: authHeader(),
+      data: { email },
+    });
+  }
+
+  // Send HTTP-request to get a users name.
+  static sendGetUserName() {
+    return axiosInstance().get('get-user-name', {
+      headers: authHeader(),
+    });
+  }
+
+  // Send HTTP-request to get all users info.
+  static sendGetUsers() {
+    return axiosInstance().get('get-users', {
+      headers: authHeader(),
+    });
+  }
+
   static sendGetUserProjects() {
     return axiosInstance().get('get-user-projects', {
       headers: authHeader(),
@@ -101,10 +168,10 @@ class HTTPLauncher {
 
   /* Send HTTP-request to add one or more text data points to an existing project.
 
-    Below is the expected structure of JSONData for the different project types:
-     
+    Below is the expected structure of JSONFile's content for the different project types:
+
     Document classification:
-    JSONData shape, where labels may be omitted:
+    JSON shape, where labels may be omitted:
     [
         {
             "text": "Excellent customer service.",
@@ -114,7 +181,7 @@ class HTTPLauncher {
     ]
 
     Sequence labeling:
-    JSONData shape, where labels may be omitted:
+    JSON shape, where labels may be omitted:
     [
         {
             "text": "Alex is going to Los Angeles in California",
@@ -128,7 +195,7 @@ class HTTPLauncher {
     ]
 
     Sequence to sequence:
-    JSONData shape, where labels may be omitted:
+    JSON shape, where labels may be omitted:
     [
         {
             "text": "John saw the man on the mountain with a telescope.",
@@ -139,23 +206,19 @@ class HTTPLauncher {
         },
     ]
   */
-  static sendAddNewTextData(projectID, JSONData) {
-    return axiosInstance().post(
-      'add-text-data',
-      {
-        project_id: projectID,
-        json_data: JSONData,
-      },
-      {
-        headers: authHeader(),
-      }
-    );
+  static sendAddNewTextData(projectID, JSONFile) {
+    const formData = new FormData();
+    formData.append('project_id', projectID);
+    formData.append('json_file', JSONFile);
+    return axiosInstance().post('add-text-data', formData, {
+      headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
+    });
   }
 
   /* Send HTTP-request to add one or more text data points to an existing project.
-    Below is the expected structure of JSONData:
-    
-    JSONData shape, where labels may be omitted:
+    Below is the expected structure of JSONFile's content:
+
+    JSON shape, where labels may be omitted:
     [
         {
             "labels": [
@@ -165,13 +228,13 @@ class HTTPLauncher {
         },
         ...
     ]
-   */
+  */
 
-  static sendAddNewImageData(projectID, JSONData, images) {
+  static sendAddNewImageData(projectID, JSONFile, imageFiles) {
     const formData = new FormData();
     formData.append('project_id', projectID);
-    formData.append('json_data', JSONData);
-    images.forEach((i) => formData.append('images', i));
+    formData.append('json_file', JSONFile);
+    [...imageFiles].forEach((img) => formData.append('images', img));
     return axiosInstance().post('add-image-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
     });
@@ -279,7 +342,7 @@ class HTTPLauncher {
             ...
         ]
     }
-    
+
     Sequence labeling:
     {
         project_id: 0,
@@ -345,6 +408,7 @@ class HTTPLauncher {
 
     return axiosInstance().get('get-export-data', {
       headers: authHeader(),
+      responseType: 'arraybuffer',
       params: {
         project_id: projectID,
       },

@@ -202,7 +202,7 @@ const Labeling = () => {
     if (dataCounter - 1 >= 0) {
       dataCounterLogic(-1, listOfDataPoints);
     } else {
-      console.log('This is the first data');
+      console.log('Cant go further back');
     }
   };
 
