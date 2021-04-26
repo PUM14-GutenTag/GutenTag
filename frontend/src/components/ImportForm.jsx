@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import { Form, Row, Button } from 'react-bootstrap';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 import ProjectType from '../ProjectType';
@@ -52,25 +51,25 @@ const ImportForm = ({ projectID, projectType }) => {
 
   return (
     <Form className="center-importform">
-      <Form.File
-        id="text-upload"
-        ref={textRef}
-        label="Upload text file (json)"
-        accept=".json"
-        onChange={(e) => setTextFiles(e.target.files)}
-      />
-      <br />
-      <br />
-      {projectType === ProjectType.IMAGE_CLASSIFICATION && (
+      <Row>
         <Form.File
-          id="image-upload"
-          ref={imageRef}
-          label="Upload image file (jpg, png)"
-          accept=".jpg, .jpeg, .png"
-          multiple
-          onChange={(e) => setImageFiles(e.target.files)}
+          id="text-upload"
+          ref={textRef}
+          label="Upload text file (json)"
+          accept=".json"
+          onChange={(e) => setTextFiles(e.target.files)}
         />
-      )}
+        {projectType === ProjectType.IMAGE_CLASSIFICATION && (
+          <Form.File
+            id="image-upload"
+            ref={imageRef}
+            label="Upload image file (jpg, png)"
+            accept=".jpg, .jpeg, .png"
+            multiple
+            onChange={(e) => setImageFiles(e.target.files)}
+          />
+        )}
+      </Row>
       <br />
       <Button className="dark" margin-bottom="1em" disabled={!importEnabled} onClick={handleImport}>
         Submit
