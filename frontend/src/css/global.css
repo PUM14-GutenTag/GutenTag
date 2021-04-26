@@ -11,14 +11,70 @@ article {
   flex: 1 0 auto;
 }
 
-body {
+body h1 {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #063954;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+button.dark {
+  color: #ffffff;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding: 0.7em;
+  padding-right: 1.5em;
+  padding-left: 1.5em;
+  font-size: 18px;
+}
+
+button.dark:hover {
+  color: #ffffff;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+button.dark:not(:disabled):not(.disabled):active,
+button.dark:focus,
+button.dark:not(:disabled):not(.disabled):active:focus {
+  color: #ffffff;
+  background-color: #063954;
+  border-color: #063954;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+}
+
+button.dark:disabled {
+  background-color: #063954;
+  border-color: #063954;
+}
+
+input.text,
+select.text {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  border-radius: 0.3em;
+  height: calc(1.5em + 1rem + 2px);
+  padding: 0.5rem 1rem;
+  color: #495057;
+  border: 1px solid #ced4da;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input.text:focus,
+select.text:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #00c8c8;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgb(0 200 200 / 25%);
 }

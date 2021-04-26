@@ -292,6 +292,32 @@ class RemoveProject(Resource):
         return jsonify({"message": msg})
 
 
+class RemoveUser(Resource):
+    """
+    Endpoint for removing a user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("email", type=str, required=True)
+
+    @jwt_required()
+    def delete(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        deletion_candidate = User.get_by_email(args.email)
+
+        if user.access_level >= AccessLevel.ADMIN:
+            try:
+                return jsonify(try_delete_response(deletion_candidate))
+            except Exception as e:
+                msg = f"Could not remove user: {e}"
+        else:
+            msg = "User is not authorized to delete other users"
+
+        return jsonify({"message": msg})
+
+
 class AddNewTextData(Resource):
     """
     Endpoint to add one or more text data points.
@@ -557,6 +583,58 @@ class DeleteLabel(Resource):
         return jsonify({"message": msg})
 
 
+class FetchUserName(Resource):
+    """
+    Fetch the logged in users information.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
+    @jwt_required()
+    def get(self):
+        current_user = User.get_by_email(get_jwt_identity())
+        msg = "Succesfully got user information."
+        name = current_user.first_name + " " + current_user.last_name
+
+        return jsonify({
+            "name": name,
+            "message": msg
+        })
+
+
+class FetchUsers(Resource):
+    """
+    Fetch all users email.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
+    @jwt_required()
+    def get(self):
+        user = User.get_by_email(get_jwt_identity())
+
+        if user.access_level >= AccessLevel.ADMIN:
+            users = []
+            user_info = {}
+
+            users = User.query.all()
+            for user in users:
+                user_info[user.id] = {
+                    "name": user.first_name + " " + user.last_name,
+                    "email": user.email,
+                    "admin": user.access_level
+                }
+
+            return jsonify({"msg": "Retrieved user information",
+                            "users": user_info})
+
+        else:
+            msg = "User is not authorized to fetch users."
+            return jsonify({"msg": msg})
+
+
 class FetchUserProjects(Resource):
     """
     Fetch all projects that a user is authorized to
@@ -670,6 +748,7 @@ rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
 rest.add_resource(NewProject, "/create-project")
 rest.add_resource(RemoveProject, "/delete-project")
+rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
 rest.add_resource(GetNewData, "/get-data")
@@ -678,6 +757,8 @@ rest.add_resource(CreateSequenceLabel, "/label-sequence")
 rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
 rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
+rest.add_resource(FetchUserName, '/get-user-name')
+rest.add_resource(FetchUsers, '/get-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")

@@ -48,7 +48,7 @@ function Login() {
               required
               autoFocus
               size="lg"
-              className="input-box"
+              className="text"
               type="email"
               placeholder="Enter email"
               onChange={(e) => setEmail(e.target.value)}
@@ -66,7 +66,7 @@ function Login() {
             <Form.Control
               required
               size="lg"
-              className="input-box"
+              className="text"
               type="password"
               placeholder="Enter password"
               onChange={(e) => setPassword(e.target.value)}
@@ -74,13 +74,7 @@ function Login() {
             <Form.Control.Feedback type="invalid">Please input a password.</Form.Control.Feedback>
           </Col>
         </Form.Group>
-        <Button
-          size="lg"
-          className="mx-auto"
-          variant="login"
-          type="submit"
-          disabled={!validateForm()}
-        >
+        <Button className="dark" id="button-center" type="submit" disabled={!validateForm()}>
           Login
         </Button>
       </Form>
