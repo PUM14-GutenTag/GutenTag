@@ -19,12 +19,6 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
     setShowInfo((previousValue) => !previousValue);
   };
 
-  const handleStart = (event) => {
-    event.preventDefault();
-    window.location.href = `http://localhost:3000/labeling/${projectType}/${id}`;
-  };
-
-
   return (
     <div className="project-container" style={{ backgroundColor: selectedColor }}>
       <div className="title-container" onClick={toggleInfo} aria-hidden="true">
@@ -37,7 +31,17 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             <p>Type: {projectTypeNames[projectType - 1]}</p>
             <p>Progress: 1/4 </p>
             <p>Started: {created}</p>
-            <Button variant="outline-primary" onClick={handleStart}>
+            <Button
+              variant="outline-primary"
+              as={Link}
+              to={{
+                pathname: '/labeling',
+                state: {
+                  projectType,
+                  id,
+                },
+              }}
+            >
               Start
             </Button>
           </div>

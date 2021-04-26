@@ -3,26 +3,28 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
 import ProgressBar from 'react-bootstrap/ProgressBar';
-import { useParams } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import HTTPLauncher from '../services/HTTPLauncher';
 import DocumentClassification from '../components/DocumentClassification';
 import SequenceToSequence from '../components/SequenceToSequence';
 import FinishedPopUp from '../components/FinishedPopUp';
 import '../css/Labeling.css';
+import Layout from '../components/Layout';
 import Label from '../components/Label';
 
 /* 
 Labeling-page handles labeling functionality
 */
-const Labeling = () => {
+const Labeling = ({ location }) => {
+  console.log('Location state', location.state);
+  const { projectType, id } = location.state;
   const [dataCounter, setDataCounter] = useState(0);
   const [finished, setFinished] = useState(false);
   const [labels, setLabels] = useState([]);
-
-  const projectId = useParams().id;
-  const type = useParams().projectType;
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
 
+  const type = projectType;
+  const projectId = id;
   // fetch all labels for a given datapoint
   async function getSetLabels(dataPoints = listOfDataPoints, tempDataCounter = dataCounter) {
     if (typeof dataPoints[tempDataCounter] !== 'undefined') {
@@ -44,6 +46,7 @@ const Labeling = () => {
   // Gets 5 new datapoints from database, runs when entering a project
   async function fetchdata() {
     const response = await HTTPLauncher.sendGetData(projectId, 5);
+    console.log(response);
 
     // check if project has data left to label otherwise get data for label
     if (Object.keys(response.data).length === 0) {
@@ -59,27 +62,30 @@ const Labeling = () => {
 
   // Temporary function to add testdata to projects
   async function testAddData() {
-    await HTTPLauncher.sendAddNewTextData(
+    const response = await HTTPLauncher.sendAddNewTextData(
       projectId,
-      JSON.stringify([
-        {
-          text: 'Data nummer 1',
-          labels: [],
-        },
-        {
-          text: 'Data nummer 2',
-          labels: [],
-        },
-        {
-          text: 'Data nummer 3',
-          labels: [],
-        },
-        {
-          text: 'Data nummer 4',
-          labels: [],
-        },
+      new Blob([
+        JSON.stringify([
+          {
+            text: 'Data nummer 1',
+            labels: [],
+          },
+          {
+            text: 'Data nummer 2',
+            labels: [],
+          },
+          {
+            text: 'Data nummer 3',
+            labels: [],
+          },
+          {
+            text: 'Data nummer 4',
+            labels: [],
+          },
+        ]),
       ])
     );
+    console.log(response);
   }
 
   useEffect(() => {
@@ -174,7 +180,7 @@ const Labeling = () => {
   // select what project type showed be displayed bases on project type
   const selectProjectComponent = (typeOfProject) => {
     if (listOfDataPoints[dataCounter]) {
-      if (typeOfProject === '1') {
+      if (typeOfProject === 1) {
         return (
           <DocumentClassification
             data={listOfDataPoints[dataCounter][1]}
@@ -183,7 +189,7 @@ const Labeling = () => {
           />
         );
       }
-      if (typeOfProject === '3') {
+      if (typeOfProject === 3) {
         return (
           <SequenceToSequence
             data={listOfDataPoints[dataCounter][1]}
@@ -220,7 +226,7 @@ const Labeling = () => {
   // decide for which project types label suggestions should appear
   const suggestionLabels = (typeOfProject) => {
     /* Seq to Seq should not display suggestions */
-    if (typeOfProject !== '3') {
+    if (typeOfProject !== 3) {
       return (
         <>
           {' '}
@@ -232,71 +238,82 @@ const Labeling = () => {
   };
 
   return (
-    <div className="content-container">
-      <div className="progress-bars">
-        <ProgressBar striped variant="success" now={75} />
-        <br />
-        <ProgressBar striped variant="warning" now={25} />
-      </div>
-      <br />
-      {!finished ? (
-        <div>
-          <div className="main-content">
-            <ChevronLeft
-              className="right-left-arrow  make-large fa-10x arrow-btn"
-              onClick={getLastData}
-            />
-
-            <div className="data-content">
-              {suggestionLabels(type)}
-
-              {/* Project type component */}
-              {selectProjectComponent(type)}
-
-              <hr className="hr-title" data-content="Your Labels" />
-              <div className="your-labels-container">
-                {labels.map((oneLabel) => (
-                  <div key={oneLabel.label_id}>
-                    <Label
-                      labelId={oneLabel.label_id}
-                      label={oneLabel.label}
-                      deleteLabel={deleteLabel}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <ChevronRight
-              className="right-left-arrow  make-large fa-10x arrow-btn"
-              onClick={nextData}
-            />
-          </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => {
-              window.location.href = 'http://localhost:3000/home';
-            }}
-          >
-            Go back
-          </button>
-          <button type="button" className="btn btn-primary" onClick={seelistOfDataPoints}>
-            CurrentDataPoints
-          </button>
-          <button type="button" className="btn btn-primary" onClick={seeExportData}>
-            See exported data
-          </button>
+    <Layout>
+      <div className="content-container">
+        <div className="progress-bars">
+          <ProgressBar striped variant="success" now={75} />
+          <br />
+          <ProgressBar striped variant="warning" now={25} />
         </div>
-      ) : (
-        <FinishedPopUp />
-      )}
+        <br />
+        {!finished ? (
+          <div>
+            <div className="main-content">
+              <ChevronLeft
+                className="right-left-arrow  make-large fa-10x arrow-btn"
+                onClick={getLastData}
+              />
 
-      <button type="button" className="btn btn-primary" onClick={testAddData}>
-        Add data
-      </button>
-    </div>
+              <div className="data-content">
+                {suggestionLabels(type)}
+
+                {/* Project type component */}
+                {selectProjectComponent(type)}
+
+                <hr className="hr-title" data-content="Your Labels" />
+                <div className="your-labels-container">
+                  {labels.map((oneLabel) => (
+                    <div key={oneLabel.label_id}>
+                      <Label
+                        labelId={oneLabel.label_id}
+                        label={oneLabel.label}
+                        deleteLabel={deleteLabel}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <ChevronRight
+                className="right-left-arrow  make-large fa-10x arrow-btn"
+                onClick={nextData}
+              />
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                window.location.href = 'http://localhost:3000/home';
+              }}
+            >
+              Go back
+            </button>
+            <button type="button" className="btn btn-primary" onClick={seelistOfDataPoints}>
+              CurrentDataPoints
+            </button>
+            <button type="button" className="btn btn-primary" onClick={seeExportData}>
+              See exported data
+            </button>
+          </div>
+        ) : (
+          <FinishedPopUp />
+        )}
+
+        <button type="button" className="btn btn-primary" onClick={testAddData}>
+          Add data
+        </button>
+      </div>
+    </Layout>
   );
+};
+
+Labeling.propTypes = {
+  location: PropTypes.shape({
+    state: PropTypes.shape({
+      projectType: PropTypes.number.isRequired,
+      id: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default Labeling;

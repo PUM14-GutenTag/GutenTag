@@ -1,6 +1,7 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { Link } from 'react-router-dom';
 import '../css/FinishedPopUp.css';
 
 const FinishedPopUp = () => {
@@ -11,12 +12,7 @@ const FinishedPopUp = () => {
       </Modal.Header>
 
       <Modal.Footer className="modal-footer">
-        <Button
-          variant="primary"
-          onClick={() => {
-            window.location.href = 'http://localhost:3000/home';
-          }}
-        >
+        <Button variant="primary" as={Link} to="/home">
           Go back
         </Button>
       </Modal.Footer>

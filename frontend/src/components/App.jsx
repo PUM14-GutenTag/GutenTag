@@ -25,7 +25,7 @@ const App = () => {
       <Router>
         <Switch>
           <Route exact path="/" component={Login} />
-          <ProtectedRoute exact path="/labeling/:projectType/:id" component={Labeling} />
+          <ProtectedRoute exact path="/labeling" component={Labeling} />
           <ProtectedRoute exact path="/home" component={Home} />
           <ProtectedRoute exact path="/settings" component={Settings} />
           <ProtectedRoute exact path="/edit-project" component={EditProject} />
