@@ -17,7 +17,7 @@ from api.models import (Project,
                         SequenceToSequenceLabel)
 
 
-def import_text_data(project_id, json_data, transaction):
+def import_text_data(project_id, json_data):
     """
     Import the given json_data to a project of the given id and type.
 
