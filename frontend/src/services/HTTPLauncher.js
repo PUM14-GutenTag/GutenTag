@@ -135,7 +135,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to delete a user.
   static sendDeleteUser(email) {
-    return axiosInstance().delete('delete-user', {
+    return axios.delete('delete-user', {
       headers: authHeader(),
       data: { email },
     });
@@ -143,14 +143,14 @@ class HTTPLauncher {
 
   // Send HTTP-request to get a users name.
   static sendGetUserName() {
-    return axiosInstance().get('get-user-name', {
+    return axios.get('get-user-name', {
       headers: authHeader(),
     });
   }
 
   // Send HTTP-request to get all users info.
   static sendGetUsers() {
-    return axiosInstance().get('get-users', {
+    return axios.get('get-users', {
       headers: authHeader(),
     });
   }
