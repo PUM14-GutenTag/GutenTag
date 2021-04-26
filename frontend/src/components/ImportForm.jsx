@@ -11,11 +11,36 @@ import ProjectType from '../ProjectType';
 const ImportForm = ({ projectID, projectType }) => {
   const [textFiles, setTextFiles] = useState();
   const [imageFiles, setImageFiles] = useState();
-  const [importEnabled, setImportEnabled] = useState();
-  const [error, setError] = useState(null);
+  const [importEnabled, setImportEnabled] = useState(true);
+  const [status, setStatus] = useState(null);
 
   const textRef = useRef();
   const imageRef = useRef();
+
+  // Reset file elements.
+  const resetFiles = () => {
+    setTextFiles(null);
+    textRef.current.value = '';
+    if (projectType === ProjectType.IMAGE_CLASSIFICATION) {
+      setImageFiles(null);
+      imageRef.current.value = '';
+    }
+  };
+
+  const handleUploadProgress = (e) => {
+    const percentCompleted = Math.round((e.loaded * 100) / e.total);
+    const isDone = percentCompleted >= 100;
+    let uploadStatus;
+    if (isDone) {
+      uploadStatus =
+        'Upload complete. Beware that the data may take a while to process before appearing in the project.';
+      resetFiles();
+    } else {
+      uploadStatus = `Uploading: ${percentCompleted}%...`;
+    }
+    setStatus(uploadStatus);
+    setImportEnabled(isDone);
+  };
 
   // Keep HTML consistent with file states.
   useEffect(() => {
@@ -33,20 +58,15 @@ const ImportForm = ({ projectID, projectType }) => {
   const handleImport = async () => {
     try {
       if (projectType === ProjectType.IMAGE_CLASSIFICATION)
-        await HTTPLauncher.sendAddNewImageData(projectID, textFiles[0], imageFiles);
-      else await HTTPLauncher.sendAddNewTextData(projectID, textFiles[0]);
+        await HTTPLauncher.sendAddNewImageData(
+          projectID,
+          textFiles[0],
+          imageFiles,
+          handleUploadProgress
+        );
+      else await HTTPLauncher.sendAddNewTextData(projectID, textFiles[0], handleUploadProgress);
     } catch (e) {
-      setError(e.toString());
-      return;
-    } finally {
-      setError(null);
-    }
-
-    setTextFiles(null);
-    textRef.current.value = '';
-    if (projectType === ProjectType.IMAGE_CLASSIFICATION) {
-      setImageFiles(null);
-      imageRef.current.value = '';
+      setStatus(e.toString());
     }
   };
 
@@ -76,8 +96,7 @@ const ImportForm = ({ projectID, projectType }) => {
           Submit
         </Button>
       </Form.Row>
-      {/* Probably should switch this out for built-in form validation. */}
-      <Form.Label>{error}</Form.Label>
+      <Form.Label>{status}</Form.Label>
     </Form>
   );
 };

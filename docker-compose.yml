@@ -35,8 +35,8 @@ services:
       - ./frontend/src:/usr/src/frontend/src
       - ./test_resources:/usr/src/frontend/src/tests/res
       # - /usr/src/frontend/node_modules
-    # depends_on:
-    #   - backend
+    depends_on:
+      - backend
     ports:
       - "3000:3000"
     environment:
