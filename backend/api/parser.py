@@ -5,6 +5,7 @@ import json
 from api.database_handler import (add_flush,
                                   add_list_flush,
                                   try_add_list,
+                                  db,
                                   commit)
 from api.models import (Project,
                         ProjectData,
@@ -60,10 +61,7 @@ def import_text_data(project_id, json_data):
     if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Incorrect project type.")
 
-    print("Creating objects")
     data_list = []
-    label_list = []
-
     length = len(json_data)
     t = time.perf_counter()
     t_last = t
@@ -83,9 +81,11 @@ def import_text_data(project_id, json_data):
 
         i += 1
     print(f"Time elapsed, create objects: {time.perf_counter() - t}")
-    try_add_list(data_list)
+    db.session.add_all(data_list)
+    db.session.flush()
     print(f"Time elapsed, add data: {time.perf_counter() - t}")
 
+    label_list = []
     for i in range(length):
         obj = json_data[i]
         data = data_list[i]
@@ -97,31 +97,31 @@ def import_text_data(project_id, json_data):
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-                prelabels = [
+                label_list += [
                     DocumentClassificationLabel(
                         data.id, None, lab, is_prelabel=True)
                     for lab in set(labels)
                 ]
             elif project.project_type == ProjectType.SEQUENCE_LABELING:
-                prelabels = [
+                label_list += [
                     SequenceLabel(data.id, None, lab, begin, end,
                                   is_prelabel=True)
                     for begin, end, lab in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-                prelabels = [
+                label_list += [
                     SequenceToSequenceLabel(data.id, None, lab,
                                             is_prelabel=True)
-                    for lab in labels]
+                    for lab in labels
+                ]
             else:
                 raise ValueError(
                     f"Invalid project type: {project.project_type}.")
 
-        label_list += prelabels
-
-    try_add_list(label_list)
+    db.session.add_all(label_list)
     print(f"Time elapsed, add labels: {time.perf_counter() - t}")
     print(f"Total time: {time.perf_counter() - t}")
+    commit()
 
 
 def import_image_data(project_id, json_data, images):
@@ -141,6 +141,7 @@ def import_image_data(project_id, json_data, images):
         ...
     ]
     """
+    print("Validate input")
     # Validate that json_data matches images.
     if (len(images) != len(json_data)):
         raise ValueError(f"Number of data objects ({len(json_data)} must "
@@ -170,21 +171,52 @@ def import_image_data(project_id, json_data, images):
     if project.project_type != ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Incorrect project type.")
 
+    data_list = []
+    length = len(json_data)
+    t = time.perf_counter()
+    t_last = t
+    chunk_size = 1000
+    i = 0
     for obj in json_data:
+        if not (i % chunk_size):
+            t_now = time.perf_counter()
+            print(f"{i}/{length} -- time/{chunk_size}: "
+                  f"{t_now - t_last}")
+            t_last = t_now
         file_name = obj.get("file_name")
         if file_name is None:
             raise ValueError(f"'{obj}' is missing 'file_name' entry")
-        project_data = ProjectImageData(project.id, file_name,
-                                        images[file_name])
-        add_flush(project_data)
+        data_list.append(ProjectImageData(project.id, file_name,
+                                          images[file_name]))
+        i += 1
+
+    print(f"Time elapsed, create objects: {time.perf_counter() - t}")
+    db.session.add_all(data_list)
+    db.session.flush()
+    print(f"Time elapsed, add data: {time.perf_counter() - t}")
+
+    label_list = []
+    for i in range(length):
+        obj = json_data[i]
+        data = data_list[i]
+        if not (i % chunk_size):
+            t_now = time.perf_counter()
+            print(f"{i}/{length} -- time/{chunk_size}: "
+                  f"{t_now - t_last}")
+            t_last = t_now
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
-            prelabels = [
-                ImageClassificationLabel(project_data.id, None, lab, tuple(p1),
-                                         tuple(p2), is_prelabel=True)
-                for p1, p2, lab in labels
-            ]
-            add_list_flush(prelabels)
+            if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
+                label_list += [
+                    ImageClassificationLabel(data.id, None, lab,
+                                             tuple(p1), tuple(p2),
+                                             is_prelabel=True)
+                    for p1, p2, lab in labels
+                ]
+
+    db.session.add_all(label_list)
+    print(f"Time elapsed, add labels: {time.perf_counter() - t}")
+    print(f"Total time: {time.perf_counter() - t}")
     commit()
 
 

@@ -84,7 +84,7 @@ const ImportForm = ({ projectID, projectType }) => {
           <Form.File
             id="image-upload"
             ref={imageRef}
-            label="Upload image file (jpg, png)"
+            label="Upload image files (jpg, png)"
             accept=".jpg, .jpeg, .png"
             multiple
             onChange={(e) => setImageFiles(e.target.files)}

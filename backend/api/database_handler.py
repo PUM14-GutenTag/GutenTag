@@ -43,9 +43,13 @@ def add_flush(object):
     Add the column 'object' to its table in the database without
     ending the current transacion and return it.
     """
-    db.session.add(object)
-    db.session.flush()
-    return object
+    try:
+        db.session.add(object)
+        db.session.flush()
+        return object
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def try_add_list(objects):
@@ -67,9 +71,13 @@ def add_list_flush(objects):
     Add each column columnin 'objects' to its table in the database without
     ending the current transacion. Returns objects.
     """
-    db.session.add_all(objects)
-    db.session.flush()
-    return objects
+    try:
+        db.session.add_all(objects)
+        db.session.flush()
+        return objects
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def try_delete(object):
