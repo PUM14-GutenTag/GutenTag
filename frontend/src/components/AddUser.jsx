@@ -3,6 +3,7 @@ import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import HTTPLauncher from '../services/HTTPLauncher';
 
+// Admin can register new users.
 const AddUser = ({ toggleBack }) => {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
