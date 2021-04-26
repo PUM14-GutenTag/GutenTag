@@ -17,11 +17,18 @@ const ManageUsers = ({ toggleCallback }) => {
   const [filter, setFilter] = useState('');
   const [showWarning, setShowWarning] = useState(false);
   const [userRemove, setUserRemove] = useState('');
+  const [userName, setUserName] = useState('');
 
   const handleClose = () => setShowWarning(false);
   const handleShow = (u) => {
     setShowWarning(true);
     setUserRemove(u[1]);
+  };
+
+  // Fetches the logged in users name from backend.
+  const fetchName = async () => {
+    const response = await HTTPLauncher.sendGetUserName();
+    return response.data.name;
   };
 
   // Fetches all users from beckend and sorts them in an array.
@@ -46,6 +53,7 @@ const ManageUsers = ({ toggleCallback }) => {
   useEffect(() => {
     if (showUsers) {
       fetchData();
+      fetchName().then((n) => setUserName(n));
     }
   }, [showUsers]);
 
@@ -103,7 +111,9 @@ const ManageUsers = ({ toggleCallback }) => {
                     <td>{result[1]}</td>
                     <td>{result[0] === 5 ? 'yes' : 'no'}</td>
                     <td className="right">
-                      <Trash className="remove" onClick={() => handleShow(result)} />
+                      {userName !== result[2] && (
+                        <Trash className="remove" onClick={() => handleShow(result)} />
+                      )}
                     </td>
                   </tr>
                 ))}
