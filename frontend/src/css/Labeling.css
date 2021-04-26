@@ -36,3 +36,8 @@
   cursor: pointer;
   color: rgb(38, 9, 201);
 }
+
+/* .project-content{
+  display: flex;
+  flex-direction: column;
+} */

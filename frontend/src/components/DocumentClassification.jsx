@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/DocumentClassification.css';
-import Label from './Label';
 
 /* 
 Component that shows the specifics for document classification 
 */
-const DocumentClassification = ({ data, dataPointId, labels, deleteLabel, getSetLabels }) => {
+const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
   const inputRef = useRef();
 
   const addLabel = async (event) => {
@@ -40,8 +39,6 @@ const DocumentClassification = ({ data, dataPointId, labels, deleteLabel, getSet
       <div className="text-box-container">
         <p className={`${textBoxSize()}`}>{data}</p>
       </div>
-      <hr className="hr-title" data-content="Suggestions" />
-      <h6>Display label suggestions</h6>
       <hr className="hr-title" data-content="Add new label" />
       <div className="form-container">
         <Form onSubmit={addLabel}>
@@ -59,14 +56,6 @@ const DocumentClassification = ({ data, dataPointId, labels, deleteLabel, getSet
           </Form.Group>
         </Form>
       </div>
-      <hr className="hr-title" data-content="Your Labels" />
-      <div className="your-labels-container">
-        {labels.map((oneLabel) => (
-          <div key={oneLabel.label_id}>
-            <Label labelId={oneLabel.label_id} label={oneLabel.label} deleteLabel={deleteLabel} />
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
@@ -74,8 +63,6 @@ const DocumentClassification = ({ data, dataPointId, labels, deleteLabel, getSet
 DocumentClassification.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
-  deleteLabel: PropTypes.func.isRequired,
   getSetLabels: PropTypes.func.isRequired,
-  labels: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 export default DocumentClassification;

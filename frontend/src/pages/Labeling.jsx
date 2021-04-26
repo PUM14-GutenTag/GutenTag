@@ -6,6 +6,7 @@ import HTTPLauncher from '../services/HTTPLauncher';
 import DocumentClassification from '../components/DocumentClassification';
 import FinishedPopUp from '../components/FinishedPopUp';
 import '../css/Labeling.css';
+import Label from '../components/Label';
 
 /* 
 Labeling-page handles labeling functionality
@@ -253,6 +254,14 @@ const Labeling = () => {
     console.log(response);
   };
 
+  const suggestionLabels = (typeOfProject) => {
+    /* Seq to Seq should not display suggestions*/ 
+    if (typeOfProject !== "2"){
+      return (<> <hr className="hr-title" data-content="Suggestions" />
+      <h6> [Insert suggestions from admin]</h6> </>);
+    }
+  }
+
   return (
     <div className="content-container">
       <div className="progress-bars">
@@ -269,7 +278,21 @@ const Labeling = () => {
               onClick={getLastData}
             />
 
-            <div className="data-content">{selectProjectComponent(type)}</div>
+            {/* Project type component*/}
+            <div className="data-content">
+              {suggestionLabels(type)}
+              
+              {selectProjectComponent(type)}
+              
+              <hr className="hr-title" data-content="Your Labels" />
+              <div className="your-labels-container">
+              {labels.map((oneLabel) => (<div key={oneLabel.label_id}>
+              <Label labelId={oneLabel.label_id} label={oneLabel.label} deleteLabel={deleteLabel} />
+              </div>))}
+              </div>
+              
+              
+              </div>
 
             <ChevronRight
               className="right-left-arrow  make-large fa-10x arrow-btn"
