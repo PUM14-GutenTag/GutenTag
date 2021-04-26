@@ -6,7 +6,7 @@ import '../css/FinishedPopUp.css';
 const FinishedPopUp = () => {
   return (
     <Modal.Dialog>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Congratulations! You have finished this project</Modal.Title>
       </Modal.Header>
 
