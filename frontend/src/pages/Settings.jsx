@@ -11,6 +11,8 @@ import HTTPLauncher from '../services/HTTPLauncher';
 
 import { useUser } from '../contexts/UserContext';
 
+import SettingPages from '../SettingPages';
+
 import '../css/settings.css';
 
 /**
@@ -19,7 +21,7 @@ import '../css/settings.css';
  * a new project and manage users.
  */
 const Settings = () => {
-  const [showPage, setPageShow] = useState(0);
+  const [showPage, setPageShow] = useState(SettingPages.DEFAULT);
   const [name, setName] = useState('');
   const { state: userState } = useUser();
 
@@ -30,7 +32,7 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    if (showPage === 0) {
+    if (showPage === SettingPages.DEFAULT) {
       fetchName().then((n) => setName(n));
     }
   }, [showPage]);
@@ -42,13 +44,9 @@ const Settings = () => {
   };
 
   const toggleBack = () => {
-    setPageShow(0);
+    setPageShow(SettingPages.DEFAULT);
   };
 
-  // 0: default page
-  // 1: Change password
-  // 2: Add new project
-  // 3: Manage users
   const pages = [
     <div>
       <Col
@@ -66,36 +64,34 @@ const Settings = () => {
           <AchievementCarousel />
         </div>
         <br />
-        {userState.isAdmin ? (
+        {userState.isAdmin && (
           <Row id="manage-btn-row">
-            <Button className="generic" onClick={() => setPageShow(2)}>
+            <Button className="generic" onClick={() => setPageShow(SettingPages.ADD_NEW_PROJECT)}>
               Add new project
             </Button>
-            <Button className="generic" onClick={() => setPageShow(3)}>
+            <Button className="generic" onClick={() => setPageShow(SettingPages.MANAGE_USERS)}>
               Manage users
             </Button>
           </Row>
-        ) : (
-          <div />
         )}
         <Row id="account-btn-row">
           <Button id="logoutbtn" className="red" onClick={logout}>
             Log out
           </Button>
-          <Button className="pass" onClick={() => setPageShow(1)}>
+          <Button className="pass" onClick={() => setPageShow(SettingPages.CHANGE_PASSWORD)}>
             Change password
           </Button>
         </Row>
       </Col>
     </div>,
     <div>
-      <Button className="dark" onClick={() => setPageShow(0)}>
+      <Button className="dark" onClick={() => setPageShow(SettingPages.DEFAULT)}>
         Back
       </Button>
       <ChangePass toggleCallback={toggleBack} />
     </div>,
     <div>
-      <Button className="dark" onClick={() => setPageShow(0)}>
+      <Button className="dark" onClick={() => setPageShow(SettingPages.DEFAULT)}>
         Back
       </Button>
       <CreateProject toggleCallback={toggleBack} />

@@ -3,6 +3,7 @@ import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import HTTPLauncher from '../services/HTTPLauncher';
 
+// Admin can register new users.
 const AddUser = ({ toggleBack }) => {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
@@ -15,14 +16,16 @@ const AddUser = ({ toggleBack }) => {
     await HTTPLauncher.sendCreateUser(firstname, lastname, password, email, isAdmin);
     toggleBack();
   };
+
   const handleChange = (event) => {
     setIsAdmin(event.target.checked);
   };
+
   return (
     <div className="create-container">
       <Form onSubmit={submitHandler}>
         <Form.Group controlId="form.text">
-          <Form.Label className="titleLabel">Firstname</Form.Label>
+          <Form.Label className="titleLabel">First name</Form.Label>
           <Form.Control
             className="text"
             type="text"
@@ -31,13 +34,13 @@ const AddUser = ({ toggleBack }) => {
             placeholder="Enter a name..."
             required
           />
-          <Form.Label className="titleLabel">Lastname</Form.Label>
+          <Form.Label className="titleLabel">Last name</Form.Label>
           <Form.Control
             className="text"
             type="text"
             name="lastname"
             onChange={(event) => setLastname(event.target.value)}
-            placeholder="Enter a lastname..."
+            placeholder="Enter a last name..."
             required
           />
           <Form.Label className="titleLabel">Email</Form.Label>
@@ -73,4 +76,5 @@ const AddUser = ({ toggleBack }) => {
 AddUser.propTypes = {
   toggleBack: PropTypes.func.isRequired,
 };
+
 export default AddUser;

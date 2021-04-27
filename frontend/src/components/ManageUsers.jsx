@@ -17,11 +17,18 @@ const ManageUsers = ({ toggleCallback }) => {
   const [filter, setFilter] = useState('');
   const [showWarning, setShowWarning] = useState(false);
   const [userRemove, setUserRemove] = useState('');
+  const [userName, setUserName] = useState('');
 
   const handleClose = () => setShowWarning(false);
-  const handleShow = (u) => {
+  const handleShow = (user) => {
     setShowWarning(true);
-    setUserRemove(u[1]);
+    setUserRemove(user[1]);
+  };
+
+  // Fetches the logged in users name from backend.
+  const fetchName = async () => {
+    const response = await HTTPLauncher.sendGetUserName();
+    return response.data.name;
   };
 
   // Fetches all users from beckend and sorts them in an array.
@@ -46,6 +53,7 @@ const ManageUsers = ({ toggleCallback }) => {
   useEffect(() => {
     if (showUsers) {
       fetchData();
+      fetchName().then((n) => setUserName(n));
     }
   }, [showUsers]);
 
@@ -54,10 +62,10 @@ const ManageUsers = ({ toggleCallback }) => {
   };
 
   // Filters users based on input.
-  const filterFunc = (u) => {
+  const filterFunc = (user) => {
     return (
-      u[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
-      u[1].toUpperCase().indexOf(filter.toUpperCase()) > -1
+      user[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
+      user[1].toUpperCase().indexOf(filter.toUpperCase()) > -1
     );
   };
 
@@ -68,71 +76,72 @@ const ManageUsers = ({ toggleCallback }) => {
     handleClose();
   };
 
+  if (showUsers) {
+    return (
+      <div>
+        <Button className="dark" id="button-margin" onClick={toggleCallback}>
+          Back
+        </Button>
+        <Button className="dark" onClick={toggleUsers}>
+          Add user
+        </Button>
+        <br />
+        <input
+          className="text"
+          type="text"
+          onChange={(e) => setFilter(e.target.value)}
+          value={filter}
+          placeholder="Search for users..."
+        />
+        <Table className="users-table" striped borderless hover size="sm">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users
+              .filter((u) => filterFunc(u))
+              .map((result) => (
+                <tr key={result}>
+                  <td>{result[2]}</td>
+                  <td>{result[1]}</td>
+                  <td>{result[0] === 5 ? 'yes' : 'no'}</td>
+                  <td className="right">
+                    {userName !== result[2] && (
+                      <Trash className="remove" onClick={() => handleShow(result)} />
+                    )}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </Table>
+
+        <Modal show={showWarning} onHide={handleClose} backdrop="static" keyboard={false}>
+          <Modal.Header closeButton>
+            <Modal.Title>Warning</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Are you sure you want to delete {userRemove}?</Modal.Body>
+          <Modal.Footer>
+            <Button className="dark" id="small" onClick={handleClose}>
+              No
+            </Button>
+            <Button className="red" id="small" onClick={removeUser}>
+              Yes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    );
+  }
   return (
     <div>
-      {showUsers ? (
-        <div>
-          <Button className="dark" id="button-margin" onClick={toggleCallback}>
-            Back
-          </Button>
-          <Button className="dark" onClick={toggleUsers}>
-            Add user
-          </Button>
-          <br />
-          <input
-            className="text"
-            type="text"
-            onChange={(e) => setFilter(e.target.value)}
-            value={filter}
-            placeholder="Search for users..."
-          />
-          <Table className="users-table" striped borderless hover size="sm">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Admin</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users
-                .filter((u) => filterFunc(u))
-                .map((result) => (
-                  <tr key={result}>
-                    <td>{result[2]}</td>
-                    <td>{result[1]}</td>
-                    <td>{result[0] === 5 ? 'yes' : 'no'}</td>
-                    <td className="right">
-                      <Trash className="remove" onClick={() => handleShow(result)} />
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </Table>
-
-          <Modal show={showWarning} onHide={handleClose} backdrop="static" keyboard={false}>
-            <Modal.Header closeButton>
-              <Modal.Title>Warning</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>Are you sure you want to delete {userRemove}?</Modal.Body>
-            <Modal.Footer>
-              <Button className="dark" id="small" onClick={handleClose}>
-                No
-              </Button>
-              <Button className="red" id="small" onClick={removeUser}>
-                Yes
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </div>
-      ) : (
-        <div>
-          <Button className="dark" onClick={toggleUsers}>
-            Back
-          </Button>
-          <AddUser toggleBack={toggleUsers} />
-        </div>
-      )}
+      <Button className="dark" onClick={toggleUsers}>
+        Back
+      </Button>
+      <AddUser toggleBack={toggleUsers} />
     </div>
   );
 };
