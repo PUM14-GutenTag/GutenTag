@@ -60,39 +60,23 @@ def import_text_data(project_id, json_data):
     if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Incorrect project type.")
 
+    num_items = len(json_data)
+    print(f"Adding {num_items} items to '{project.name}'...")
     data_list = []
-    length = len(json_data)
-    t = time.perf_counter()
-    t_last = t
-    chunk_size = 1000
-    i = 0
     for obj in json_data:
-        if not (i % chunk_size):
-            t_now = time.perf_counter()
-            print(f"{i}/{length} -- time/{chunk_size}: "
-                  f"{t_now - t_last}")
-            t_last = t_now
         text = obj.get("text")
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
         project_data = ProjectTextData(project.id, text)
         data_list.append(project_data)
 
-        i += 1
-    print(f"Time elapsed, create objects: {time.perf_counter() - t}")
     db.session.add_all(data_list)
     db.session.flush()
-    print(f"Time elapsed, add data: {time.perf_counter() - t}")
 
+    print(f"Adding labels to '{project.name}'...")
     label_list = []
-    for i in range(length):
-        obj = json_data[i]
+    for i, obj in enumerate(json_data):
         data = data_list[i]
-        if not (i % chunk_size):
-            t_now = time.perf_counter()
-            print(f"{i}/{length} -- time/{chunk_size}: "
-                  f"{t_now - t_last}")
-            t_last = t_now
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
@@ -118,9 +102,8 @@ def import_text_data(project_id, json_data):
                     f"Invalid project type: {project.project_type}.")
 
     db.session.add_all(label_list)
-    print(f"Time elapsed, add labels: {time.perf_counter() - t}")
     commit()
-    print(f"Total time: {time.perf_counter() - t}")
+    print(f"Finished adding {num_items} items to '{project.name}'...")
 
 
 def import_image_data(project_id, json_data, images):
@@ -140,7 +123,6 @@ def import_image_data(project_id, json_data, images):
         ...
     ]
     """
-    print("Validate input")
     # Validate that json_data matches images.
     if (len(images) != len(json_data)):
         raise ValueError(f"Number of data objects ({len(json_data)}) must "
@@ -170,39 +152,24 @@ def import_image_data(project_id, json_data, images):
     if project.project_type != ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Incorrect project type.")
 
+    num_items = len(json_data)
+    print(f"Adding {num_items} items to '{project.name}'...")
+
     data_list = []
-    length = len(json_data)
-    t = time.perf_counter()
-    t_last = t
-    chunk_size = 1000
-    i = 0
     for obj in json_data:
-        if not (i % chunk_size):
-            t_now = time.perf_counter()
-            print(f"{i}/{length} -- time/{chunk_size}: "
-                  f"{t_now - t_last}")
-            t_last = t_now
         file_name = obj.get("file_name")
         if file_name is None:
             raise ValueError(f"'{obj}' is missing 'file_name' entry")
         data_list.append(ProjectImageData(project.id, file_name,
                                           images[file_name]))
-        i += 1
 
-    print(f"Time elapsed, create objects: {time.perf_counter() - t}")
     db.session.add_all(data_list)
     db.session.flush()
-    print(f"Time elapsed, add data: {time.perf_counter() - t}")
 
+    print(f"Adding labels to '{project.name}'...")
     label_list = []
-    for i in range(length):
-        obj = json_data[i]
+    for i, obj in enumerate(json_data):
         data = data_list[i]
-        if not (i % chunk_size):
-            t_now = time.perf_counter()
-            print(f"{i}/{length} -- time/{chunk_size}: "
-                  f"{t_now - t_last}")
-            t_last = t_now
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
@@ -214,9 +181,8 @@ def import_image_data(project_id, json_data, images):
                 ]
 
     db.session.add_all(label_list)
-    print(f"Time elapsed, add labels: {time.perf_counter() - t}")
     commit()
-    print(f"Total time: {time.perf_counter() - t}")
+    print(f"Finished adding {num_items} items to '{project.name}'...")
 
 
 def get_standard_dict(project):
@@ -334,15 +300,12 @@ def export_data(project_id, filters=None):
         raise NotImplementedError("Filters are not yet supported.")
 
     project = Project.query.get(project_id)
-    result = get_standard_dict(project)
+    text = get_standard_dict(project)
 
-    t = time.perf_counter()
-    t_last = t
-    chunk_size = 1000
-
-    print("Fetch data list")
     data_list = ProjectData.query.filter_by(project_id=project_id).all()
-    print(f"Time elapsed, fetch data list: {time.perf_counter() - t}")
+
+    num_items = len(data_list)
+    print(f"Fetching {num_items} items from '{project.name}'...")
 
     labelClass = {
         ProjectType.DOCUMENT_CLASSIFICATION: DocumentClassificationLabel,
@@ -353,7 +316,6 @@ def export_data(project_id, filters=None):
     label_list = db.session.query(labelClass[project.project_type]).filter(
         Label.data.has(project_id=project_id)
     ).all()
-    print(f"Time elapsed, fetch label list: {time.perf_counter() - t}")
 
     label_dict = defaultdict(list)
     for lab in label_list:
@@ -369,10 +331,6 @@ def export_data(project_id, filters=None):
             raise ValueError(f"Invalid project type: {project.project_type}")
         label_dict[lab.data_id].append(label)
 
-    print(f"Time elapsed, create defaultdict: {time.perf_counter() - t}")
-
-    length = len(data_list)
-    i = 0
     for data in data_list:
         entry = {
             "id": data.id,
@@ -383,22 +341,15 @@ def export_data(project_id, filters=None):
         else:
             entry["text"] = data.text_data
 
-        result["data"].append(entry)
-
-        if not (i % chunk_size):
-            t_now = time.perf_counter()
-            print(f"{i}/{length} -- time/{chunk_size}: "
-                  f"{t_now - t_last}")
-            t_last = t_now
-        i += 1
-
-    print(f"Time elapsed, add to results: {time.perf_counter() - t}")
+        text["data"].append(entry)
 
     if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
+        print(f"Zipping files from '{project.name}'...")
         zip_file = get_image_zip(project.id, project.name,
-                                 json.dumps(result, ensure_ascii=False))
-        print(f"Total time: {time.perf_counter() - t}")
-        return zip_file
+                                 json.dumps(text, ensure_ascii=False))
+        result = zip_file
     else:
-        print(f"Total time: {time.perf_counter() - t}")
-        return result
+        result = text
+
+    print(f"Finished fetching {num_items} items from '{project.name}'...")
+    return result
