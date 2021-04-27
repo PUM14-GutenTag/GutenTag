@@ -248,6 +248,13 @@ class HTTPLauncher {
     });
   }
 
+  static sendGetAmountOfData(projectID) {
+    return axiosInstance().get('get-data-amount', {
+      headers: authHeader(),
+      params: { project_id: projectID },
+    });
+  }
+
   // Send HTTP-request to fetch datapoints to be labelled.
   static sendGetLabel(projectID, dataID) {
     return axiosInstance().get('get-label', {

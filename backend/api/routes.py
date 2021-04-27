@@ -1,5 +1,5 @@
 import json
-from flask import jsonify, send_file
+from flask import jsonify, send_file, make_response
 from flask_restful import Resource, reqparse, inputs, request
 from flask_jwt_extended import (
     create_access_token,
@@ -411,7 +411,6 @@ class GetNewData(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument("amount", type=int, required=True)
 
     @jwt_required()
     def get(self):
@@ -421,13 +420,40 @@ class GetNewData(Resource):
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
-                return jsonify(project.get_data(user.id, args.amount))
+                return jsonify(project.get_data(user.id))
             except Exception as e:
-                msg = f"Could not add data: {e}"
+                msg = f"Could not get data: {e}"
         else:
-            msg = "User is not authorized to add data."
+            msg = "User is not authorized to get data."
 
         return jsonify({"message": msg})
+
+
+class GetAmountOfData(Resource):
+    """
+    Endpoint to retrieve amount of data in a project and amount
+    of data labeled by a user in the same project.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        user_id = user.id
+        project = Project.query.get(args.project_id)
+        amountOfData = len(project.data)
+        user_labels = 0
+        for data in project.data:
+            for label in data.labels:
+                if (user_id == label.user_id):
+                    user_labels += 1
+                    break
+        return make_response(jsonify({"dataAmount": amountOfData,
+                                      "labeledByUser": user_labels}), 200)
 
 
 class GetLabel(Resource):
@@ -443,7 +469,7 @@ class GetLabel(Resource):
         self.reqparse.add_argument(
             "data_id", type=int, required=False, default=None)
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -683,7 +709,7 @@ class FetchUserName(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         msg = "Succesfully got user information."
@@ -703,7 +729,7 @@ class FetchUsers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         user = User.get_by_email(get_jwt_identity())
 
@@ -844,6 +870,7 @@ rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
 rest.add_resource(GetNewData, "/get-data")
+rest.add_resource(GetAmountOfData, "/get-data-amount")
 rest.add_resource(GetLabel, "/get-label")
 rest.add_resource(CreateDocumentClassificationLabel, "/label-document")
 rest.add_resource(CreateSequenceLabel, "/label-sequence")

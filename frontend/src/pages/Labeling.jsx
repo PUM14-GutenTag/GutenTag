@@ -3,7 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import Button from 'react-bootstrap/Button';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import HTTPLauncher from '../services/HTTPLauncher';
 import DocumentClassification from '../components/DocumentClassification';
 import SequenceToSequence from '../components/SequenceToSequence';
@@ -17,24 +19,37 @@ Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
   const { projectType, id } = location.state;
-  const [dataCounter, setDataCounter] = useState(0);
+  const [index, setIndex] = useState();
   const [finished, setFinished] = useState(false);
   const [labels, setLabels] = useState([]);
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
+  const [progress, setProgress] = useState(0);
 
   const type = projectType;
   const projectId = id;
   // fetch all labels for a given datapoint
-  async function getSetLabels(dataPoints = listOfDataPoints, tempDataCounter = dataCounter) {
-    if (typeof dataPoints[tempDataCounter] !== 'undefined') {
-      const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[tempDataCounter][0]);
-      if (response.data != null) {
+  const getSetLabels = async (dataPoints = listOfDataPoints, counter = dataCounter) => {
+    if (dataPoints[counter]) {
+      const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[counter][0]);
+      if (response.data) {
         setLabels(Object.values(response.data));
       } else {
         setLabels([]);
       }
     }
-  }
+  };
+
+  // Choose size of the text to use depending on the length of the text
+  const textBoxSize = () => {
+    const data = listOfDataPoints[dataCounter][1];
+    if (data.length < 18) {
+      return 'small-text';
+    }
+    if (data.length < 600) {
+      return 'medium-text';
+    }
+    return 'large-text';
+  };
 
   // function which can be called through callbacks to remove label
   const deleteLabel = async (labelId) => {
@@ -43,8 +58,9 @@ const Labeling = ({ location }) => {
   };
 
   // Gets 5 new datapoints from database, runs when entering a project
-  async function fetchdata() {
-    const response = await HTTPLauncher.sendGetData(projectId, 5);
+  const fetchData = async () => {
+    const response = await HTTPLauncher.sendGetData(projectId);
+    console.log(response);
 
     // check if project has data left to label otherwise get data for label
     if (Object.keys(response.data).length === 0) {
@@ -52,41 +68,31 @@ const Labeling = ({ location }) => {
       return;
     }
     // create array of arrays from object with key and value pair
-    const dataArray = Object.entries(response.data);
-    setListOfDataPoints(dataArray);
-    setDataCounter(0);
-    getSetLabels(dataArray, 0);
-  }
+    setListOfDataPoints(response.data.list);
+    console.log(response.data.list);
+    console.log(response.data.index);
+    setIndex(response.data.index);
+    // getSetLabels(dataArray, 0);
+  };
 
-  // Temporary function to add testdata to projects
-  async function testAddData() {
-    await HTTPLauncher.sendAddNewTextData(
-      projectId,
-      new Blob([
-        JSON.stringify([
-          {
-            text: 'Data nummer 1',
-            labels: [],
-          },
-          {
-            text: 'Data nummer 2',
-            labels: [],
-          },
-          {
-            text: 'Data nummer 3',
-            labels: [],
-          },
-          {
-            text: 'Data nummer 4',
-            labels: [],
-          },
-        ]),
-      ])
-    );
-  }
+  const getAmountOfData = async () => {
+    const response = await HTTPLauncher.sendGetAmountOfData(projectId);
+    console.log('data: ', response);
+    const dataAmount = response.data.dataAmount;
+    const labeledByUser = response.data.labeledByUser;
+    if (dataAmount === 0) {
+      setProgress(0);
+    } else {
+      setProgress((labeledByUser / dataAmount) * 100);
+    }
+  };
+  useEffect(() => {
+    getAmountOfData();
+  }, [deleteLabel]);
 
   useEffect(() => {
-    fetchdata();
+    fetchData();
+
     // eslint-disable-next-line
   }, []);
 
@@ -182,8 +188,9 @@ const Labeling = ({ location }) => {
         return (
           <DocumentClassification
             data={listOfDataPoints[dataCounter][1]}
-            dataPointId={parseInt(listOfDataPoints[dataCounter][0])}
+            dataPointId={parseInt(listOfDataPoints[dataCounter][0], 10)}
             getSetLabels={getSetLabels}
+            textBoxSize={textBoxSize()}
           />
         );
       }
@@ -191,8 +198,9 @@ const Labeling = ({ location }) => {
         return (
           <SequenceToSequence
             data={listOfDataPoints[dataCounter][1]}
-            dataPointId={parseInt(listOfDataPoints[dataCounter][0])}
+            dataPointId={parseInt(listOfDataPoints[dataCounter][0], 10)}
             getSetLabels={getSetLabels}
+            textBoxSize={textBoxSize()}
           />
         );
       }
@@ -205,8 +213,6 @@ const Labeling = ({ location }) => {
   const getLastData = () => {
     if (dataCounter - 1 >= 0) {
       dataCounterLogic(-1, listOfDataPoints);
-    } else {
-      console.log('Cant go further back');
     }
   };
 
@@ -215,21 +221,13 @@ const Labeling = ({ location }) => {
     console.log(listOfDataPoints);
   };
 
-  // temporary help function
-  const seeExportData = async () => {
-    const response = await HTTPLauncher.sendGetExportData(projectId);
-    console.log(response);
-  };
-
   // decide for which project types label suggestions should appear
   const suggestionLabels = (typeOfProject) => {
     /* Seq to Seq should not display suggestions */
     if (typeOfProject !== 3) {
       return (
         <>
-          {' '}
           <hr className="hr-title" data-content="Suggestions" />
-          <h6> [Insert suggestions from admin]</h6>{' '}
         </>
       );
     }
@@ -240,7 +238,7 @@ const Labeling = ({ location }) => {
     <Layout>
       <div className="content-container">
         <div className="progress-bars">
-          <ProgressBar striped variant="success" now={75} />
+          <ProgressBar striped variant="success" now={progress} />
           <br />
           <ProgressBar striped variant="warning" now={25} />
         </div>
@@ -278,29 +276,22 @@ const Labeling = ({ location }) => {
                 onClick={nextData}
               />
             </div>
-            <button
-              type="button"
+            <Button
               className="btn btn-primary"
-              onClick={() => {
-                window.location.href = 'http://localhost:3000/home';
+              as={Link}
+              to={{
+                pathname: '/home',
               }}
             >
               Go back
-            </button>
+            </Button>
             <button type="button" className="btn btn-primary" onClick={seelistOfDataPoints}>
               CurrentDataPoints
-            </button>
-            <button type="button" className="btn btn-primary" onClick={seeExportData}>
-              See exported data
             </button>
           </div>
         ) : (
           <FinishedPopUp />
         )}
-
-        <button type="button" className="btn btn-primary" onClick={testAddData}>
-          Add data
-        </button>
       </div>
     </Layout>
   );

@@ -7,7 +7,7 @@ import '../css/DocumentClassification.css';
 /* 
 Component that shows the specifics for document classification 
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
+const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize }) => {
   const inputRef = useRef();
 
   const addLabel = async (event) => {
@@ -23,21 +23,10 @@ const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
     inputRef.current.focus();
   }, [dataPointId]);
 
-  // Choose size of the text to use depending on the length of the text
-  const textBoxSize = () => {
-    if (data.length < 18) {
-      return 'small-text';
-    }
-    if (data.length < 600) {
-      return 'medium-text';
-    }
-    return 'large-text';
-  };
-
   return (
     <div className="classification-container">
       <div className="text-box-container">
-        <p className={`${textBoxSize()}`}>{data}</p>
+        <p className={textBoxSize}>{data}</p>
       </div>
       <hr className="hr-title" data-content="Add new label" />
       <div className="form-container">
@@ -64,5 +53,7 @@ DocumentClassification.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
+  textBoxSize: PropTypes.func.isRequired,
 };
+
 export default DocumentClassification;

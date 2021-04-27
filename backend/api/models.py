@@ -195,40 +195,138 @@ class Project(db.Model):
         self.name = project_name
         self.project_type = project_type
 
-    def get_data(self, user_id, amount):
-        """
-        Function for retrieving datapoints that
-        are previously unlabeled by the user
-        """
+    # def get_data(self, user_id, amount=5):
+    #     """
+    #     Function for retrieving datapoints that
+    #     are previously unlabeled by the user
+    #     """
 
-        check_types([(amount, int), (user_id, int)])
+    #     check_types([(amount, int), (user_id, int)])
 
-        user_labels = Label.query.filter_by(user_id=user_id).all()
+    #     user_labels = Label.query.filter_by(user_id=user_id).all()
+    #     data_points = self.data
+    #     index = 0
+    #     found_labeled = True
+    #     # find earliest none labeled data point
+    #     for data in data_points:
+    #         if not found_labeled:
+    #             break
+    #         found_labeled = False
+    #         for label in data.labels:
+    #             if(user_id == label.user_id):
+    #                 found_labeled = True
+    #                 index += 1
+    #                 break
 
-        labeled_ids = set()
-        unlabeled_data = {}
+    #     #    l l l l l l l l l l  l  l  l  l  l  l  l
+    #     #    1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
 
-        for label in user_labels:
-            labeled_ids.add(label.data_id)
+    #     #
+    #     labeled_ids = set()
+    #     unlabeled_data = {}
+    #     new_list = data_points[index-5:index+5]
 
+    #     for label in user_labels:
+    #         labeled_ids.add(label.data_id)
+
+    #     # for data in self.data:
+    #     #     if data.id not in labeled_ids:
+    #     #         if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
+    #     #             data_item = data.file_name
+    #     #         else:
+    #     #             data_item = data.text_data
+    #     #         unlabeled_data[data.id] = data_item
+
+    #     # print("labeled ids: ", labeled_ids)
+
+    #         #            l l l l l L  l  l  l  l  l
+    #         #    1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+
+    #         #     Ny http request?
+
+    #         #            l l l l l  L  l  l  l l  l  l  l  l
+    #         #    1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    #     # list to retur
+
+    #     # self.data[len(user_labels)+1]
+
+    #     if len(unlabeled_data) > amount:
+    #         random_numbers = random.sample(range(len(unlabeled_data)),
+    # amount)
+    #         keys = list(unlabeled_data.keys())
+    #         random_data = {}
+    #         for n in random_numbers:
+    #             random_data[keys[n]] = unlabeled_data[keys[n]]
+
+    #         return random_data
+
+    #     return unlabeled_data
+    def get_data(self, user_id):
+        data_points = []
         for data in self.data:
-            if data.id not in labeled_ids:
-                if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
-                    data_item = data.file_name
-                else:
-                    data_item = data.text_data
-                unlabeled_data[data.id] = data_item
+            data_point = {}
+            if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
+                data_item = data.file_name
+            else:
+                data_item = data.text_data
+            data_point["id"] = data.id
+            data_point["data"] = data_item
+            data_points.append(data_point)
+        # list_of_data = []
+        index = 0
+        found_labeled = True
+        project_data = self.data
+        # find earliest none labeled data point
+        for data in project_data:
+            if not found_labeled:
+                break
+            found_labeled = False
+            for label in data.labels:
+                if(user_id == label.user_id):
+                    found_labeled = True
+                    index += 1
+                    break
+        if len(data_points) > 11:
+            if index < 5:
+                list_of_data = data_points[:index+6]
+            elif ((len(data_points) - 1) - 5) < index:
+                list_of_data = data_points[index-5:]
+            else:
+                list_of_data = data_points[index-5:index+6]
+        else:
+            list_of_data = data_points
 
-        if len(unlabeled_data) > amount:
-            random_numbers = random.sample(range(len(unlabeled_data)), amount)
-            keys = list(unlabeled_data.keys())
-            random_data = {}
-            for n in random_numbers:
-                random_data[keys[n]] = unlabeled_data[keys[n]]
+        print("list_of_data: ", list_of_data)
+        print("index: ", index)
+        return {"list": list_of_data, "index": index}
 
-            return random_data
+    def get_next_data(self, index):
+        check_types([(index, int)])
+        data_points = self.data
+        try:
+            data = data_points[index + 5]
+            data_id = data.id
+            data_item = data.text_data
+            data_point = {}
+            data_point[data_id] = data_item
+            next_data = [data_point]
+        except IndexError:
+            next_data = []
+        return next_data
 
-        return unlabeled_data
+    def get_earlier_data(self, index):
+        check_types([(index, int)])
+        data_points = self.data
+        try:
+            data = data_points[index - 5]
+            data_id = data.id
+            data_item = data.text_data
+            data_point = {}
+            data_point[data_id] = data_item
+            earlier_data = [data_point]
+        except IndexError:
+            earlier_data = []
+        return earlier_data
 
 
 class ProjectData(db.Model):

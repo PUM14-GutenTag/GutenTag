@@ -22,9 +22,6 @@
   font-size: 15px;
 }
 
-.form-container {
-}
-
 .form-group {
   display: flex;
   flex-direction: row;
@@ -85,7 +82,7 @@
   display: inline-block;
 }
 
-.your-labels-container{
+.your-labels-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
