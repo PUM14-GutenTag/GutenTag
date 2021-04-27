@@ -145,7 +145,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to get all users related to a project.
   static sendGetProjectUsers(projectID) {
-    return axiosInstance().get('get-project-users', {
+    return axios.get('get-project-users', {
       headers: authHeader(),
       params: { project_id: projectID },
     });
