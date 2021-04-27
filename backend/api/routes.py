@@ -89,23 +89,25 @@ class Login(Resource):
         user = User.get_by_email(args.email)
         if user is None:
             msg = "Incorrect login credentials"
-            access_token, refresh_token = None, None
+            access_token, refresh_token, access_level = None, None, None
             status = 404
         else:
             response = user.login(args.password)
             if response is None:
                 msg = "Incorrect login credentials"
-                access_token, refresh_token = None, None
+                access_token, refresh_token, access_level = None, None, None
                 status = 401
             else:
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
+                access_level = user.access_level
                 status = 200
 
         return make_response(jsonify({
             "message": msg,
             "access_token": access_token,
-            "refresh_token": refresh_token
+            "refresh_token": refresh_token,
+            "access_level": access_level
         }), status)
 
 
@@ -130,8 +132,6 @@ class ChangePassword(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
-
-        print(args.old_password, args.new_password, args.email)
 
         if not args.email:
             if not args.old_password:
@@ -194,7 +194,6 @@ class Authorize(Resource):
                 msg = f"{user} added to project {args.project_id}"
                 status = 200
             except Exception as e:
-                print("EXCEPTION:", e)
                 msg = f"Could not authorize user: {e}"
                 status = 404
         else:
@@ -345,7 +344,7 @@ class AddNewImageData(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -401,7 +400,7 @@ class GetNewData(Resource):
         self.reqparse.add_argument("project_id", type=int, required=True)
         self.reqparse.add_argument("amount", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -435,7 +434,7 @@ class CreateDocumentClassificationLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -473,7 +472,7 @@ class CreateSequenceLabel(Resource):
         self.reqparse.add_argument("begin", type=int, required=True)
         self.reqparse.add_argument("end", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -508,7 +507,7 @@ class CreateSequenceToSequenceLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -548,7 +547,7 @@ class CreateImageClassificationLabel(Resource):
         self.reqparse.add_argument("x2", type=int, required=True)
         self.reqparse.add_argument("y2", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -584,7 +583,7 @@ class DeleteLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("label_id", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def delete(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -616,7 +615,7 @@ class FetchUserProjects(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         user_projects = {}
@@ -655,7 +654,7 @@ class GetExportData(Resource):
                                    required=False,
                                    action="append")
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -694,7 +693,7 @@ class GetImageData(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         data = ProjectData.query.get(args.data_id)
