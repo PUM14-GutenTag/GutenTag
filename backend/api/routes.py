@@ -651,10 +651,10 @@ class FetchUserName(Resource):
         msg = "Succesfully got user information."
         name = current_user.first_name + " " + current_user.last_name
 
-        return jsonify({
+        return make_response(jsonify({
             "name": name,
             "message": msg
-        })
+        }), 200)
 
 
 class FetchUsers(Resource):
@@ -704,19 +704,21 @@ class FetchProjectUsers(Resource):
         current_user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
         users = []
+        users_email = []
+        msg = "Fetching users failed."
+        status = 400
 
         if current_user.access_level >= AccessLevel.ADMIN:
             users = project.users
 
-            users_email = []
             for user in users:
                 users_email.append(user.email)
 
-            return make_response(jsonify({"msg": "Users recieved.",
-                                          "users": users_email}), 200)
+            msg = "Users recieved."
+            status = 200
 
-        return make_response(jsonify({"msg": "Request failed"}), 400
-                             )
+        return make_response(jsonify({"msg": msg, "users": users_email}),
+                             status)
 
 
 class FetchUserProjects(Resource):
@@ -727,31 +729,32 @@ class FetchUserProjects(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         user_projects = {}
         projects = []
+        msg = "No projects found"
+        status = 404
 
         if current_user.access_level >= AccessLevel.ADMIN:
             projects = Project.query.all()
         else:
             projects = current_user.projects
 
-        if not projects:
-            return make_response(jsonify({"message": "No projects found"}),
-                                 404)
+        if projects:
+            for project in projects:
+                user_projects[project.id] = {
+                    "id": project.id,
+                    "name": project.name,
+                    "type": project.project_type,
+                    "created": project.created
+                }
+            msg = "Retrieved user projects"
+            status = 200
 
-        for project in projects:
-            user_projects[project.id] = {
-                "id": project.id,
-                "name": project.name,
-                "type": project.project_type,
-                "created": project.created
-            }
-
-        return make_response(jsonify({"msg": "Retrieved user projects",
-                                      "projects": user_projects}), 200)
+        return make_response(jsonify({"msg": msg,
+                                      "projects": user_projects}), status)
 
 
 class GetExportData(Resource):
@@ -766,7 +769,7 @@ class GetExportData(Resource):
                                    required=False,
                                    action="append")
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())

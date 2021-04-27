@@ -26,8 +26,8 @@ const ManageProjectUsers = ({ projectID }) => {
   const fetchUserData = async () => {
     const result = await HTTPLauncher.sendGetUsers();
     const dataArray = Object.values(result.data.users);
-    const mapedDataArray = dataArray.map((userObject) => Object.values(userObject));
-    mapedDataArray.sort((a, b) => {
+    const mappedDataArray = dataArray.map((userObject) => Object.values(userObject));
+    mappedDataArray.sort((a, b) => {
       const nameA = a[2].toUpperCase();
       const nameB = b[2].toUpperCase();
       if (nameA < nameB) {
@@ -38,7 +38,7 @@ const ManageProjectUsers = ({ projectID }) => {
       }
       return 0;
     });
-    setUsers(mapedDataArray);
+    setUsers(mappedDataArray);
     fetchProjectUsersData();
   };
 
