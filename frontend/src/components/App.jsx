@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import HTTPLauncher from '../services/HTTPLauncher';
 
 // Pages
 import Home from '../pages/Home';
@@ -16,6 +17,9 @@ import ProtectedRoute from './ProtectedRoute';
 import '../css/App.css';
 import '../css/global.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Axios
+const axios = require('axios');
 
 // App content.
 const App = () => {
@@ -34,5 +38,31 @@ const App = () => {
     </UserProvider>
   );
 };
+
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const {
+      config,
+      response: { status },
+    } = error;
+
+    const originalRequest = config;
+    if (status === 401 && !originalRequest.url.includes('refresh-token')) {
+      const response = await HTTPLauncher.sendRefreshToken();
+      if (response.status === 200) {
+        localStorage.setItem('gutentag-accesstoken', response.data.access_token);
+        originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
+        return axios.request(originalRequest);
+      }
+      localStorage.removeItem('gutentag-accesstoken');
+      localStorage.removeItem('gutentag-refreshtoken');
+    }
+
+    return error;
+  }
+);
 
 export default App;

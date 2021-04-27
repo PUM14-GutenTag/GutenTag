@@ -22,7 +22,9 @@ const arrayBufferToJSONObject = async (arrayBuffer) => {
 const createUser = async (admin = true) => {
   const email = 'mail@gmail.com';
   const password = 'pass';
-  await HTTPLauncher.sendRegister('Nameer', 'Sur', password, email, admin);
+  const initialAdminLogin = await HTTPLauncher.sendLogin('admin@admin', 'password');
+  localStorage.setItem('gutentag-accesstoken', initialAdminLogin.data.access_token);
+  await HTTPLauncher.sendCreateUser('Nameer', 'Sur', password, email, admin);
   const response = await HTTPLauncher.sendLogin(email, password);
   localStorage.setItem('gutentag-accesstoken', response.data.access_token);
   localStorage.setItem('gutentag-refreshtoken', response.data.refresh_token);

@@ -28,7 +28,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
       {showInfo ? (
         <div className="projectInfo">
           <div className="left-info">
-            <p>Type: {projectTypeNames[projectType]}</p>
+            <p>Type: {projectTypeNames[projectType - 1]}</p>
             <p>Progress: 1/4 </p>
             <p>Started: {created}</p>
             <Button variant="outline-primary">Start</Button>

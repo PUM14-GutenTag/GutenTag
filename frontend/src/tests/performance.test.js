@@ -28,11 +28,11 @@ describe('Test requirement "50 HTTP requests/sec".', () => {
     await testUtil.resetDB();
     const email = 'mail@gmail.com';
     const password = 'pass';
-    await HTTPLauncher.sendRegister('Nameer', 'Sur', password, email, true);
+    await HTTPLauncher.sendCreateUser('Nameer', 'Sur', password, email, true);
 
     const start = new Date();
     const numRequests = 1000;
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, no-unused-vars
     for (const i of [...Array(numRequests).keys()]) {
       // eslint-disable-next-line no-await-in-loop
       await HTTPLauncher.sendLogin(email, password);
@@ -68,6 +68,8 @@ describe('Test requirement "Index and store 100 data points of size 10 MB in 10 
   }, 20000);
 });
 
+// These may sometimes lose the HTTP connection after a couple of minutes (but upload will complete)
+// Might have to look at closing the connection during processing.
 describe('Test requirement "Handle datasets up to 250 MB in size".', () => {
   test('Document classification dataset', async () => {
     await testUtil.resetDB();
