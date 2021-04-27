@@ -119,8 +119,8 @@ def import_text_data(project_id, json_data):
 
     db.session.add_all(label_list)
     print(f"Time elapsed, add labels: {time.perf_counter() - t}")
-    print(f"Total time: {time.perf_counter() - t}")
     commit()
+    print(f"Total time: {time.perf_counter() - t}")
 
 
 def import_image_data(project_id, json_data, images):
@@ -143,7 +143,7 @@ def import_image_data(project_id, json_data, images):
     print("Validate input")
     # Validate that json_data matches images.
     if (len(images) != len(json_data)):
-        raise ValueError(f"Number of data objects ({len(json_data)} must "
+        raise ValueError(f"Number of data objects ({len(json_data)}) must "
                          f"match number of images ({len(images)}).")
     image_names = {obj["file_name"] for obj in json_data}
     image_file_names = set(images.keys())
@@ -215,8 +215,8 @@ def import_image_data(project_id, json_data, images):
 
     db.session.add_all(label_list)
     print(f"Time elapsed, add labels: {time.perf_counter() - t}")
-    print(f"Total time: {time.perf_counter() - t}")
     commit()
+    print(f"Total time: {time.perf_counter() - t}")
 
 
 def get_standard_dict(project):

@@ -4,7 +4,7 @@ import json
 
 """
 This is a quickly thrown together script to large, representative, input files
-for integration tests. 
+for integration tests.
 
 Run it with python, with an optional argument for project type if you only want
 a single type. Otherwise, all 4 will be created.
@@ -14,7 +14,9 @@ The script requires that you have copied the dataset directories from the
 """
 
 DOCUMENT_CLASSIFICATION_LABELS = [["positive"], ["negative"]]
-SEQUENCE_LABELS = [[0, 3, "PER"], [16, 27, "LOC"], [31, 41, "LOC"]]
+SEQUENCE_LABELS = [
+    [0, 3, "PER"], [16, 27, "LOC"], [31, 41, "LOC"]
+]
 IMAGE_CLASSIFICATION_LABELS = [
     [[75, 125], [100, 150], "person"],
     [[100, 150], [160, 200], "person"],
@@ -46,7 +48,7 @@ def document_classification_dataset(input_path, output_path):
     print("Indexing input...")
     data_list = []
     with open(input_path, "r", encoding="utf-8") as input_file:
-        lines = cut_list(input_file.read().splitlines(), 0.01)
+        lines = cut_list(input_file.read().splitlines(), 0.33)  # 0.33
     for i, line in enumerate(lines):
         data_list.append({
             "text": line,
@@ -59,11 +61,11 @@ def sequence_labeling_dataset(input_path, output_path):
     print("Indexing input...")
     data_list = []
     with open(input_path, "r", encoding="utf-8") as input_file:
-        lines = cut_list(input_file.read().splitlines(), 0.5)
+        lines = cut_list(input_file.read().splitlines(), 0.01)  # 0.33
     for i, line in enumerate(lines):
         data_list.append({
             "text": line,
-            "labels": rolling_item(SEQUENCE_LABELS, i)
+            "labels": [rolling_item(SEQUENCE_LABELS, i)]
         })
 
     write_json(output_path, data_list)
@@ -73,9 +75,9 @@ def sequence_to_sequence_dataset(data_path, label_path, output_path):
     print("Indexing input...")
     data_list = []
     with open(data_path, "r", encoding="utf-8") as data_file:
-        data_lines = cut_list(data_file.read().splitlines(), 0.25)
+        data_lines = cut_list(data_file.read().splitlines(), 0.165)  # 0.165
     with open(label_path, "r", encoding="utf-8") as label_file:
-        label_lines = cut_list(label_file.read().splitlines(), 0.25)
+        label_lines = cut_list(label_file.read().splitlines(), 0.165)  # 0.165
 
     for i, line in enumerate(data_lines):
         data_list.append({
@@ -88,10 +90,10 @@ def sequence_to_sequence_dataset(data_path, label_path, output_path):
 def image_classification_dataset(image_dir, file_output_path):
     print("Indexing input...")
     image_names = [p.name for p in Path(image_dir).iterdir() if p.is_file()]
-    image_names = cut_list(image_names, 1)
+    image_names = cut_list(image_names, 1)  # 1
     data_list = [{
         "file_name": name,
-        "label": rolling_item(IMAGE_CLASSIFICATION_LABELS, i)
+        "labels": [rolling_item(IMAGE_CLASSIFICATION_LABELS, i)]
     } for i, name in enumerate(image_names)]
 
     write_json(file_output_path, data_list)
