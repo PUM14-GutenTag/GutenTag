@@ -621,4 +621,3 @@ describe('sendGetExportData', () => {
     expect(response.status).toBe(200);
   });
 });
-
