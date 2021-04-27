@@ -1,5 +1,5 @@
 import json
-from flask import jsonify, send_file
+from flask import jsonify, send_file, make_response
 from flask_restful import Resource, reqparse, inputs, request
 from flask_jwt_extended import (
     create_access_token,
@@ -440,8 +440,7 @@ class GetLabel(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument(
-            "data_id", type=int, required=False, default=None)
+        self.reqparse.add_argument("data_id", type=int, required=True)
 
     @jwt_required()
     def get(self):
@@ -449,77 +448,25 @@ class GetLabel(Resource):
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
-        if args.data_id is not None:
-            labels = Label.query.filter_by(
-                data_id=args.data_id, user_id=user.id).all()
+        labels = Label.query.filter_by(
+            data_id=args.data_id, user_id=user.id).all()
 
-            res = {}
+        res = {}
 
-            if labels and project:
-                if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-                    for label in labels:
-                        res.update(self.format_document_classification(label))
-                if project.project_type == ProjectType.SEQUENCE_LABELING:
-                    for label in labels:
-                        res.update(self.format_sequence_labeling(label))
-                if project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-                    for label in labels:
-                        res.update(self.format_sequence_to_sequence(label))
-                if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
-                    for label in labels:
-                        res.update(self.format_image_classification(label))
-
-                return res
+        if labels and project:
+            for label in labels:
+                res.update(label.format_json())
+            status = 200
+            msg = "Labels retrieved"
+        elif project:
+            status = 401
+            msg = f"No labels by {user.first_name} " + (
+                f"{user.last_name} found in project {project.name}")
         else:
-            return jsonify({"message": "Not implemented"})
+            status = 401
+            msg = f"No project with id {args.project_id} found"
 
-    def format_document_classification(self, label):
-        return {
-            label.id: {
-                "label_id": label.id,
-                "data_id": label.data_id,
-                "user_id": label.user_id,
-                "label": label.label,
-            }
-        }
-
-    def format_sequence_labeling(self, label):
-        return {
-            label.id: {
-                "label_id": label.id,
-                "data_id": label.data_id,
-                "user_id": label.user_id,
-                "label": label.label,
-                "begin": label.begin,
-                "end": label.end,
-            }
-        }
-
-    def format_sequence_to_sequence(self, label):
-        return {
-            label.id: {
-                "label_id": label.id,
-                "data_id": label.data_id,
-                "user_id": label.user_id,
-                "label": label.label,
-            }
-        }
-
-    def format_image_classification(self, label):
-        return {
-            label.id: {
-                "label_id": label.id,
-                "data_id": label.data_id,
-                "user_id": label.user_id,
-                "label": label.label,
-                "coordinates": {
-                    "x1": label.x1,
-                    "x2": label.x2,
-                    "y1": label.y1,
-                    "y2": label.y2
-                }
-            }
-        }
+        return make_response(jsonify({"message": msg, "labels": res}), status)
 
 
 class CreateDocumentClassificationLabel(Resource):

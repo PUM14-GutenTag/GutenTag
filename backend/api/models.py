@@ -311,7 +311,8 @@ class ProjectImageData(ProjectData):
 class Label(db.Model):
     """
     Label contains the label for a certain piece of data. Base class that
-    should not be instantiated.
+    should not be instantiated. All children to Label must implement
+    a format_json-function.
     """
     __tablename__ = "label"
 
@@ -358,6 +359,16 @@ class DocumentClassificationLabel(Label):
         self.label = label_str
         self.is_prelabel = is_prelabel
 
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label
+            }
+        }
+
 
 class SequenceLabel(Label):
     """
@@ -392,6 +403,18 @@ class SequenceLabel(Label):
         self.end = end
         self.is_prelabel = is_prelabel
 
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label,
+                "begin": self.begin,
+                "end": self.end
+            }
+        }
+
 
 class SequenceToSequenceLabel(Label):
     """
@@ -416,6 +439,16 @@ class SequenceToSequenceLabel(Label):
         self.user_id = user_id
         self.label = label_str
         self.is_prelabel = is_prelabel
+
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label
+            }
+        }
 
 
 class ImageClassificationLabel(Label):
@@ -452,3 +485,19 @@ class ImageClassificationLabel(Label):
         self.x2 = coord2[0]
         self.y2 = coord2[1]
         self.is_prelabel = is_prelabel
+
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label,
+                "coordinates": {
+                    "x1": self.x1,
+                    "x2": self.x2,
+                    "y1": self.y1,
+                    "y2": self.y2
+                }
+            }
+        }
