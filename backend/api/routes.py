@@ -29,8 +29,7 @@ from api.database_handler import (
 from api.parser import (
     import_text_data,
     import_image_data,
-    export_text_data,
-    export_image_data
+    export_data
 )
 """
 This file contains the routes to the database.
@@ -606,12 +605,12 @@ class GetExportData(Resource):
             try:
                 if (project.project_type == ProjectType.IMAGE_CLASSIFICATION):
                     return send_file(
-                        export_image_data(project.id),
+                        export_data(project.id),
                         attachment_filename=f"{project.name}.zip",
                         as_attachment=True
                     )
                 else:
-                    return export_text_data(project.id)
+                    return jsonify(export_data(project.id))
             except Exception as e:
                 msg = f"Could not export data: {e}"
         else:

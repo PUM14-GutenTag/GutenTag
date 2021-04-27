@@ -16,7 +16,7 @@ const ExportButton = ({ projectID, projectType, fileName, className }) => {
     const percentCompleted = Math.round((e.loaded * 100) / e.total);
     const isDone = percentCompleted >= 100;
     let downloadStatus;
-    if (!isDone) downloadStatus = `: ${percentCompleted}%...`;
+    if (!isDone) downloadStatus = `Downloading: ${percentCompleted}%...`;
     setStatus(downloadStatus);
     setExportEnabled(isDone);
   };

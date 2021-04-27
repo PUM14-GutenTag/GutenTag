@@ -1,17 +1,16 @@
+from collections import defaultdict
 from io import BytesIO
 import zipfile
 import time
 import json
-from api.database_handler import (add_flush,
-                                  add_list_flush,
-                                  try_add_list,
-                                  db,
+from api.database_handler import (db,
                                   commit)
 from api.models import (Project,
                         ProjectData,
                         ProjectTextData,
                         ProjectImageData,
                         ProjectType,
+                        Label,
                         DocumentClassificationLabel,
                         ImageClassificationLabel,
                         SequenceLabel,
@@ -232,10 +231,37 @@ def get_standard_dict(project):
     }
 
 
-def export_text_data(project_id, filters=None):
+def write_zip_entry(file_name, date_time, data, file):
     """
-    Export all data from a text-based project with the given id.
+    Write an individual file to a zip archive.
+    """
+    data_zip = zipfile.ZipInfo(file_name)
+    data_zip.date_time = date_time
+    data_zip.compress_type = zipfile.ZIP_DEFLATED
+    file.writestr(data_zip, data)
+
+
+def get_image_zip(project_id, project_name, json_data, filters=None):
+    """
+    Create a zip file in memory containing the project's images and a
+    descriptive JSON file.
+    """
+    all_data = ProjectImageData.query.filter_by(project_id=project_id).all()
+    date_time = time.localtime(time.time())[:6]
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, "w") as zf:
+        for data in all_data:
+            write_zip_entry(data.file_name, date_time, data.image_data, zf)
+        write_zip_entry(f"{project_name}.json", date_time, json_data, zf)
+    memory_file.seek(0)
+    return memory_file
+
+
+def export_data(project_id, filters=None):
+    """
+    Export all data from a project with the given id.
     The returned JSON object's shape depends on the project type.
+    Image projects return a zip containing all images and the JSON file.
 
     Document classification:
     {
@@ -285,72 +311,8 @@ def export_text_data(project_id, filters=None):
             ...
         ]
     }
-    """
-    if filters is not None:
-        raise NotImplementedError("Filters are not yet supported.")
 
-    project = Project.query.get(project_id)
-    if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
-        raise ValueError("Incorrect project type")
-
-    result = get_standard_dict(project)
-    for data in ProjectData.query.filter_by(project_id=project_id):
-        if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-            entry = {
-                "text": data.text_data,
-                "labels": [lab.label for lab in data.labels]
-            }
-        elif project.project_type == ProjectType.SEQUENCE_LABELING:
-            entry = {
-                "text": data.text_data,
-                "labels": [
-                    [lab.begin, lab.end, lab.label] for lab in data.labels
-                ]
-            }
-        elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-            entry = {
-                "text": data.text_data,
-                "labels": [lab.label for lab in data.labels]
-            }
-        else:
-            raise ValueError(f"Invalid project type: {project.project_type}")
-        result["data"].append(entry)
-
-    return result
-
-
-def write_zip_entry(file_name, date_time, data, file):
-    """
-    Write an individual file to a zip archive.
-    """
-    data_zip = zipfile.ZipInfo(file_name)
-    data_zip.date_time = date_time
-    data_zip.compress_type = zipfile.ZIP_DEFLATED
-    file.writestr(data_zip, data)
-
-
-def get_image_zip(project_id, project_name, json_data, filters=None):
-    """
-    Create a zip file in memory containing the project's images and a
-    descriptive JSON file.
-    """
-    all_data = ProjectImageData.query.filter_by(project_id=project_id).all()
-    date_time = time.localtime(time.time())[:6]
-    memory_file = BytesIO()
-    with zipfile.ZipFile(memory_file, "w") as zf:
-        for data in all_data:
-            write_zip_entry(data.file_name, date_time, data.image_data, zf)
-        write_zip_entry(f"{project_name}.json", date_time, json_data, zf)
-    memory_file.seek(0)
-    return memory_file
-
-
-def export_image_data(project_id, filters=None, with_images=True):
-    """
-    Export all data from the image classification project with the given id.
-
-    Returns a json object with the following shape, where labels are named
-    rectangles: [[x1, y1], [x2, y2], "label"]:
+    Image classification
     {
         project_id: 0,
         project_name: "project name",
@@ -372,22 +334,71 @@ def export_image_data(project_id, filters=None, with_images=True):
         raise NotImplementedError("Filters are not yet supported.")
 
     project = Project.query.get(project_id)
-    if project.project_type != ProjectType.IMAGE_CLASSIFICATION:
-        raise ValueError("Project is not of type IMAGE_CLASSIFICATION")
+    result = get_standard_dict(project)
 
-    text = get_standard_dict(project)
-    for data in ProjectData.query.filter_by(project_id=project_id).all():
-        labels = [[[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label]
-                  for lab in data.labels]
-        text["data"].append({
-            "file_name": data.file_name,
+    t = time.perf_counter()
+    t_last = t
+    chunk_size = 1000
+
+    print("Fetch data list")
+    data_list = ProjectData.query.filter_by(project_id=project_id).all()
+    print(f"Time elapsed, fetch data list: {time.perf_counter() - t}")
+
+    labelClass = {
+        ProjectType.DOCUMENT_CLASSIFICATION: DocumentClassificationLabel,
+        ProjectType.SEQUENCE_LABELING: SequenceLabel,
+        ProjectType.SEQUENCE_TO_SEQUENCE: SequenceToSequenceLabel,
+        ProjectType.IMAGE_CLASSIFICATION: ImageClassificationLabel
+    }
+    label_list = db.session.query(labelClass[project.project_type]).filter(
+        Label.data.has(project_id=project_id)
+    ).all()
+    print(f"Time elapsed, fetch label list: {time.perf_counter() - t}")
+
+    label_dict = defaultdict(list)
+    for lab in label_list:
+        if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
+            label = lab.label
+        elif project.project_type == ProjectType.SEQUENCE_LABELING:
+            label = [lab.begin, lab.end, lab.label]
+        elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
+            label = lab.label
+        elif project.project_type == ProjectType.IMAGE_CLASSIFICATION:
+            label = [[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label]
+        else:
+            raise ValueError(f"Invalid project type: {project.project_type}")
+        label_dict[lab.data_id].append(label)
+
+    print(f"Time elapsed, create defaultdict: {time.perf_counter() - t}")
+
+    length = len(data_list)
+    i = 0
+    for data in data_list:
+        entry = {
             "id": data.id,
-            "labels": labels
-        })
+            "labels": label_dict[data.id]
+        }
+        if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
+            entry["file_name"] = data.file_name
+        else:
+            entry["text"] = data.text_data
 
-    if with_images:
+        result["data"].append(entry)
+
+        if not (i % chunk_size):
+            t_now = time.perf_counter()
+            print(f"{i}/{length} -- time/{chunk_size}: "
+                  f"{t_now - t_last}")
+            t_last = t_now
+        i += 1
+
+    print(f"Time elapsed, add to results: {time.perf_counter() - t}")
+
+    if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
         zip_file = get_image_zip(project.id, project.name,
-                                 json.dumps(text, ensure_ascii=False))
+                                 json.dumps(result, ensure_ascii=False))
+        print(f"Total time: {time.perf_counter() - t}")
         return zip_file
     else:
-        return text
+        print(f"Total time: {time.perf_counter() - t}")
+        return result
