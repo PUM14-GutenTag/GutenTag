@@ -1,3 +1,5 @@
+// Util file containing functions that are shared between test files.
+
 import fs from 'fs';
 import path from 'path';
 

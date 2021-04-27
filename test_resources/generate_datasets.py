@@ -3,8 +3,8 @@ from pathlib import Path
 import json
 
 """
-This is a quickly thrown together script to large, representative, input files
-for integration tests.
+This is a quickly thrown together script use to generate large, representative,
+input files for performance integration tests.
 
 Run it with python, with an optional argument for project type if you only want
 a single type. Otherwise, all 4 will be created.

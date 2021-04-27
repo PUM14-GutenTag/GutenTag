@@ -12,6 +12,8 @@ const ExportButton = ({ projectID, projectType, fileName, className }) => {
   const [exportEnabled, setExportEnabled] = useState(true);
   const [status, setStatus] = useState(null);
 
+  // Update the interface on the file download progress.
+  // Beware that this is only for the file transfer itself, and does not include server processing.
   const handleDownloadProgress = (e) => {
     const percentCompleted = Math.round((e.loaded * 100) / e.total);
     const isDone = percentCompleted >= 100;
@@ -21,6 +23,7 @@ const ExportButton = ({ projectID, projectType, fileName, className }) => {
     setExportEnabled(isDone);
   };
 
+  // Handle an export by opening a file save dialog.
   const handleExport = async () => {
     setStatus('Preparing download. This may take a while...');
     setExportEnabled(false);

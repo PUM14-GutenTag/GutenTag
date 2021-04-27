@@ -8,7 +8,7 @@ import ProjectType from '../ProjectType';
 
 // Form for importing files to a project with projectID.
 // Image projects require JSON file and image files, others only require JSON.
-const ImportForm = ({ projectID, projectType }) => {
+const ImportForm = ({ projectID, projectType, className }) => {
   const [textFiles, setTextFiles] = useState();
   const [imageFiles, setImageFiles] = useState();
   const [importEnabled, setImportEnabled] = useState(true);
@@ -27,6 +27,8 @@ const ImportForm = ({ projectID, projectType }) => {
     }
   };
 
+  // Update the interface on the file upload progress.
+  // Beware that this is only for the file transfer itself, and does not include server processing.
   const handleUploadProgress = (e) => {
     const percentCompleted = Math.round((e.loaded * 100) / e.total);
     const isDone = percentCompleted >= 100;
@@ -71,7 +73,7 @@ const ImportForm = ({ projectID, projectType }) => {
   };
 
   return (
-    <Form>
+    <Form className={className}>
       <Form.Row>
         <Form.File
           id="text-upload"
@@ -104,6 +106,11 @@ const ImportForm = ({ projectID, projectType }) => {
 ImportForm.propTypes = {
   projectID: PropTypes.number.isRequired,
   projectType: PropTypes.number.isRequired,
+  className: PropTypes.string,
+};
+
+ImportForm.defaultProps = {
+  className: '',
 };
 
 export default ImportForm;
