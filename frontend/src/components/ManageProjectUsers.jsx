@@ -7,18 +7,22 @@ import HTTPLauncher from '../services/HTTPLauncher';
 
 import '../css/editProject.css';
 
+// Component for making users authorized and deauthorized to projects.
+// Only accessable as admin.
 const ManageProjectUsers = ({ projectID }) => {
   const [showUsers] = useState(true);
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('');
   const [projectUsers, setProjectUsers] = useState([]);
 
+  // Fetches all users authorized to the project.
   const fetchProjectUsersData = async () => {
     const result = await HTTPLauncher.sendGetProjectUsers(projectID);
     const dataArray = Object.values(result.data.users);
     setProjectUsers(dataArray);
   };
 
+  // Fetches all users.
   const fetchUserData = async () => {
     const result = await HTTPLauncher.sendGetUsers();
     const dataArray = Object.values(result.data.users);
@@ -38,6 +42,7 @@ const ManageProjectUsers = ({ projectID }) => {
     fetchProjectUsersData();
   };
 
+  // Filters users based on name, email and accesslevel.
   const filterFunc = (u) => {
     return (
       (u[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
@@ -46,6 +51,7 @@ const ManageProjectUsers = ({ projectID }) => {
     );
   };
 
+  // Filters users based on if they are authorized to the project.
   const filterProjectUsers = (u) => {
     return projectUsers.includes(u[1]);
   };
@@ -56,12 +62,14 @@ const ManageProjectUsers = ({ projectID }) => {
     }
   }, [showUsers]);
 
-  const removeUser = async (u) => {
+  // Sends request to backend to deauthorize user.
+  const deauthorizeUser = async (u) => {
     await HTTPLauncher.sendDeauthorizeUser(projectID, u);
     fetchUserData();
   };
 
-  const addUser = async (u) => {
+  // Sends request to backend to authorize a user.
+  const authorizeUser = async (u) => {
     await HTTPLauncher.sendAuthorizeUser(projectID, u);
     fetchUserData();
   };
@@ -96,11 +104,11 @@ const ManageProjectUsers = ({ projectID }) => {
 
                 {filterProjectUsers(result) ? (
                   <td className="right">
-                    <Trash className="remove" onClick={() => removeUser(result[1])} />
+                    <Trash className="remove" onClick={() => deauthorizeUser(result[1])} />
                   </td>
                 ) : (
                   <td className="right">
-                    <Check className="add" onClick={() => addUser(result[1])} />
+                    <Check className="add" onClick={() => authorizeUser(result[1])} />
                   </td>
                 )}
               </tr>
