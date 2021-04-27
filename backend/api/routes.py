@@ -1,5 +1,5 @@
 import json
-from flask import jsonify, send_file
+from flask import jsonify, send_file, make_response
 from flask_restful import Resource, reqparse, inputs, request
 from flask_jwt_extended import (
     create_access_token,
@@ -45,28 +45,6 @@ def allowed_extension(filename, allowed):
            filename.rsplit(".", 1)[1].lower() in allowed
 
 
-class Register(Resource):
-    """
-    THIS ENDPOINT IS ONLY FOR DEVELOPMENT PURPOSES AND WILL BE REMOVED
-    """
-
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("first_name", type=str, required=True)
-        self.reqparse.add_argument("last_name", type=str, required=True)
-        self.reqparse.add_argument("email", type=str, required=True)
-        self.reqparse.add_argument("password", type=str, required=True)
-        self.reqparse.add_argument("admin", type=inputs.boolean,
-                                   required=False, default=False)
-
-    def post(self):
-        args = self.reqparse.parse_args()
-
-        user = User(args.first_name, args.last_name, args.email, args.password,
-                    args.admin)
-        return jsonify(try_add_response(user))
-
-
 class CreateUser(Resource):
     """
     Endpoint for creating an user.
@@ -89,10 +67,11 @@ class CreateUser(Resource):
         if user.access_level >= AccessLevel.ADMIN:
             new_user = User(args.first_name, args.last_name, args.email,
                             args.password, args.admin)
-            return jsonify(try_add_response(new_user))
+            return make_response(jsonify(try_add_response(new_user)), 200)
 
-        return jsonify({"id": None, "message":
-                        "You are not authorized to create other users."})
+        return make_response(jsonify({"id": None, "message":
+                                      "You are not authorized to  \
+                                      create other users."}), 401)
 
 
 class Login(Resource):
@@ -108,24 +87,28 @@ class Login(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(args.email)
-        access_token, refresh_token, access_level = None, None, None
         if user is None:
             msg = "Incorrect login credentials"
+            access_token, refresh_token, access_level = None, None, None
+            status = 404
         else:
             response = user.login(args.password)
             if response is None:
                 msg = "Incorrect login credentials"
+                access_token, refresh_token, access_level = None, None, None
+                status = 401
             else:
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
                 access_level = user.access_level
+                status = 200
 
-        return jsonify({
+        return make_response(jsonify({
             "message": msg,
             "access_token": access_token,
             "refresh_token": refresh_token,
             "access_level": access_level
-        })
+        }), status)
 
 
 class ChangePassword(Resource):
@@ -149,26 +132,32 @@ class ChangePassword(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
-        msg = "Failed to change password: old password is invalid"
 
         if not args.email:
             if not args.old_password:
                 msg = "Missing parameter: 'old_password'"
+                status = 406
             elif user.check_password(args.old_password):
                 user.change_password(args.new_password)
                 msg = "Password changed succesfully"
+                status = 200
+            else:
+                msg = "Failed to change password: old password is invalid"
+                status = 401
         else:
             if user.access_level >= AccessLevel.ADMIN:
                 other_user = User.get_by_email(args.email)
                 if other_user:
                     other_user.change_password(args.new_password)
                     msg = f"Password of {args.email} was changed succesfully"
+                    status = 200
             else:
                 msg = "User is unauthorized to change other users passwords."
+                status = 401
 
-        return jsonify({
+        return make_response(jsonify({
             "message": msg
-        })
+        }), status)
 
 
 class RefreshToken(Resource):
@@ -196,18 +185,21 @@ class Authorize(Resource):
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
-        user = User.get_by_email(get_jwt_identity())
+        admin_user = User.get_by_email(get_jwt_identity())
+        user = User.get_by_email(args.email)
 
-        if user.access_level >= AccessLevel.ADMIN:
+        if admin_user.access_level >= AccessLevel.ADMIN:
             try:
                 user.authorize(args.project_id)
                 msg = f"{user} added to project {args.project_id}"
+                status = 200
             except Exception as e:
                 msg = f"Could not authorize user: {e}"
+                status = 404
         else:
             msg = "User is not authorized to authorize other users"
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class Deauthorize(Resource):
@@ -223,18 +215,22 @@ class Deauthorize(Resource):
     @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
-        user = User.get_by_email(get_jwt_identity())
+        admin_user = User.get_by_email(get_jwt_identity())
+        user = User.get_by_email(args.email)
 
-        if user.access_level >= AccessLevel.ADMIN:
+        if admin_user.access_level >= AccessLevel.ADMIN:
             try:
                 user.deauthorize(args.project_id)
                 msg = f"{user} removed from project {args.project_id}"
+                status = 200
             except Exception as e:
                 msg = f"Could not deauthorize user: {e}"
+                status = 404
         else:
             msg = "User is not authorized to deauthorize other users"
+            status = 404
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class NewProject(Resource):
@@ -254,15 +250,17 @@ class NewProject(Resource):
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
-                return jsonify(try_add_response(
+                return make_response(jsonify(try_add_response(
                     Project(args.project_name, args.project_type)
-                ))
+                )), 200)
             except Exception as e:
                 msg = f"Could not create project: {e}"
+                status = 404
         else:
             msg = "User is not authorized to create projects."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class RemoveProject(Resource):
@@ -281,15 +279,17 @@ class RemoveProject(Resource):
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
-                return jsonify(try_delete_response(
+                return make_response(jsonify(try_delete_response(
                     Project.query.get(args.project_id)
-                ))
+                )), 200)
             except Exception as e:
                 msg = f"Could not remove project: {e}"
+                status = 404
         else:
             msg = "User is not authorized to remove projects."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class RemoveUser(Resource):
@@ -335,25 +335,30 @@ class AddNewTextData(Resource):
 
         if "json_file" not in request.files:
             msg = "No JSON file uploaded."
+            status = 406
         elif user.access_level < AccessLevel.ADMIN:
             msg = "User is not authorized to add data."
+            status = 401
         else:
             json_file = request.files["json_file"]
             if not allowed_extension(json_file.filename, TEXT_EXTENSIONS):
-                return jsonify({"message":
-                                ("Invalid file extension for "
-                                 f"{json_file.filename}. Must be in "
-                                 f"{TEXT_EXTENSIONS}")})
+                return make_response(
+                    jsonify({"message":
+                             ("Invalid file extension for "
+                              f"{json_file.filename}. \
+                              Must be in "f"{TEXT_EXTENSIONS}")}), 406)
+
             try:
                 project = Project.query.get(project.id)
                 import_text_data(project.id, json.load(json_file))
                 msg = "Data added."
+                status = 200
             except Exception as e:
                 import traceback
                 traceback.print_exc()
                 msg = f"Could not add data: {e}"
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class AddNewImageData(Resource):
@@ -371,6 +376,10 @@ class AddNewImageData(Resource):
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
+        if not project:
+            return make_response(jsonify({"message": "Invalid project id"}),
+                                 404)
+
         if user.access_level < AccessLevel.ADMIN:
             msg = "User is not authorized to add data."
         elif "images" not in request.files:
@@ -383,24 +392,28 @@ class AddNewImageData(Resource):
             if not allowed_extension(json_file.filename, TEXT_EXTENSIONS):
                 msg = (f"Invalid file extension for {json_file.filename}. "
                        f"Must be in {TEXT_EXTENSIONS}.")
+                status = 406
 
             image_files = request.files.getlist("images")
             for file in image_files:
                 if not allowed_extension(file.filename, IMAGE_EXTENSIONS):
                     msg = (f"Invalid file extension for {file.filename}. "
                            f"Must be in {IMAGE_EXTENSIONS}.")
+                    status = 406
             if msg is not None:
-                return jsonify({"message": msg})
+                return make_response(jsonify({"message": msg}), status)
 
             image_dict = {secure_filename(
                 file.filename): file.read() for file in image_files}
             try:
                 import_image_data(project.id, json.load(json_file), image_dict)
                 msg = "Data added."
+                status = 200
             except Exception as e:
                 msg = f"Could not add data: {e}"
+                status = 404
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class GetNewData(Resource):
@@ -419,15 +432,22 @@ class GetNewData(Resource):
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
+        if not project:
+            return make_response(jsonify({"message": "Invalid project id"}),
+                                 404)
+
         if user.access_level >= AccessLevel.ADMIN:
             try:
-                return jsonify(project.get_data(user.id, args.amount))
+                return make_response(jsonify(project.get_data(
+                    user.id, args.amount)), 200)
             except Exception as e:
                 msg = f"Could not add data: {e}"
+                status = 404
         else:
             msg = "User is not authorized to add data."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class CreateDocumentClassificationLabel(Resource):
@@ -446,18 +466,24 @@ class CreateDocumentClassificationLabel(Resource):
         user = User.get_by_email(get_jwt_identity())
         data = ProjectData.query.get(args.data_id)
 
+        if not data:
+            return make_response(jsonify({"message": "Invalid datapoint"}),
+                                 404)
+
         if user.is_authorized(data.project.id):
             try:
-                return jsonify(try_add_response(
+                return make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label)
-                ))
+                )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
+                status = 404
         else:
             msg = "User is not authorized to create label."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class CreateSequenceLabel(Resource):
@@ -478,17 +504,23 @@ class CreateSequenceLabel(Resource):
         user = User.get_by_email(get_jwt_identity())
         data = ProjectData.query.get(args.data_id)
 
+        if not data:
+            return make_response(jsonify({"message": "Invalid datapoint"}),
+                                 404)
+
         if user.is_authorized(data.project.id):
             try:
-                return jsonify(try_add_response(
+                return make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
-                                  args.begin, args.end)))
+                                  args.begin, args.end))), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
+                status = 404
         else:
             msg = "User is not authorized to create label."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class CreateSequenceToSequenceLabel(Resource):
@@ -507,18 +539,24 @@ class CreateSequenceToSequenceLabel(Resource):
         user = User.get_by_email(get_jwt_identity())
         data = ProjectData.query.get(args.data_id)
 
+        if not data:
+            return make_response(jsonify({"message": "Invalid datapoint"}),
+                                 404)
+
         if user.is_authorized(data.project.id):
             try:
-                return jsonify(try_add_response(
+                return make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
                         args.data_id, user.id, args.label)
-                ))
+                )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
+                status = 404
         else:
             msg = "User is not authorized to create label."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class CreateImageClassificationLabel(Resource):
@@ -541,19 +579,25 @@ class CreateImageClassificationLabel(Resource):
         user = User.get_by_email(get_jwt_identity())
         data = ProjectData.query.get(args.data_id)
 
+        if not data:
+            return make_response(jsonify({"message": "Invalid datapoint"}),
+                                 404)
+
         if user.is_authorized(data.project.id):
             try:
-                return jsonify(try_add_response(
+                return make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,
                         (args.x1, args.y1), (args.x2, args.y2))
-                ))
+                )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
+                status = 404
         else:
             msg = "User is not authorized to create label."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class DeleteLabel(Resource):
@@ -571,16 +615,22 @@ class DeleteLabel(Resource):
         user = User.get_by_email(get_jwt_identity())
         label = Label.query.get(args.label_id)
 
+        if not label:
+            return make_response(jsonify({"message": "Failed to remove label \
+                                                Invalid label id"}), 404)
+
         if (label.user_id == user.id
                 or (user.access_level >= AccessLevel.ADMIN)):
             try:
-                return jsonify(try_delete_response(label))
+                return make_response(jsonify(try_delete_response(label)), 200)
             except Exception as e:
                 msg = f"Could not remove label: {e}"
+                status = 404
         else:
             msg = "User is not authorized to remove this label."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class FetchUserName(Resource):
@@ -681,6 +731,10 @@ class FetchUserProjects(Resource):
         else:
             projects = current_user.projects
 
+        if not projects:
+            return make_response(jsonify({"message": "No projects found"}),
+                                 404)
+
         for project in projects:
             user_projects[project.id] = {
                 "id": project.id,
@@ -689,8 +743,8 @@ class FetchUserProjects(Resource):
                 "created": project.created
             }
 
-        return jsonify({"msg": "Retrieved user projects",
-                        "projects": user_projects})
+        return make_response(jsonify({"msg": "Retrieved user projects",
+                                      "projects": user_projects}), 200)
 
 
 class GetExportData(Resource):
@@ -711,22 +765,28 @@ class GetExportData(Resource):
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
+        if not project:
+            return make_response(jsonify({"message": "Invalid project id"}),
+                                 404)
+
         if user.access_level >= AccessLevel.ADMIN:
             try:
                 if (project.project_type == ProjectType.IMAGE_CLASSIFICATION):
-                    return send_file(
+                    return make_response(send_file(
                         export_image_data(project.id),
                         attachment_filename=f"{project.name}.zip",
                         as_attachment=True
-                    )
+                    ), 200)
                 else:
-                    return export_text_data(project.id)
+                    return make_response(export_text_data(project.id), 200)
             except Exception as e:
                 msg = f"Could not export data: {e}"
+                status = 404
         else:
             msg = "User is not authorized to export data."
+            status = 401
 
-        return jsonify({"message": msg})
+        return make_response(jsonify({"message": msg}), status)
 
 
 class GetImageData(Resource):
@@ -742,16 +802,20 @@ class GetImageData(Resource):
     def get(self):
         args = self.reqparse.parse_args()
         data = ProjectData.query.get(args.data_id)
-        if (data.project.project_type != ProjectType.IMAGE_CLASSIFICATION):
+        if not data or (
+                data.project.project_type != ProjectType.IMAGE_CLASSIFICATION):
             msg = "Data is not an image."
+            status = 406
         else:
             try:
-                return send_file(data.get_image_file(),
-                                 attachment_filename=data.file_name,
-                                 as_attachment=True)
+                return make_response(send_file(
+                    data.get_image_file(),
+                    attachment_filename=data.file_name,
+                    as_attachment=True), 200)
             except Exception as e:
                 msg = f"Could not get image: {e}"
-        return jsonify({"message": msg})
+                status = 404
+        return make_response(jsonify({"message": msg}), status)
 
 
 class Reset(Resource):
@@ -766,7 +830,6 @@ class Reset(Resource):
         try_add(admin)
 
 
-rest.add_resource(Register, "/register")
 rest.add_resource(CreateUser, "/create-user")
 rest.add_resource(Login, "/login")
 rest.add_resource(ChangePassword, "/change-password")
