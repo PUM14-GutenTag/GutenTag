@@ -14,8 +14,10 @@ const Home = () => {
 
   const fetchData = async () => {
     const result = await HTTPLauncher.sendGetUserProjects();
-    const dataArray = Object.values(result.data.projects);
-    setProjects(dataArray);
+    if (result.data !== undefined) {
+      const dataArray = Object.values(result.data.projects);
+      setProjects(dataArray);
+    }
   };
 
   useEffect(() => {
