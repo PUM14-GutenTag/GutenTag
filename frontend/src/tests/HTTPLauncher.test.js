@@ -262,8 +262,12 @@ describe('sendDeleteUser request', () => {
     const deleteResponse = await HTTPLauncher.sendDeleteUser(email);
     expect(deleteResponse.status).toBe(200);
 
-    const loginResponse = await HTTPLauncher.sendLogin(email, password);
-    expect(loginResponse.access_token).not.toBeDefined();
+    try {
+      await HTTPLauncher.sendLogin(email, password);
+    } catch (e) {
+      expect(e.response.status).toBe(404);
+      expect(e.response.data.access_token).toBeNull();
+    }
 
     const registerAgainResponse = await HTTPLauncher.sendCreateUser(
       'Meeran',
@@ -617,3 +621,4 @@ describe('sendGetExportData', () => {
     expect(response.status).toBe(200);
   });
 });
+
