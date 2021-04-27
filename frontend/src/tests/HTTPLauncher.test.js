@@ -213,6 +213,17 @@ describe('sendCreateProject', () => {
   });
 });
 
+describe('sendGetUserName', () => {
+  test('Correct request', async () => {
+    await resetDB();
+    await createUser();
+
+    const response = await HTTPLauncher.sendGetUserName();
+    expect(response.status).toBe(200);
+    expect(response.data.name).toBe('Nameer Sur');
+  });
+});
+
 describe('sendGetUserProjects', () => {
   test('Correct request', async () => {
     await resetDB();
@@ -236,6 +247,32 @@ describe('sendDeleteProject request', () => {
     const response = await HTTPLauncher.sendDeleteProject(projectID);
     expect(response.status).toBe(200);
     expect(response.data.id).toBeDefined();
+  });
+});
+
+describe('sendDeleteUser request', () => {
+  test('Correct request', async () => {
+    await resetDB();
+    await createUser();
+
+    const email = 'normal@gmail.com';
+    const password = 'pass';
+    await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, true);
+
+    const deleteResponse = await HTTPLauncher.sendDeleteUser(email);
+    expect(deleteResponse.status).toBe(200);
+
+    const loginResponse = await HTTPLauncher.sendLogin(email, password);
+    expect(loginResponse.access_token).not.toBeDefined();
+
+    const registerAgainResponse = await HTTPLauncher.sendCreateUser(
+      'Meeran',
+      'Urs',
+      'bassword',
+      email,
+      true
+    );
+    expect(registerAgainResponse.status).toBe(200);
   });
 });
 
