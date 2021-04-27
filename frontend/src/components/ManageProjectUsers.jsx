@@ -11,6 +11,13 @@ const ManageProjectUsers = ({ projectID }) => {
   const [showUsers] = useState(true);
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('');
+  const [projectUsers, setProjectUsers] = useState([]);
+
+  const fetchProjectUsersData = async () => {
+    const result = await HTTPLauncher.sendGetProjectUsers(projectID);
+    const dataArray = Object.values(result.data.users);
+    setProjectUsers(dataArray);
+  };
 
   const fetchUserData = async () => {
     const result = await HTTPLauncher.sendGetUsers();
@@ -28,13 +35,19 @@ const ManageProjectUsers = ({ projectID }) => {
       return 0;
     });
     setUsers(mapedDataArray);
+    fetchProjectUsersData();
   };
 
   const filterFunc = (u) => {
     return (
-      u[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
-      u[1].toUpperCase().indexOf(filter.toUpperCase()) > -1
+      (u[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
+        u[1].toUpperCase().indexOf(filter.toUpperCase()) > -1) &&
+      u[0] !== 5
     );
+  };
+
+  const filterProjectUsers = (u) => {
+    return projectUsers.includes(u[1]);
   };
 
   useEffect(() => {
@@ -70,6 +83,7 @@ const ManageProjectUsers = ({ projectID }) => {
           <tr>
             <th>Name</th>
             <th>Email</th>
+            <th className="right">Authorize</th>
           </tr>
         </thead>
         <tbody>
@@ -79,12 +93,16 @@ const ManageProjectUsers = ({ projectID }) => {
               <tr key={result}>
                 <td>{result[2]}</td>
                 <td>{result[1]}</td>
-                <td>
-                  <Check className="add" onClick={() => addUser(result[1])} />
-                </td>
-                <td>
-                  <Trash className="remove" onClick={() => removeUser(result[1])} />
-                </td>
+
+                {filterProjectUsers(result) ? (
+                  <td className="right">
+                    <Trash className="remove" onClick={() => removeUser(result[1])} />
+                  </td>
+                ) : (
+                  <td className="right">
+                    <Check className="add" onClick={() => addUser(result[1])} />
+                  </td>
+                )}
               </tr>
             ))}
         </tbody>

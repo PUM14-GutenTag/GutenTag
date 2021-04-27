@@ -691,7 +691,7 @@ class FetchProjectUsers(Resource):
     """
 
     def __init__(self):
-        self.repparse = reqparse.RequestParser()
+        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
 
     @jwt_required()
@@ -705,11 +705,14 @@ class FetchProjectUsers(Resource):
             users = project.users
 
             users_email = []
-            for i, user in enumerate(users):
-                users_email[i] = user.email
+            for user in users:
+                users_email.append(user.email)
 
-            return jsonify({"msg": "Users recieved.",
-                            "users": users_email})
+            return make_response(jsonify({"msg": "Users recieved.",
+                                          "users": users_email}), 200)
+
+        return make_response(jsonify({"msg": "Request failed"}), 400
+                             )
 
 
 class FetchUserProjects(Resource):
@@ -720,7 +723,7 @@ class FetchUserProjects(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         user_projects = {}
@@ -759,7 +762,7 @@ class GetExportData(Resource):
                                    required=False,
                                    action="append")
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())

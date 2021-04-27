@@ -127,6 +127,7 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to delete a user.
   static sendDeleteUser(email) {
     return axiosInstance().delete('delete-user', {
       headers: authHeader(),
@@ -148,12 +149,15 @@ class HTTPLauncher {
     });
   }
 
-  static sensGetProjectUsers() {
+  // Send HTTP-request to get all users related to a project.
+  static sendGetProjectUsers(projectID) {
     return axiosInstance().get('get-project-users', {
       headers: authHeader(),
+      params: { project_id: projectID },
     });
   }
 
+  // Send HTTP-request to get all users projects.
   static sendGetUserProjects() {
     return axiosInstance().get('get-user-projects', {
       headers: authHeader(),
