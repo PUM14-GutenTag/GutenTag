@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import HTTPLauncher from './../services/HTTPLauncher'
+import HTTPLauncher from '../services/HTTPLauncher';
 
 // Pages
 import Home from '../pages/Home';
