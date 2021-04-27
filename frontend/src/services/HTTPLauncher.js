@@ -2,7 +2,6 @@ import authHeader from './auth-header';
 
 const axios = require('axios');
 
-// let apiURL = 'http://localhost:5000/';
 axios.defaults.baseURL = 'http://localhost:5000/';
 class HTTPLauncher {
   // Sets the base URL for all requests.
