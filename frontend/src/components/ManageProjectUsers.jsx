@@ -49,7 +49,6 @@ const ManageProjectUsers = ({ projectID }) => {
   };
 
   const addUser = async (u) => {
-    console.log(projectID + u);
     await HTTPLauncher.sendAuthorizeUser(projectID, u);
     fetchUserData();
   };

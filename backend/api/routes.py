@@ -635,6 +635,33 @@ class FetchUsers(Resource):
             return jsonify({"msg": msg})
 
 
+class FetchProjectUsers(Resource):
+    """
+    Fetch all users that is authorizeed to the project.
+    """
+
+    def __init__(self):
+        self.repparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        current_user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+        users = []
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            users = project.users
+
+            users_email = []
+            for i, user in enumerate(users):
+                users_email[i] = user.email
+
+            return jsonify({"msg": "Users recieved.",
+                            "users": users_email})
+
+
 class FetchUserProjects(Resource):
     """
     Fetch all projects that a user is authorized to
@@ -759,6 +786,7 @@ rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
 rest.add_resource(FetchUserName, '/get-user-name')
 rest.add_resource(FetchUsers, '/get-users')
+rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")

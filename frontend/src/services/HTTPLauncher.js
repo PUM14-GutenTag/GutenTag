@@ -159,6 +159,12 @@ class HTTPLauncher {
     });
   }
 
+  static sensGetProjectUsers() {
+    return axiosInstance().get('get-project-users', {
+      headers: authHeader(),
+    });
+  }
+
   static sendGetUserProjects() {
     return axiosInstance().get('get-user-projects', {
       headers: authHeader(),
