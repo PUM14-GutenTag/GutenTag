@@ -47,7 +47,7 @@ def allowed_extension(filename, allowed):
 
 class CreateUser(Resource):
     """
-    Endpoint for creating an user.
+    Endpoint for creating a user.
     """
 
     def __init__(self):
