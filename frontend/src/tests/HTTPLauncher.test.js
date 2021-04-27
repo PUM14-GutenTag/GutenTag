@@ -224,6 +224,23 @@ describe('sendGetUserName', () => {
   });
 });
 
+describe('sendGetProjectUsers', () => {
+  test('Correct request', async () => {
+    await resetDB();
+    await createUser();
+    const projectID = await createProject(1);
+
+    const email = 'normal@gmail.com';
+    const password = 'pass';
+    await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, false);
+    await HTTPLauncher.sendAuthorizeUser(projectID, email);
+
+    const response = await HTTPLauncher.sendGetProjectUsers(projectID);
+    expect(response.status).toBe(200);
+    expect(response.data.users[0]).toBe(email);
+  });
+});
+
 describe('sendGetUserProjects', () => {
   test('Correct request', async () => {
     await resetDB();
