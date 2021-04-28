@@ -188,7 +188,7 @@ class Project(db.Model):
         "User", secondary=access_control, back_populates="projects")
 
     LIST_SIDE_LENGTH = 5
-    LIST_LENGTH = 2*LIST_SIDE_LENGTH+1
+    LIST_LENGTH = 2 * LIST_SIDE_LENGTH + 1
 
     def __init__(self, project_name, project_type):
         check_types([(project_name, str), (project_type, int)])
@@ -200,7 +200,7 @@ class Project(db.Model):
     def get_data(self, user_id):
         """
         Returns a list with length LIST_LENGTH which is always an uneven
-        number. The middle value will be the first value in project_data 
+        number. The middle value will be the first value in project_data
         that is unlabeled by the user.
         """
         LIST_SIDE_LENGTH = self.LIST_SIDE_LENGTH
@@ -248,14 +248,14 @@ class Project(db.Model):
 
             if index < LIST_SIDE_LENGTH:
                 list_of_data = data_points[:index + LIST_SIDE_LENGTH + 1]
-                for i in range(LIST_SIDE_LENGTH-index):
+                for i in range(LIST_SIDE_LENGTH - index):
                     list_of_data.insert(0, {})
 
             # -1 to compensate for index, -(LIST_SIDE_LENGTH) because we want
             # LIST_SIDE_LENGTH values ahead
 
             elif ((len(data_points) - 1) - LIST_SIDE_LENGTH) < index:
-                list_of_data = data_points[index-LIST_SIDE_LENGTH:]
+                list_of_data = data_points[index - LIST_SIDE_LENGTH:]
                 for i in range(index - ((len(data_points) - 1) -
                                         LIST_SIDE_LENGTH)):
                     list_of_data.append({})
