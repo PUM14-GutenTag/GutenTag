@@ -218,7 +218,6 @@ class Project(db.Model):
             found_labeled = False
             for label in data.labels:
                 if(user_id == label.user_id):
-                    print(label)
                     found_labeled = True
                     index += 1
                     break
