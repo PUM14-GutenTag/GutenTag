@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, Row, Col } from 'react-bootstrap';
 
 import CreateProject from '../components/CreateProject';
@@ -6,8 +6,6 @@ import ChangePass from '../components/ChangePass';
 import ManageUsers from '../components/ManageUsers';
 import AchievementCarousel from '../components/AchievementCarousel';
 import Layout from '../components/Layout';
-
-import HTTPLauncher from '../services/HTTPLauncher';
 
 import { useUser } from '../contexts/UserContext';
 
@@ -22,20 +20,7 @@ import '../css/settings.css';
  */
 const Settings = () => {
   const [showPage, setPageShow] = useState(SettingPages.DEFAULT);
-  const [name, setName] = useState('');
   const { state: userState } = useUser();
-
-  // Fetches the logged in users name from backend.
-  const fetchName = async () => {
-    const response = await HTTPLauncher.sendGetUserName();
-    return response.data.name;
-  };
-
-  useEffect(() => {
-    if (showPage === SettingPages.DEFAULT) {
-      fetchName().then((n) => setName(n));
-    }
-  }, [showPage]);
 
   // Sets the accesstoken to null and redirects to login page.
   const logout = () => {
@@ -57,7 +42,7 @@ const Settings = () => {
           alignItems: 'center',
         }}
       >
-        <h1>Name: {name}</h1>
+        <h1>Name: {userState.name}</h1>
         <br />
         <h1>Personal records</h1>
         <div style={{ height: '100%', width: '90%' }}>

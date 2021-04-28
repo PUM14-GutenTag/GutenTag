@@ -9,6 +9,13 @@ const reducer = (state, action) => {
         ...state,
         isAdmin: action.value,
       };
+    case 'SET_USER_INFO':
+      return {
+        ...state,
+        name: action.value.name,
+        email: action.value.email,
+        isAdmin: action.value.isAdmin,
+      };
     default:
       return state;
   }
@@ -24,12 +31,14 @@ const UserContext = createContext();
 const useUser = () => {
   const context = useContext(UserContext);
   if (context == null) throw new Error('useUser must be used within a UserProvider');
+  console.log({ useUser: context.state });
   return context;
 };
 
 // Context provider. Needs to be wrapped around components that want to reach the user context.
 const UserProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  console.log({ userProvider: state });
   return <UserContext.Provider value={{ state, dispatch }}>{children}</UserContext.Provider>;
 };
 

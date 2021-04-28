@@ -91,25 +91,23 @@ class Login(Resource):
         user = User.get_by_email(args.email)
         if user is None:
             msg = "Incorrect login credentials"
-            access_token, refresh_token, access_level = None, None, None
+            access_token, refresh_token = None, None
             status = 404
         else:
             response = user.login(args.password)
             if response is None:
                 msg = "Incorrect login credentials"
-                access_token, refresh_token, access_level = None, None, None
+                access_token, refresh_token = None, None
                 status = 401
             else:
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
-                access_level = user.access_level
                 status = 200
 
         return make_response(jsonify({
             "message": msg,
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "access_level": access_level
         }), status)
 
 
@@ -637,9 +635,9 @@ class DeleteLabel(Resource):
         return make_response(jsonify({"message": msg}), status)
 
 
-class FetchUserName(Resource):
+class FetchUserInfo(Resource):
     """
-    Fetch the logged in users information.
+    Fetch the logged in user's information.
     """
 
     def __init__(self):
@@ -647,13 +645,14 @@ class FetchUserName(Resource):
 
     @jwt_required()
     def get(self):
-        current_user = User.get_by_email(get_jwt_identity())
-        msg = "Succesfully got user information."
-        name = current_user.first_name + " " + current_user.last_name
+        email = get_jwt_identity()
+        current_user = User.get_by_email(email)
+        name = f"{current_user.first_name} {current_user.last_name}"
 
         return jsonify({
             "name": name,
-            "message": msg
+            "email": email,
+            "access_level": current_user.access_level,
         })
 
 
@@ -824,7 +823,7 @@ rest.add_resource(CreateSequenceLabel, "/label-sequence")
 rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
 rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
-rest.add_resource(FetchUserName, '/get-user-name')
+rest.add_resource(FetchUserInfo, '/get-user-info')
 rest.add_resource(FetchUsers, '/get-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")

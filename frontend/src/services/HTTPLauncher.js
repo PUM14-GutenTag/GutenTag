@@ -129,9 +129,9 @@ class HTTPLauncher {
     });
   }
 
-  // Send HTTP-request to get a users name.
-  static sendGetUserName() {
-    return axios.get('get-user-name', {
+  // Send HTTP-request to get the logged in user's info.
+  static sendGetUserInfo() {
+    return axios.get('get-user-info', {
       headers: authHeader(),
     });
   }
