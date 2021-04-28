@@ -2,33 +2,16 @@ import authHeader from './auth-header';
 
 const axios = require('axios');
 
-let apiURL = 'http://localhost:5000/';
-
-const axiosInstance = () =>
-  axios.create({
-    baseURL: apiURL,
-  });
-
+axios.defaults.baseURL = 'http://localhost:5000/';
 class HTTPLauncher {
   // Sets the base URL for all requests.
   static setBaseURL(URL) {
-    apiURL = URL;
-  }
-
-  // Send HTTP-request to register a user.
-  static sendRegister(firstName, lastName, password, email, admin) {
-    return axiosInstance().post('register', {
-      first_name: firstName,
-      last_name: lastName,
-      password,
-      email,
-      admin,
-    });
+    axios.defaults.baseURL = URL;
   }
 
   // Send HTTP-request to create a user
   static sendCreateUser(firstName, lastName, password, email, admin) {
-    return axiosInstance().post(
+    return axios.post(
       'create-user',
       {
         first_name: firstName,
@@ -45,7 +28,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to login a user.
   static sendLogin(email, password) {
-    return axiosInstance().post('login', {
+    return axios.post('login', {
       email,
       password,
     });
@@ -53,7 +36,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to change password
   static sendChangePassword(oldPassword, newPassword) {
-    return axiosInstance().post(
+    return axios.post(
       'change-password',
       {
         old_password: oldPassword,
@@ -66,7 +49,7 @@ class HTTPLauncher {
   }
 
   static sendChangePasswordOther(email, newPassword) {
-    return axiosInstance().post(
+    return axios.post(
       'change-password',
       {
         old_password: 'old password',
@@ -81,7 +64,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to refresh an access token.
   static sendRefreshToken() {
-    return axiosInstance().post(
+    return axios.post(
       'refresh-token',
       {},
       {
@@ -92,7 +75,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to authorize a user to a project.
   static sendAuthorizeUser(projectID, email) {
-    return axiosInstance().post(
+    return axios.post(
       'authorize-user',
       {
         project_id: projectID,
@@ -106,7 +89,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to deauthorize a user from a project.
   static sendDeauthorizeUser(projectID, email) {
-    return axiosInstance().post(
+    return axios.post(
       'deauthorize-user',
       {
         project_id: projectID,
@@ -120,7 +103,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to create a new project.
   static sendCreateProject(projectName, projectType) {
-    return axiosInstance().post(
+    return axios.post(
       'create-project',
       {
         project_name: projectName,
@@ -132,7 +115,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to delete an existing project.
   static sendDeleteProject(projectID) {
-    return axiosInstance().delete('delete-project', {
+    return axios.delete('delete-project', {
       headers: authHeader(),
       data: { project_id: projectID },
     });
@@ -140,28 +123,28 @@ class HTTPLauncher {
 
   // Send HTTP-request to delete a user.
   static sendDeleteUser(email) {
-    return axiosInstance().delete('delete-user', {
+    return axios.delete('delete-user', {
       headers: authHeader(),
-      data: { email },
+      params: { email },
     });
   }
 
   // Send HTTP-request to get a users name.
   static sendGetUserName() {
-    return axiosInstance().get('get-user-name', {
+    return axios.get('get-user-name', {
       headers: authHeader(),
     });
   }
 
   // Send HTTP-request to get all users info.
   static sendGetUsers() {
-    return axiosInstance().get('get-users', {
+    return axios.get('get-users', {
       headers: authHeader(),
     });
   }
 
   static sendGetUserProjects() {
-    return axiosInstance().get('get-user-projects', {
+    return axios.get('get-user-projects', {
       headers: authHeader(),
     });
   }
@@ -210,7 +193,7 @@ class HTTPLauncher {
     const formData = new FormData();
     formData.append('project_id', projectID);
     formData.append('json_file', JSONFile);
-    return axiosInstance().post('add-text-data', formData, {
+    return axios.post('add-text-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
     });
   }
@@ -235,21 +218,21 @@ class HTTPLauncher {
     formData.append('project_id', projectID);
     formData.append('json_file', JSONFile);
     [...imageFiles].forEach((img) => formData.append('images', img));
-    return axiosInstance().post('add-image-data', formData, {
+    return axios.post('add-image-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
     });
   }
 
   // Send HTTP-request to fetch datapoints to be labelled.
   static sendGetData(projectID, type, index = 0) {
-    return axiosInstance().get('get-data', {
+    return axios.get('get-data', {
       headers: authHeader(),
       params: { project_id: projectID, type, index },
     });
   }
 
   static sendGetAmountOfData(projectID) {
-    return axiosInstance().get('get-data-amount', {
+    return axios.get('get-data-amount', {
       headers: authHeader(),
       params: { project_id: projectID },
     });
@@ -257,7 +240,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to fetch datapoints to be labelled.
   static sendGetLabel(projectID, dataID) {
-    return axiosInstance().get('get-label', {
+    return axios.get('get-label', {
       headers: authHeader(),
       params: { project_id: projectID, data_id: dataID },
     });
@@ -265,7 +248,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to label a datapoint.
   static sendCreateDocumentClassificationLabel(dataID, label) {
-    return axiosInstance().post(
+    return axios.post(
       'label-document',
       {
         data_id: dataID,
@@ -279,7 +262,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to label a datapoint.
   static sendCreateSequenceLabel(dataID, label, begin, end) {
-    return axiosInstance().post(
+    return axios.post(
       'label-sequence',
       {
         data_id: dataID,
@@ -295,7 +278,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to label a datapoint.
   static sendCreateSequenceToSequenceLabel(dataID, label) {
-    return axiosInstance().post(
+    return axios.post(
       'label-sequence-to-sequence',
       {
         data_id: dataID,
@@ -309,7 +292,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to label a datapoint.
   static sendCreateImageClassificationLabel(dataID, label, x1, y1, x2, y2) {
-    return axiosInstance().post(
+    return axios.post(
       'label-image',
       {
         data_id: dataID,
@@ -327,7 +310,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to remove a label.
   static sendRemoveLabel(labelID) {
-    return axiosInstance().delete('remove-label', {
+    return axios.delete('remove-label', {
       headers: authHeader(),
       data: { label_id: labelID },
     });
@@ -413,7 +396,7 @@ class HTTPLauncher {
     //   params.append('filter', element);
     // });
 
-    return axiosInstance().get('get-export-data', {
+    return axios.get('get-export-data', {
       headers: authHeader(),
       responseType: 'arraybuffer',
       params: {
@@ -424,7 +407,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to get image file from a data point.
   static sendGetImageData(dataID) {
-    return axiosInstance().get('get-image-data', {
+    return axios.get('get-image-data', {
       headers: authHeader(),
       params: { data_id: dataID },
     });
@@ -432,7 +415,7 @@ class HTTPLauncher {
 
   // Send HTTP-request to reset database (TODO: remove for production).
   static sendResetDatabase() {
-    return axiosInstance().get('reset');
+    return axios.get('reset');
   }
 }
 export default HTTPLauncher;

@@ -28,9 +28,14 @@ function Login() {
 
     setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
-    const { access_token: token, access_level: accessLevel } = responseLogin.data;
+    const {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      access_level: accessLevel,
+    } = responseLogin.data;
     userDispatch({ type: 'SET_IS_ADMIN', value: accessLevel >= 5 });
-    localStorage.setItem('gutentag-accesstoken', token);
+    localStorage.setItem('gutentag-accesstoken', accessToken);
+    localStorage.setItem('gutentag-refreshtoken', refreshToken);
 
     history.push('/home');
   };

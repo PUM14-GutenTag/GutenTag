@@ -12,7 +12,7 @@ function Header() {
   return (
     <Navbar className="sticky-top" expand="md">
       <Container id="navbar-content" className="navbar-container">
-        <Navbar.Brand className="logo" href="https://github.com/th3tard1sparadox/GutenTag">
+        <Navbar.Brand className="logo" as={Link} to="/home">
           <img src={logo} alt="logo" className="logo" />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
