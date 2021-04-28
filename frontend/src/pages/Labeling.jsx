@@ -1,5 +1,3 @@
-/* eslint-disable radix */
-/* eslint-disable no-plusplus */
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
 import ProgressBar from 'react-bootstrap/ProgressBar';
@@ -19,18 +17,20 @@ Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
   const { projectType, id } = location.state;
-  const [index, setIndex] = useState();
-  const [finished, setFinished] = useState(false);
+
   const [labels, setLabels] = useState([]);
+  const [index, setIndex] = useState(0);
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
   const [progress, setProgress] = useState(0);
+  const [dataAmount, setDataAmount] = useState(0);
 
+  const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
   const type = projectType;
   const projectId = id;
   // fetch all labels for a given datapoint
-  const getSetLabels = async (dataPoints = listOfDataPoints, counter = dataCounter) => {
-    if (dataPoints[counter]) {
-      const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[counter][0]);
+  const getSetLabels = async (dataPoints = listOfDataPoints) => {
+    if (dataPoints[5]) {
+      const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[5].id);
       if (response.data) {
         setLabels(Object.values(response.data));
       } else {
@@ -41,7 +41,7 @@ const Labeling = ({ location }) => {
 
   // Choose size of the text to use depending on the length of the text
   const textBoxSize = () => {
-    const data = listOfDataPoints[dataCounter][1];
+    const data = listOfDataPoints[5].data;
     if (data.length < 18) {
       return 'small-text';
     }
@@ -51,144 +51,92 @@ const Labeling = ({ location }) => {
     return 'large-text';
   };
 
-  // function which can be called through callbacks to remove label
+  // Function which can be called through callbacks to remove label
   const deleteLabel = async (labelId) => {
     await HTTPLauncher.sendRemoveLabel(labelId);
     getSetLabels();
   };
 
-  // Gets 5 new datapoints from database, runs when entering a project
+  // Get 5 new datapoints from database, runs when entering a project
   const fetchData = async () => {
-    const response = await HTTPLauncher.sendGetData(projectId);
-    console.log(response);
-
-    // check if project has data left to label otherwise get data for label
-    if (Object.keys(response.data).length === 0) {
-      setFinished(true);
-      return;
-    }
-    // create array of arrays from object with key and value pair
+    const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
     setListOfDataPoints(response.data.list);
-    console.log(response.data.list);
-    console.log(response.data.index);
     setIndex(response.data.index);
-    // getSetLabels(dataArray, 0);
+    getSetLabels(response.data.list);
   };
 
-  const getAmountOfData = async () => {
-    const response = await HTTPLauncher.sendGetAmountOfData(projectId);
-    console.log('data: ', response);
-    const dataAmount = response.data.dataAmount;
-    const labeledByUser = response.data.labeledByUser;
-    if (dataAmount === 0) {
-      setProgress(0);
-    } else {
-      setProgress((labeledByUser / dataAmount) * 100);
-    }
-  };
   useEffect(() => {
+    // Gets amount of data in project and individual progress in percent
+    const getAmountOfData = async () => {
+      const response = await HTTPLauncher.sendGetAmountOfData(projectId);
+      setDataAmount(response.data.dataAmount);
+      const labeledByUser = response.data.labeledByUser;
+      if (response.data.dataAmount === 0) {
+        setProgress(0);
+      } else {
+        setProgress((labeledByUser / response.data.dataAmount) * 100);
+      }
+    };
+
     getAmountOfData();
-  }, [deleteLabel]);
+  }, [labels, projectId]);
 
   useEffect(() => {
     fetchData();
+    if (listOfDataPoints.length > 0) {
+      getSetLabels(listOfDataPoints);
+    }
 
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    if (listOfDataPoints.length > 0) {
-      getSetLabels(listOfDataPoints, dataCounter);
+  // Get earlier datapoint, and delete data point out of scope from list
+  const getLastData = async () => {
+    const tempLocalIndex = 4;
+    const tempListOfDataPoints = listOfDataPoints.slice();
+    if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
+      const tempIndex = index - 1;
+      setIndex(tempIndex);
+      tempListOfDataPoints.pop();
+      const response = await HTTPLauncher.sendGetData(
+        projectId,
+        getDataTypeEnum.earlier_value,
+        tempIndex
+      );
+      tempListOfDataPoints.unshift(response.data);
+      setListOfDataPoints(tempListOfDataPoints);
+      getSetLabels(tempListOfDataPoints);
     }
-    // eslint-disable-next-line
-  }, [dataCounter]);
-
-  const dataCounterLogic = async (incrementDataPoint, newListOfDataPoints = listOfDataPoints) => {
-    /* 
-    Remove other duplicate data points from data points list if data point has been labled
-    */
-    const currentDataPoint = newListOfDataPoints[dataCounter];
-    let dataPointExists = false;
-    const removeIndexList = [];
-    let counterAdjust = 0;
-    let newDataCounter = 0;
-    let slicedListOfDataPoints = [];
-    // iterate list of data points with higher index than current data point
-    // and check if there exist data points with the same data
-    for (let i = 0; i < newListOfDataPoints.length; i++) {
-      // skip current data point
-      if (
-        JSON.stringify(currentDataPoint) === JSON.stringify(newListOfDataPoints[i]) &&
-        i !== dataCounter
-      ) {
-        dataPointExists = true;
-        removeIndexList.push(i); // list of all index in the future which has to be removed
-
-        // if index less then current data point then add tp counter adjustment
-        if (i < dataCounter) {
-          counterAdjust += 1;
-        }
-      }
-    }
-    if (dataPointExists) {
-      const response = await HTTPLauncher.sendGetLabel(projectId, currentDataPoint[0]);
-      // check if current data point has been labeled
-      if (response.data != null) {
-        newDataCounter = dataCounter - counterAdjust + incrementDataPoint;
-        setDataCounter(newDataCounter);
-
-        // create copy of list of data points
-        const tempListOfDataPoints = newListOfDataPoints.slice();
-        removeIndexList.reverse();
-        for (let i = 0; i < removeIndexList.length; i++) {
-          tempListOfDataPoints.splice(removeIndexList[i], 1);
-        }
-        slicedListOfDataPoints = tempListOfDataPoints;
-        setListOfDataPoints(tempListOfDataPoints);
-      } else {
-        newDataCounter = dataCounter + incrementDataPoint;
-        setDataCounter(newDataCounter);
-      }
-    } else {
-      setDataCounter(dataCounter + incrementDataPoint);
-      newDataCounter = dataCounter + incrementDataPoint;
-    }
-    getSetLabels(slicedListOfDataPoints, newDataCounter);
   };
 
-  // Go to next datapoint, and get a new one
+  // Get next datapoint, and delete data point out of scope from list
   const nextData = async () => {
-    const tempDataCounter = dataCounter + 1;
-    let newListOfDataPoints = listOfDataPoints;
-    // If there are less than 5 datapoints ahead in the list
-    if (Object.keys(listOfDataPoints).length - 5 < tempDataCounter) {
-      // adjust so there is always 5 datapoints ahead in the queue
-      const diff = Object.keys(listOfDataPoints).length - tempDataCounter;
-      const addToQueue = 5 - diff;
-      const response = await HTTPLauncher.sendGetData(projectId, addToQueue);
+    const tempLocalIndex = 6;
+    const tempListOfDataPoints = listOfDataPoints.slice();
+    if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
+      const tempIndex = index + 1;
+      setIndex(tempIndex);
+      tempListOfDataPoints.shift();
+      const response = await HTTPLauncher.sendGetData(
+        projectId,
+        getDataTypeEnum.next_value,
+        tempIndex
+      );
 
-      // check if labeling is done
-      if (Object.keys(response.data).length === 0) {
-        setFinished(true);
-      } else {
-        // add new data to list of data points
-        const newDataPoint = Object.entries(response.data);
-        const tempListOfDataPoints = listOfDataPoints.slice();
-        newListOfDataPoints = tempListOfDataPoints.concat(newDataPoint);
-        setListOfDataPoints(newListOfDataPoints);
-      }
+      tempListOfDataPoints.push(response.data);
+      setListOfDataPoints(tempListOfDataPoints);
+      getSetLabels(tempListOfDataPoints);
     }
-    dataCounterLogic(1, newListOfDataPoints);
   };
 
   // select what project type showed be displayed bases on project type
   const selectProjectComponent = (typeOfProject) => {
-    if (listOfDataPoints[dataCounter]) {
+    if (listOfDataPoints[5]) {
       if (typeOfProject === 1) {
         return (
           <DocumentClassification
-            data={listOfDataPoints[dataCounter][1]}
-            dataPointId={parseInt(listOfDataPoints[dataCounter][0], 10)}
+            data={listOfDataPoints[5].data}
+            dataPointId={parseInt(listOfDataPoints[5].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
           />
@@ -197,8 +145,8 @@ const Labeling = ({ location }) => {
       if (typeOfProject === 3) {
         return (
           <SequenceToSequence
-            data={listOfDataPoints[dataCounter][1]}
-            dataPointId={parseInt(listOfDataPoints[dataCounter][0], 10)}
+            data={listOfDataPoints[5].data}
+            dataPointId={parseInt(listOfDataPoints[5].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
           />
@@ -209,21 +157,9 @@ const Labeling = ({ location }) => {
     return <div>This should not show</div>;
   };
 
-  // Go to the data before in listOfDataPoints (last shown data)
-  const getLastData = () => {
-    if (dataCounter - 1 >= 0) {
-      dataCounterLogic(-1, listOfDataPoints);
-    }
-  };
-
-  // temporary help function
-  const seelistOfDataPoints = () => {
-    console.log(listOfDataPoints);
-  };
-
-  // decide for which project types label suggestions should appear
   const suggestionLabels = (typeOfProject) => {
-    /* Seq to Seq should not display suggestions */
+    /* Choose for which project types label suggestions should appear */
+    // Seq to Seq should not display suggestions
     if (typeOfProject !== 3) {
       return (
         <>
@@ -233,65 +169,66 @@ const Labeling = ({ location }) => {
     }
     return <></>;
   };
+  const finishedLabel = () => {
+    if (progress === 100) {
+      return <FinishedPopUp />;
+    }
+    return <ProgressBar striped variant="success" now={progress} />;
+  };
 
   return (
     <Layout>
       <div className="content-container">
         <div className="progress-bars">
-          <ProgressBar striped variant="success" now={progress} />
+          {finishedLabel()}
           <br />
           <ProgressBar striped variant="warning" now={25} />
         </div>
         <br />
-        {!finished ? (
-          <div>
-            <div className="main-content">
-              <ChevronLeft
-                className="right-left-arrow  make-large fa-10x arrow-btn"
-                onClick={getLastData}
-              />
+        <div>
+          <div className="main-content">
+            <ChevronLeft
+              className="right-left-arrow  make-large fa-10x arrow-btn"
+              onClick={getLastData}
+            />
 
-              <div className="data-content">
-                {suggestionLabels(type)}
-
-                {/* Project type component */}
-                {selectProjectComponent(type)}
-
-                <hr className="hr-title" data-content="Your Labels" />
-                <div className="your-labels-container">
-                  {labels.map((oneLabel) => (
-                    <div key={oneLabel.label_id}>
-                      <Label
-                        labelId={oneLabel.label_id}
-                        label={oneLabel.label}
-                        deleteLabel={deleteLabel}
-                      />
-                    </div>
-                  ))}
-                </div>
+            <div className="data-content">
+              {suggestionLabels(type)}
+              <div>
+                {index + 1}/{dataAmount}
               </div>
 
-              <ChevronRight
-                className="right-left-arrow  make-large fa-10x arrow-btn"
-                onClick={nextData}
-              />
+              {selectProjectComponent(type)}
+
+              <hr className="hr-title" data-content="Your Labels" />
+              <div className="your-labels-container">
+                {labels.map((oneLabel) => (
+                  <div key={oneLabel.label_id}>
+                    <Label
+                      labelId={oneLabel.label_id}
+                      label={oneLabel.label}
+                      deleteLabel={deleteLabel}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-            <Button
-              className="btn btn-primary"
-              as={Link}
-              to={{
-                pathname: '/home',
-              }}
-            >
-              Go back
-            </Button>
-            <button type="button" className="btn btn-primary" onClick={seelistOfDataPoints}>
-              CurrentDataPoints
-            </button>
+
+            <ChevronRight
+              className="right-left-arrow  make-large fa-10x arrow-btn"
+              onClick={nextData}
+            />
           </div>
-        ) : (
-          <FinishedPopUp />
-        )}
+          <Button
+            className="btn btn-primary"
+            as={Link}
+            to={{
+              pathname: '/home',
+            }}
+          >
+            Go back
+          </Button>
+        </div>
       </div>
     </Layout>
   );

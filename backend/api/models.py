@@ -3,7 +3,6 @@ This file contains all database models and associated methods.
 """
 import datetime
 import io
-import random
 from enum import IntEnum
 from api import db
 from api.database_handler import check_types
@@ -188,6 +187,9 @@ class Project(db.Model):
     users = db.relationship(
         "User", secondary=access_control, back_populates="projects")
 
+    LIST_SIDE_LENGTH = 5
+    LIST_LENGTH = 2*LIST_SIDE_LENGTH+1
+
     def __init__(self, project_name, project_type):
         check_types([(project_name, str), (project_type, int)])
         if not ProjectType.has_value(project_type):
@@ -195,73 +197,38 @@ class Project(db.Model):
         self.name = project_name
         self.project_type = project_type
 
-    # def get_data(self, user_id, amount=5):
-    #     """
-    #     Function for retrieving datapoints that
-    #     are previously unlabeled by the user
-    #     """
-
-    #     check_types([(amount, int), (user_id, int)])
-
-    #     user_labels = Label.query.filter_by(user_id=user_id).all()
-    #     data_points = self.data
-    #     index = 0
-    #     found_labeled = True
-    #     # find earliest none labeled data point
-    #     for data in data_points:
-    #         if not found_labeled:
-    #             break
-    #         found_labeled = False
-    #         for label in data.labels:
-    #             if(user_id == label.user_id):
-    #                 found_labeled = True
-    #                 index += 1
-    #                 break
-
-    #     #    l l l l l l l l l l  l  l  l  l  l  l  l
-    #     #    1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
-
-    #     #
-    #     labeled_ids = set()
-    #     unlabeled_data = {}
-    #     new_list = data_points[index-5:index+5]
-
-    #     for label in user_labels:
-    #         labeled_ids.add(label.data_id)
-
-    #     # for data in self.data:
-    #     #     if data.id not in labeled_ids:
-    #     #         if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
-    #     #             data_item = data.file_name
-    #     #         else:
-    #     #             data_item = data.text_data
-    #     #         unlabeled_data[data.id] = data_item
-
-    #     # print("labeled ids: ", labeled_ids)
-
-    #         #            l l l l l L  l  l  l  l  l
-    #         #    1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
-
-    #         #     Ny http request?
-
-    #         #            l l l l l  L  l  l  l l  l  l  l  l
-    #         #    1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
-    #     # list to retur
-
-    #     # self.data[len(user_labels)+1]
-
-    #     if len(unlabeled_data) > amount:
-    #         random_numbers = random.sample(range(len(unlabeled_data)),
-    # amount)
-    #         keys = list(unlabeled_data.keys())
-    #         random_data = {}
-    #         for n in random_numbers:
-    #             random_data[keys[n]] = unlabeled_data[keys[n]]
-
-    #         return random_data
-
-    #     return unlabeled_data
     def get_data(self, user_id):
+        """
+        Returns a list with length LIST_LENGTH which is always an uneven
+        number. The middle value will be the first value in project_data 
+        that is unlabeled by the user.
+        """
+        LIST_SIDE_LENGTH = self.LIST_SIDE_LENGTH
+        LIST_LENGTH = self.LIST_LENGTH
+
+        index = 0
+        all_labeled = False
+        found_labeled = True
+        project_data = self.data
+
+        # find earliest none labeled data point
+        for data in project_data:
+            if not found_labeled:
+                break
+            found_labeled = False
+            for label in data.labels:
+                if(user_id == label.user_id):
+                    print(label)
+                    found_labeled = True
+                    index += 1
+                    break
+
+        # Check if all data points are labeled by user
+        if index == len(project_data):
+            all_labeled = True
+            index -= 1
+
+        # Make a list of objects where each object consists of id and data.
         data_points = []
         for data in self.data:
             data_point = {}
@@ -272,60 +239,74 @@ class Project(db.Model):
             data_point["id"] = data.id
             data_point["data"] = data_item
             data_points.append(data_point)
-        # list_of_data = []
-        index = 0
-        found_labeled = True
-        project_data = self.data
-        # find earliest none labeled data point
-        for data in project_data:
-            if not found_labeled:
-                break
-            found_labeled = False
-            for label in data.labels:
-                if(user_id == label.user_id):
-                    found_labeled = True
-                    index += 1
-                    break
-        if len(data_points) > 11:
-            if index < 5:
-                list_of_data = data_points[:index+6]
-            elif ((len(data_points) - 1) - 5) < index:
-                list_of_data = data_points[index-5:]
-            else:
-                list_of_data = data_points[index-5:index+6]
-        else:
-            list_of_data = data_points
 
-        print("list_of_data: ", list_of_data)
-        print("index: ", index)
-        return {"list": list_of_data, "index": index}
+        """
+        Fill out the list to always return a list of length LIST_LENGTH.
+        Checks if index is close to a border and fills out the list
+        with {} if that is the case
+        """
+        if len(data_points) > LIST_LENGTH:
+
+            if index < LIST_SIDE_LENGTH:
+                list_of_data = data_points[:index + LIST_SIDE_LENGTH + 1]
+                for i in range(LIST_SIDE_LENGTH-index):
+                    list_of_data.insert(0, {})
+
+            # -1 to compensate for index, -(LIST_SIDE_LENGTH) because we want
+            # LIST_SIDE_LENGTH values ahead
+
+            elif ((len(data_points) - 1) - LIST_SIDE_LENGTH) < index:
+                list_of_data = data_points[index-LIST_SIDE_LENGTH:]
+                for i in range(index - ((len(data_points) - 1) -
+                                        LIST_SIDE_LENGTH)):
+                    list_of_data.append({})
+            else:
+                list_of_data = \
+                    data_points[index - self.LIST_SIDE_LENGTH:index +
+                                self.LIST_SIDE_LENGTH+1]
+        else:
+            list_of_data = data_points[:]
+            for i in range(LIST_SIDE_LENGTH-index):
+                list_of_data.insert(0, {})
+            for i in range(index - ((len(data_points) - 1)
+                                    - LIST_SIDE_LENGTH)):
+                list_of_data.append({})
+
+        return {"list": list_of_data, "index": index,
+                "allLabeled": all_labeled}
 
     def get_next_data(self, index):
+        """
+        Get data LIST_SIDE_LENGTH index ahead in the list or return
+        empty object
+        """
         check_types([(index, int)])
         data_points = self.data
         try:
-            data = data_points[index + 5]
-            data_id = data.id
-            data_item = data.text_data
+            data = data_points[index + self.LIST_SIDE_LENGTH]
             data_point = {}
-            data_point[data_id] = data_item
-            next_data = [data_point]
+            data_point["id"] = data.id
+            data_point["data"] = data.text_data
+            next_data = data_point
         except IndexError:
-            next_data = []
+            next_data = {}
         return next_data
 
     def get_earlier_data(self, index):
+        """
+        Get data LIST_SIDE_LENGTH index earlier in the list or return
+        empty object
+        """
         check_types([(index, int)])
         data_points = self.data
-        try:
-            data = data_points[index - 5]
-            data_id = data.id
-            data_item = data.text_data
+        if index - self.LIST_SIDE_LENGTH >= 0:
+            data = data_points[index - self.LIST_SIDE_LENGTH]
             data_point = {}
-            data_point[data_id] = data_item
-            earlier_data = [data_point]
-        except IndexError:
-            earlier_data = []
+            data_point["id"] = data.id
+            data_point["data"] = data.text_data
+            earlier_data = data_point
+        else:
+            earlier_data = {}
         return earlier_data
 
 

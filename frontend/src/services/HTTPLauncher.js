@@ -241,10 +241,10 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to fetch datapoints to be labelled.
-  static sendGetData(projectID, amount = 1) {
+  static sendGetData(projectID, type, index = 0) {
     return axiosInstance().get('get-data', {
       headers: authHeader(),
-      params: { project_id: projectID, amount },
+      params: { project_id: projectID, type, index },
     });
   }
 

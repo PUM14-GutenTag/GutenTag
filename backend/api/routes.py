@@ -6,6 +6,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
 )
+from enum import IntEnum
 from werkzeug.utils import secure_filename
 from api import rest
 from api.models import (
@@ -43,6 +44,15 @@ TEXT_EXTENSIONS = {"json"}
 def allowed_extension(filename, allowed):
     return "." in filename and \
            filename.rsplit(".", 1)[1].lower() in allowed
+
+
+class GetDataType(IntEnum):
+    """
+    Enum for the different types of getting data.
+    """
+    GET_LIST = 0
+    GET_NEXT_VALUE = 1
+    GET_EARLIER_VALUE = -1
 
 
 class Register(Resource):
@@ -411,6 +421,8 @@ class GetNewData(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
+        self.reqparse.add_argument("type", type=int, required=True)
+        self.reqparse.add_argument("index", type=int, required=True)
 
     @jwt_required()
     def get(self):
@@ -420,7 +432,15 @@ class GetNewData(Resource):
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
-                return jsonify(project.get_data(user.id))
+                if args.type == GetDataType.GET_EARLIER_VALUE:
+                    return jsonify(project.get_earlier_data(args.index))
+                elif args.type == GetDataType.GET_LIST:
+                    return jsonify(project.get_data(user.id))
+                elif args.type == GetDataType.GET_NEXT_VALUE:
+                    return jsonify(project.get_next_data(args.index))
+                else:
+                    msg = "Wrong type of input."
+
             except Exception as e:
                 msg = f"Could not get data: {e}"
         else:

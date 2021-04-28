@@ -54,7 +54,7 @@ SequenceToSequence.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
-  textBoxSize: PropTypes.func.isRequired,
+  textBoxSize: PropTypes.string.isRequired,
 };
 
 export default SequenceToSequence;
