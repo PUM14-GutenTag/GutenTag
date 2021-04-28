@@ -543,7 +543,7 @@ class GetLabel(Resource):
                     for label in labels:
                         res.update(self.format_image_classification(label))
 
-                return res
+            return res
         else:
             return jsonify({"message": "Not implemented"})
 

@@ -31,7 +31,7 @@ const Labeling = ({ location }) => {
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
     if (dataPoints[5]) {
       const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[5].id);
-      if (response.data) {
+      if (!(Object.keys(response.data).length === 0)) {
         setLabels(Object.values(response.data));
       } else {
         setLabels([]);
@@ -60,6 +60,7 @@ const Labeling = ({ location }) => {
   // Get 5 new datapoints from database, runs when entering a project
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
+
     setListOfDataPoints(response.data.list);
     setIndex(response.data.index);
     getSetLabels(response.data.list);

@@ -256,16 +256,16 @@ class Project(db.Model):
 
             elif ((len(data_points) - 1) - LIST_SIDE_LENGTH) < index:
                 list_of_data = data_points[index - LIST_SIDE_LENGTH:]
-                for i in range(index - ((len(data_points) - 1) -
-                                        LIST_SIDE_LENGTH)):
+                for i in range(index - ((len(data_points) - 1)
+                                        - LIST_SIDE_LENGTH)):
                     list_of_data.append({})
             else:
                 list_of_data = \
-                    data_points[index - self.LIST_SIDE_LENGTH:index +
-                                self.LIST_SIDE_LENGTH+1]
+                    data_points[index - self.LIST_SIDE_LENGTH:index
+                                + self.LIST_SIDE_LENGTH + 1]
         else:
             list_of_data = data_points[:]
-            for i in range(LIST_SIDE_LENGTH-index):
+            for i in range(LIST_SIDE_LENGTH - index):
                 list_of_data.insert(0, {})
             for i in range(index - ((len(data_points) - 1)
                                     - LIST_SIDE_LENGTH)):
