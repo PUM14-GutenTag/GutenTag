@@ -1,44 +1,46 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/prop-types */
 import React, { useEffect } from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useHistory } from 'react-router-dom';
 
 import { useUser } from '../contexts/UserContext';
 import HTTPLauncher from '../services/HTTPLauncher';
-
-// Checks for token in localstorage
-const isLoggedIn = () => {
-  const token = localStorage.getItem('gutentag-accesstoken');
-  return token !== 'null' && token !== null;
-};
+import userAuth from '../services/userAuth';
 
 // Get user info from backend and store it in global user context.
-const getUserInfo = async (dispatch) => {
-  const response = await HTTPLauncher.sendGetUserInfo();
-  console.log({ response });
-  dispatch({
-    type: 'SET_USER_INFO',
-    value: {
-      name: response.data.name,
-      email: response.data.email,
-      isAdmin: response.data.access_level >= 5,
-    },
+// Redirects user to login if not logged in.
+const getUserInfo = async (dispatch, history) => {
+  const response = await HTTPLauncher.sendGetUserInfo().catch((e) => {
+    if (e.response.status === 401) {
+      history.push('/login');
+    }
   });
+  if (Object.prototype.hasOwnProperty.call(response, 'data')) {
+    dispatch({
+      type: 'SET_USER_INFO',
+      value: {
+        name: response.data.name,
+        email: response.data.email,
+        isAdmin: response.data.access_level >= 5,
+      },
+    });
+  }
 };
 
 // Protected route wraps content in token validation
 const ProtectedRoute = ({ component: Component, ...rest }) => {
   const { dispatch: userDispatch } = useUser();
+  const history = useHistory();
 
   useEffect(() => {
-    getUserInfo(userDispatch);
-  }, [userDispatch]);
+    getUserInfo(userDispatch, history);
+  }, [userDispatch, history]);
 
   return (
     <Route
       {...rest}
       render={(props) => {
-        if (isLoggedIn()) {
+        if (userAuth.hasAccessToken()) {
           return <Component {...props} />;
         }
         return (

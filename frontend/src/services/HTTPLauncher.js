@@ -1,4 +1,4 @@
-import authHeader from './auth-header';
+import authHeader from './authHeader';
 
 const axios = require('axios');
 
