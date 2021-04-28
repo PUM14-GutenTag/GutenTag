@@ -709,8 +709,9 @@ class FetchUserProjects(Resource):
             projects = current_user.projects
 
         if not projects:
-            return make_response(jsonify({"message": "No projects found"}),
-                                 404)
+            return make_response(jsonify({
+                "message": "No projects found", "projects": []}),
+                404)
 
         for project in projects:
             user_projects[project.id] = {

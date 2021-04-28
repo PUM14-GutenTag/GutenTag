@@ -12,6 +12,7 @@ import { UserProvider } from '../contexts/UserContext';
 
 // Components
 import ProtectedRoute from './ProtectedRoute';
+import ImageLabeling from './ImageLabeling';
 
 // Styles
 import '../css/App.css';
@@ -31,6 +32,7 @@ const App = () => {
           <ProtectedRoute exact path="/home" component={Home} />
           <ProtectedRoute exact path="/settings" component={Settings} />
           <ProtectedRoute exact path="/edit-project" component={EditProject} />
+          <ProtectedRoute exact path="/test" component={ImageLabeling} />
           <Route exact path="/404" component={NotFound} />
           <Redirect to="/404" />
         </Switch>
