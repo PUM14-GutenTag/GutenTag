@@ -2,17 +2,12 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Button } from 'react-bootstrap';
 import HTTPLauncher from '../services/HTTPLauncher';
+import ProjectType from '../ProjectType';
 import '../css/createProject.css';
 
 const CreateProject = ({ toggleCallback }) => {
   const [projectName, setProjectName] = useState('');
   const [projectType, setProjectType] = useState(1);
-  const projectTypeEnum = Object.freeze({
-    DocumentClassification: 1,
-    SequenceLabeling: 2,
-    SequenceToSequenceLabeling: 3,
-    ImageClassification: 4,
-  });
 
   const submitHandler = async (event) => {
     event.preventDefault();
@@ -44,14 +39,12 @@ const CreateProject = ({ toggleCallback }) => {
                 name="type"
                 onChange={(event) => setProjectType(event.target.value)}
               >
-                <option value={projectTypeEnum.DocumentClassification}>
-                  Document classification
-                </option>
-                <option value={projectTypeEnum.SequenceLabeling}>Sequence labeling</option>
-                <option value={projectTypeEnum.SequenceToSequenceLabeling}>
+                <option value={ProjectType.DOCUMENT_CLASSIFICATION}>Document classification</option>
+                <option value={ProjectType.SEQUENCE_LABELING}>Sequence labeling</option>
+                <option value={ProjectType.SEQUENCE_TO_SEQUENCE}>
                   Sequence to sequence labeling
                 </option>
-                <option value={projectTypeEnum.ImageClassification}>Image classification</option>
+                <option value={ProjectType.IMAGE_CLASSIFICATION}>Image classification</option>
               </Form.Control>
             </Form.Group>
             <Button className="dark" variant="primary" type="submit">
