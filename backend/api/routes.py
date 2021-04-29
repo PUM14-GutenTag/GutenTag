@@ -804,7 +804,7 @@ class FetchProjectUsers(Resource):
             for user in users:
                 users_email.append(user.email)
 
-            msg = "Users recieved."
+            msg = "Users received."
             status = 200
 
         return make_response(jsonify({"msg": msg, "users": users_email}),
