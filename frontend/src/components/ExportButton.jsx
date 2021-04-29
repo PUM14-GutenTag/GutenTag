@@ -15,7 +15,11 @@ const ExportButton = ({ projectID, projectType, fileName }) => {
     saveAs(new Blob([response.data], { type: `application/${ext}` }), `${fileName}.${ext}`);
   };
 
-  return <Button onClick={handleExport}>Export all data</Button>;
+  return (
+    <Button className="dark" onClick={handleExport}>
+      Export all data
+    </Button>
+  );
 };
 
 ExportButton.propTypes = {

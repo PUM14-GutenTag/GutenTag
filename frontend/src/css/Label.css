@@ -1,0 +1,14 @@
+.label-list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+}
+
+.label-text {
+  font-size: 1rem;
+  margin: auto;
+  height: 100%;
+  margin-right: 5px;
+  margin-top: 6px;
+}
