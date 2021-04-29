@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table } from 'react-bootstrap';
+import Table from 'react-bootstrap/Table';
 import PropTypes from 'prop-types';
 import { Check, Trash } from 'react-bootstrap-icons';
 
