@@ -31,7 +31,19 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             <p>Type: {projectTypeNames[projectType - 1]}</p>
             <p>Progress: 1/4 </p>
             <p>Started: {created}</p>
-            <Button variant="outline-primary">Start</Button>
+            <Button
+              variant="outline-primary"
+              as={Link}
+              to={{
+                pathname: '/labeling',
+                state: {
+                  projectType,
+                  id,
+                },
+              }}
+            >
+              Start
+            </Button>
           </div>
         </div>
       ) : null}

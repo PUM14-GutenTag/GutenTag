@@ -352,13 +352,22 @@ describe('sendGetData request', () => {
       projectID,
       getTextFile('input_document_classification.json')
     );
-    const response = await HTTPLauncher.sendGetData(projectID, 5);
+    const response = await HTTPLauncher.sendGetData(projectID, 0);
     expect(response.status).toBe(200);
-    expect(Object.keys(response.data).length).toBe(3);
+    expect(response.data.list.length).toBe(11);
+    let counter = 0;
+    const textList = [];
+    response.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+        textList.push(obj.data);
+      }
+    });
+    expect(counter).toBe(3);
     const originalTexts = getJSONObject('input_document_classification.json').map(
       (obj) => obj.text
     );
-    Object.values(response.data).forEach((text) => expect(originalTexts).toContain(text));
+    textList.forEach((text) => expect(originalTexts).toContain(text));
   });
 
   test('Sequence labeling project', async () => {
@@ -368,11 +377,20 @@ describe('sendGetData request', () => {
     const projectID = await createProject(projectType, 'Sequence');
 
     await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
-    const response = await HTTPLauncher.sendGetData(projectID, 5);
+    const response = await HTTPLauncher.sendGetData(projectID, 0);
     expect(response.status).toBe(200);
-    expect(Object.keys(response.data).length).toBe(3);
+    expect(response.data.list.length).toBe(11);
+    let counter = 0;
+    const textList = [];
+    response.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+        textList.push(obj.data);
+      }
+    });
+    expect(counter).toBe(3);
     const originalTexts = getJSONObject('input_sequence.json').map((obj) => obj.text);
-    Object.values(response.data).forEach((text) => expect(originalTexts).toContain(text));
+    textList.forEach((text) => expect(originalTexts).toContain(text));
   });
 
   test('Sequence to sequence project', async () => {
@@ -385,11 +403,20 @@ describe('sendGetData request', () => {
       projectID,
       getTextFile('input_sequence_to_sequence.json')
     );
-    const response = await HTTPLauncher.sendGetData(projectID, 5);
+    const response = await HTTPLauncher.sendGetData(projectID, 0);
     expect(response.status).toBe(200);
-    expect(Object.keys(response.data).length).toBe(3);
+    expect(response.data.list.length).toBe(11);
+    let counter = 0;
+    const textList = [];
+    response.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+        textList.push(obj.data);
+      }
+    });
+    expect(counter).toBe(3);
     const originalTexts = getJSONObject('input_sequence_to_sequence.json').map((obj) => obj.text);
-    Object.values(response.data).forEach((text) => expect(originalTexts).toContain(text));
+    textList.forEach((text) => expect(originalTexts).toContain(text));
   });
 
   test('Image classification project', async () => {
@@ -404,14 +431,26 @@ describe('sendGetData request', () => {
       images
     );
 
-    const getDataResponse = await HTTPLauncher.sendGetData(projectID, 5);
+    const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
     expect(getDataResponse.status).toBe(200);
-    expect(Object.keys(getDataResponse.data).length).toBe(3);
+    expect(getDataResponse.data.list.length).toBe(11);
+    let counter = 0;
+    const dataPointList = [];
+    getDataResponse.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+        const data = [];
+        data.push(obj.id);
+        data.push(obj.data);
+        dataPointList.push(data);
+      }
+    });
+    expect(counter).toBe(3);
     const fileNames = getJSONObject('input_image_classification.json').map((obj) => obj.file_name);
-    Object.values(getDataResponse.data).forEach((name) => expect(fileNames).toContain(name));
+    dataPointList.forEach((name) => expect(fileNames).toContain(name[1]));
 
     // eslint-disable-next-line no-restricted-syntax
-    for await (const [id, name] of Object.entries(getDataResponse.data)) {
+    for await (const [id, name] of dataPointList) {
       const imageResponse = await HTTPLauncher.sendGetImageData(id);
 
       const filepath = path.resolve(outDir, name);
@@ -431,14 +470,21 @@ describe('sendCreateDocumentClassificationLabel request', () => {
       projectID,
       getTextFile('input_document_classification.json')
     );
-    const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse1.data).length).toBe(3);
-
+    const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
+    expect(getDataResponse.status).toBe(200);
+    expect(getDataResponse.data.list.length).toBe(11);
+    let counter = 0;
+    getDataResponse.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+      }
+    });
+    expect(counter).toBe(3);
     const labelResponse = await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label');
     expect(labelResponse.status).toBe(200);
 
-    const getDataResponse2 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse2.data).length).toBe(2);
+    const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
+    expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });
 });
 
@@ -450,14 +496,22 @@ describe('sendCreateSequenceLabel request', () => {
     const projectID = await createProject(projectType, 'Sequence');
 
     await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
-    const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse1.data).length).toBe(3);
+    const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
+    expect(getDataResponse.status).toBe(200);
+    expect(getDataResponse.data.list.length).toBe(11);
+    let counter = 0;
+    getDataResponse.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+      }
+    });
+    expect(counter).toBe(3);
 
     const labelResponse = await HTTPLauncher.sendCreateSequenceLabel(1, 'new label', 0, 3);
     expect(labelResponse.status).toBe(200);
 
-    const getDataResponse2 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse2.data).length).toBe(2);
+    const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
+    expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });
 });
 
@@ -472,14 +526,21 @@ describe('sendCreateSequenceToSequenceLabel request', () => {
       projectID,
       getTextFile('input_sequence_to_sequence.json')
     );
-    const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse1.data).length).toBe(3);
+    const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
+    expect(getDataResponse.status).toBe(200);
+    expect(getDataResponse.data.list.length).toBe(11);
+    let counter = 0;
+    getDataResponse.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+      }
+    });
+    expect(counter).toBe(3);
 
     const labelResponse = await HTTPLauncher.sendCreateSequenceToSequenceLabel(1, 'new label');
     expect(labelResponse.status).toBe(200);
-
-    const getDataResponse2 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse2.data).length).toBe(2);
+    const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
+    expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });
 });
 
@@ -495,8 +556,16 @@ describe('sendCreateImageClassificationLabel request', () => {
       getTextFile('input_image_classification.json'),
       images
     );
-    const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse1.data).length).toBe(3);
+    const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
+    expect(getDataResponse.status).toBe(200);
+    expect(getDataResponse.data.list.length).toBe(11);
+    let counter = 0;
+    getDataResponse.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+      }
+    });
+    expect(counter).toBe(3);
 
     const labelResponse = await HTTPLauncher.sendCreateImageClassificationLabel(
       1,
@@ -508,8 +577,8 @@ describe('sendCreateImageClassificationLabel request', () => {
     );
     expect(labelResponse.status).toBe(200);
 
-    const getDataResponse2 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse2.data).length).toBe(2);
+    const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
+    expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });
 });
 
@@ -524,19 +593,28 @@ describe('sendRemoveLabel', () => {
       projectID,
       getTextFile('input_document_classification.json')
     );
-    const getDataResponse1 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse1.data).length).toBe(3);
+    const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
+    expect(getDataResponse.status).toBe(200);
+    expect(getDataResponse.data.list.length).toBe(11);
+    let counter = 0;
+    getDataResponse.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+      }
+    });
+    expect(counter).toBe(3);
 
     const labelResponse = await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label');
+    expect(labelResponse.status).toBe(200);
 
-    const getDataResponse2 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse2.data).length).toBe(2);
+    const getLabelResponse1 = await HTTPLauncher.sendGetLabel(projectID, 1);
+    expect(Object.values(getLabelResponse1.data.labels)[0].label).toBe('new label');
 
     const deleteResponse = await HTTPLauncher.sendRemoveLabel(labelResponse.data.id);
     expect(deleteResponse.status).toBe(200);
 
-    const getDataResponse3 = await HTTPLauncher.sendGetData(projectID, 5);
-    expect(Object.keys(getDataResponse3.data).length).toBe(3);
+    const getLabelResponse2 = await HTTPLauncher.sendGetLabel(projectID, 1);
+    expect(Object.keys(getLabelResponse2.data.labels).length).toBe(0);
   });
 });
 
@@ -550,7 +628,7 @@ describe('sendGetExportData', () => {
       projectID,
       getTextFile('input_document_classification.json')
     );
-    await HTTPLauncher.sendGetData(projectID, 5);
+    await HTTPLauncher.sendGetData(projectID, 0);
     await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
@@ -569,7 +647,7 @@ describe('sendGetExportData', () => {
     const projectID = await createProject(2, 'Sequence');
 
     await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
-    await HTTPLauncher.sendGetData(projectID, 5);
+    await HTTPLauncher.sendGetData(projectID, 0);
     await HTTPLauncher.sendCreateSequenceLabel(1, 'new label', 0, 3);
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
@@ -591,7 +669,7 @@ describe('sendGetExportData', () => {
       projectID,
       getTextFile('input_sequence_to_sequence.json')
     );
-    await HTTPLauncher.sendGetData(projectID, 5);
+    await HTTPLauncher.sendGetData(projectID, 0);
     await HTTPLauncher.sendCreateSequenceToSequenceLabel(1, 'new label');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
@@ -614,7 +692,7 @@ describe('sendGetExportData', () => {
       getTextFile('input_image_classification.json'),
       images
     );
-    await HTTPLauncher.sendGetData(projectID, 5);
+    await HTTPLauncher.sendGetData(projectID, 0);
     await HTTPLauncher.sendCreateImageClassificationLabel(1, 'new label', 100, 120, 200, 220);
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
