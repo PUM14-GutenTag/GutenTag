@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import HTTPLauncher from '../services/HTTPLauncher';
 import DocumentClassification from '../components/DocumentClassification';
 import SequenceToSequence from '../components/SequenceToSequence';
+import Sequence from '../components/Sequence';
 import FinishedPopUp from '../components/FinishedPopUp';
 import '../css/Labeling.css';
 import Layout from '../components/Layout';
@@ -139,6 +140,7 @@ const Labeling = ({ location }) => {
       listOfDataPoints[CURRENT_DATA] &&
       Object.keys(listOfDataPoints[CURRENT_DATA]).length !== 0
     ) {
+      console.log("typeOfProject", typeOfProject)
       if (typeOfProject === 1) {
         return (
           <DocumentClassification
@@ -146,6 +148,15 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
+          />
+        );
+      }
+      if (typeOfProject === 2) {
+        console.log("got innnn")
+        return (
+          <Sequence
+            data={listOfDataPoints[CURRENT_DATA].data}
+            dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
           />
         );
       }

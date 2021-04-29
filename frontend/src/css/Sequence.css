@@ -1,0 +1,29 @@
+.label-container {
+    display: flex;
+    border: 1px solid black;
+    flex: 4;
+    justify-content: space-between;
+  }
+  
+  .display-text {
+    flex: 1;
+    flex-basis: 200px;
+    width: 100%;
+    border: blueviolet dotted 2px;
+  }
+  
+  .sequence-form {
+    display: flex;
+    width: 100%;
+    background-color: brown;
+    flex: 1;
+    height: 100%;
+  }
+  
+  .input-seq {
+    display: flex;
+    flex: 1;
+    border-radius: 15%;
+    height: 100%;
+    justify-content: stretch;
+  }
