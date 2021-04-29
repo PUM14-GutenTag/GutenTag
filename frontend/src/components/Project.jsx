@@ -20,8 +20,12 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
   };
 
   return (
-    <div className="project-container" style={{ backgroundColor: selectedColor }}>
-      <div className="title-container" onClick={toggleInfo} aria-hidden="true">
+    <div
+      className="project-container"
+      onClick={toggleInfo}
+      style={{ backgroundColor: selectedColor }}
+    >
+      <div className="title-container" aria-hidden="true">
         <h1>{name}</h1>
         <ProgressBar now={50} striped id="progress-bar-project" />
       </div>
