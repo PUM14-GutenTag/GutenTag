@@ -24,6 +24,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
       <div
         className="project-container"
         onClick={toggleInfo}
+        aria-hidden="true"
         style={{ backgroundColor: selectedColor }}
       >
         <div className="title-container" aria-hidden="true">
