@@ -33,6 +33,7 @@ const Labeling = ({ location }) => {
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
       const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[CURRENT_DATA].id);
+      console.log(Object.values(response.data.labels));
       if (Object.keys(response.data.labels).length !== 0) {
         setLabels(Object.values(response.data.labels));
       } else {
@@ -140,7 +141,6 @@ const Labeling = ({ location }) => {
       listOfDataPoints[CURRENT_DATA] &&
       Object.keys(listOfDataPoints[CURRENT_DATA]).length !== 0
     ) {
-      console.log("typeOfProject", typeOfProject)
       if (typeOfProject === 1) {
         return (
           <DocumentClassification
@@ -152,11 +152,13 @@ const Labeling = ({ location }) => {
         );
       }
       if (typeOfProject === 2) {
-        console.log("got innnn")
         return (
           <Sequence
             data={listOfDataPoints[CURRENT_DATA].data}
+            getSetLabels={getSetLabels}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
+            textBoxSize={textBoxSize()}
+            labels={labels}
           />
         );
       }

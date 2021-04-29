@@ -114,7 +114,6 @@ class Login(Resource):
                 access_token, refresh_token = response
                 access_level = user.access_level
                 status = 200
-
         return make_response(jsonify({
             "message": msg,
             "access_token": access_token,

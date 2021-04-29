@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { objectOf } from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import '../css/Sequence.css';
 import Label from './Label';
-// import HTTPLauncher from '../services/HTTPLauncher';
+import HTTPLauncher from '../services/HTTPLauncher';
 
 /*
 TODO: 
@@ -11,46 +11,45 @@ fixa så det bara är en knapp som används för toggle och inte två
 gör så att det inte går att trycka i själva knap
  */
 
-const Sequence = ({ data, dataPointId }) => {
-  const [labelString, setLabelString] = useState('');
+const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
   const [selection, setSelection] = useState('');
-  const [labels, setLabels] = useState([]);
 
-  const addLabel = () => {
-    const label = {};
-    label.id = Math.floor(Math.random() * 100001);
-    label.label = labelString;
-    label.start = startIndex;
-    label.end = endIndex;
-    label.data = selection;
-    console.log(labelString);
-    console.log(startIndex);
-    console.log(endIndex);
-    /* const response = HTTPLauncher.sendCreateSequenceLabel(
-      dataPointId,
-      labelString,
-      startIndex,
-      endIndex
-    ); */
-    const tempLabels = labels.slice();
-    tempLabels.push(label);
-    setLabels(tempLabels);
-    console.log('label: ', label);
-    console.log('labels: ', tempLabels);
+  const addLabel = async (event) => {
+    event.preventDefault();
+    if (inputRef.current.value !== '') {
+      // sendCreateSequenceLabel(dataID, label, begin, end)
+      const response = await HTTPLauncher.sendCreateSequenceLabel(
+        dataPointId,
+        inputRef.current.value,
+        startIndex,
+        endIndex
+      );
+      getSetLabels();
+    }
+    inputRef.current.value = '';
+    inputRef.current.focus();
   };
 
   const handleSelection = () => {
     const selectedText = window.getSelection();
-
     if (
-      selectedText.anchorNode != null &&
+      selectedText !== undefined &&
+      selectedText.anchorNode !== null &&
       selectedText.toString() !== '' &&
       selectedText.toString() !== ' '
     ) {
-      if (selectedText.anchorNode.parentNode.id === 'text-box-container') {
+      const indexBefore = selectedText.getRangeAt(0).startOffset - 1;
+      const indexAfter = selectedText.getRangeAt(0).endOffset;
+      if (
+        selectedText.anchorNode.parentNode.id === 'text-box-container' &&
+        (selectedText.anchorNode.data[indexBefore] === ' ' ||
+          selectedText.anchorNode.data[indexBefore] === undefined) &&
+        (selectedText.anchorNode.data[indexAfter] === undefined ||
+          selectedText.anchorNode.data[indexAfter] === ' ')
+      ) {
         setSelection(selectedText.toString());
         setStartIndex(selectedText.getRangeAt(0).startOffset);
         setEndIndex(selectedText.getRangeAt(0).endOffset - 1);
@@ -58,13 +57,51 @@ const Sequence = ({ data, dataPointId }) => {
     }
   };
 
+  const markTextData = () => {
+    // console.log('DATA: ', data); // all the text data
+
+    // console.log('LABELS: ', labels); // want to get the label start index and end index
+    // want to geth the color
+    // let originalTex = data;
+    // iterate over labels
+
+    // labels.forEach((element) => console.log('this is element', element));
+
+    if (labels.length > 0) {
+      let str = data;
+
+      const begin = labels[0].begin;
+      const end = labels[0].end;
+      console.log('begin: ', begin, ' end: ', end);
+
+      str = `${str.substr(0, begin)}<span class="hilite">${str.substr(
+        begin,
+        end - begin + 1
+      )}</span>${str.substr(end + 1)}`;
+      // do functuion, return value, do function, return value
+
+      return <p>{str}</p>;
+    }
+
+    return 'hej';
+  };
+
   useEffect(() => {
     inputRef.current.value = '';
     inputRef.current.focus();
+
+    setSelection('');
+    setStartIndex('');
+    setEndIndex('');
   }, [dataPointId]);
 
   useEffect(() => {
+    // markTextData();
+  }, [labels]);
+
+  useEffect(() => {
     document.addEventListener('selectionchange', handleSelection);
+
     // eslint-disable-next-line
   }, []);
 
@@ -72,39 +109,28 @@ const Sequence = ({ data, dataPointId }) => {
     <div className="sequence-container">
       <hr className="hr-title" data-content="Text data" />
       <div className="text-box-container">
-        <p id="text-box-container">{data}</p>
+        <p id="text-box-container" className={textBoxSize}>
+          {markTextData()}
+        </p>
       </div>
       <hr className="hr-title" data-content="Add new sequence label" />
       <div className="label-container">
         <div className="selected-text-box">
-            <p className="selected-text">
-            {selection}
-            </p>
-            </div>
+          <p className="selected-text">{selection}</p>
+        </div>
         <Form onSubmit={addLabel} className="sequence-form">
           <Form.Group className="group-seq">
-            <input
-              type="text"
-              onChange={(event) => setLabelString(event.target.value)}
-              placeholder="Enter label..."
-              required
-              ref={inputRef}
-            />
+            <input type="text" placeholder="Enter label..." required ref={inputRef} />
           </Form.Group>
         </Form>
         <button className="btn btn-primary add-seq-btn" type="button" onClick={addLabel}>
-            {/* change type to submit */}
-            Add new label
+          {/* change type to submit */}
+          Add new label
         </button>
       </div>
       <p>
         Selected Text: {selection}, Start index: {startIndex}, End index: {endIndex}
       </p>
-      {labels.map((label) => (
-        <div key={label.id}>
-          <Label label={label.label} data={label.data} />
-        </div>
-      ))}
     </div>
   );
 };
@@ -112,6 +138,18 @@ const Sequence = ({ data, dataPointId }) => {
 Sequence.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
+  getSetLabels: PropTypes.func.isRequired,
+  textBoxSize: PropTypes.string.isRequired,
+  labels: PropTypes.arrayOf(
+    PropTypes.shape({
+      begin: PropTypes.number.isRequired,
+      data_id: PropTypes.number.isRequired,
+      end: PropTypes.number.isRequired,
+      label: PropTypes.string.isRequired,
+      label_id: PropTypes.number.isRequired,
+      user_id: PropTypes.number.isRequired,
+    }).isRequired
+  ).isRequired,
 };
 
 export default Sequence;
