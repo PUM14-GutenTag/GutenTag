@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Button } from 'react-bootstrap';
 import HTTPLauncher from '../services/HTTPLauncher';
+import ProjectType from '../ProjectType';
 import '../css/createProject.css';
 
 const CreateProject = ({ toggleCallback }) => {
@@ -38,10 +39,12 @@ const CreateProject = ({ toggleCallback }) => {
                 name="type"
                 onChange={(event) => setProjectType(event.target.value)}
               >
-                <option value={1}>Document classification</option>
-                <option value={2}>Sequence labeling</option>
-                <option value={3}>sequence to sequence labeling</option>
-                <option value={4}>Image classification</option>
+                <option value={ProjectType.DOCUMENT_CLASSIFICATION}>Document classification</option>
+                <option value={ProjectType.SEQUENCE_LABELING}>Sequence labeling</option>
+                <option value={ProjectType.SEQUENCE_TO_SEQUENCE}>
+                  Sequence to sequence labeling
+                </option>
+                <option value={ProjectType.IMAGE_CLASSIFICATION}>Image classification</option>
               </Form.Control>
             </Form.Group>
             <Button className="dark" variant="primary" type="submit">
