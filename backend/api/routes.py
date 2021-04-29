@@ -754,7 +754,7 @@ class FetchUsers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         user = User.get_by_email(get_jwt_identity())
 
@@ -787,7 +787,7 @@ class FetchProjectUsers(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         current_user = User.get_by_email(get_jwt_identity())
@@ -818,7 +818,7 @@ class FetchUserProjects(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         user_projects = {}
@@ -858,7 +858,7 @@ class GetExportData(Resource):
                                    required=False,
                                    action="append")
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -897,7 +897,7 @@ class GetImageData(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         data = ProjectData.query.get(args.data_id)
