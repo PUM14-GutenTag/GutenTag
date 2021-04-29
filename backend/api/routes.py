@@ -742,8 +742,8 @@ class FetchUserInfo(Resource):
         return make_response(jsonify({
             "name": name,
             "email": email,
-            "access_level": current_user.access_level,
-        })
+            "access_level": current_user.access_level
+        }))
 
 
 class FetchUsers(Resource):
@@ -752,19 +752,19 @@ class FetchUsers(Resource):
     """
 
     def __init__(self):
-        self.reqparse=reqparse.RequestParser()
+        self.reqparse = reqparse.RequestParser()
 
     @ jwt_required()
     def get(self):
-        user=User.get_by_email(get_jwt_identity())
+        user = User.get_by_email(get_jwt_identity())
 
         if user.access_level >= AccessLevel.ADMIN:
-            users=[]
-            user_info={}
+            users = []
+            user_info = {}
 
-            users=User.query.all()
+            users = User.query.all()
             for user in users:
-                user_info[user.id]={
+                user_info[user.id] = {
                     "name": f"{user.first_name} {user.last_name}",
                     "email": user.email,
                     "admin": user.access_level
@@ -774,7 +774,7 @@ class FetchUsers(Resource):
                             "users": user_info})
 
         else:
-            msg="User is not authorized to fetch users."
+            msg = "User is not authorized to fetch users."
             return jsonify({"msg": msg})
 
 
@@ -784,27 +784,27 @@ class FetchProjectUsers(Resource):
     """
 
     def __init__(self):
-        self.reqparse=reqparse.RequestParser()
+        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
 
     @ jwt_required()
     def get(self):
-        args=self.reqparse.parse_args()
-        current_user=User.get_by_email(get_jwt_identity())
-        project=Project.query.get(args.project_id)
-        users=[]
-        users_email=[]
-        msg="Fetching users failed."
-        status=400
+        args = self.reqparse.parse_args()
+        current_user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+        users = []
+        users_email = []
+        msg = "Fetching users failed."
+        status = 400
 
         if current_user.access_level >= AccessLevel.ADMIN:
-            users=project.users
+            users = project.users
 
             for user in users:
                 users_email.append(user.email)
 
-            msg="Users received."
-            status=200
+            msg = "Users received."
+            status = 200
 
         return make_response(jsonify({"msg": msg, "users": users_email}),
                              status)
@@ -816,31 +816,31 @@ class FetchUserProjects(Resource):
     """
 
     def __init__(self):
-        self.reqparse=reqparse.RequestParser()
+        self.reqparse = reqparse.RequestParser()
 
     @ jwt_required()
     def get(self):
-        current_user=User.get_by_email(get_jwt_identity())
-        user_projects={}
-        projects=[]
-        msg="No projects found"
-        status=404
+        current_user = User.get_by_email(get_jwt_identity())
+        user_projects = {}
+        projects = []
+        msg = "No projects found"
+        status = 404
 
         if current_user.access_level >= AccessLevel.ADMIN:
-            projects=Project.query.all()
+            projects = Project.query.all()
         else:
-            projects=current_user.projects
+            projects = current_user.projects
 
         if projects:
             for project in projects:
-                user_projects[project.id]={
+                user_projects[project.id] = {
                     "id": project.id,
                     "name": project.name,
                     "type": project.project_type,
                     "created": project.created
                 }
-            msg="Retrieved user projects"
-            status=200
+            msg = "Retrieved user projects"
+            status = 200
 
         return make_response(jsonify({"msg": msg,
                                       "projects": user_projects}), status)
@@ -852,7 +852,7 @@ class GetExportData(Resource):
     """
 
     def __init__(self):
-        self.reqparse=reqparse.RequestParser()
+        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
         self.reqparse.add_argument("filter", type=str,
                                    required=False,
@@ -860,9 +860,9 @@ class GetExportData(Resource):
 
     @ jwt_required()
     def get(self):
-        args=self.reqparse.parse_args()
-        user=User.get_by_email(get_jwt_identity())
-        project=Project.query.get(args.project_id)
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
 
         if not project:
             return make_response(jsonify({"message": "Invalid project id"}),
@@ -879,11 +879,11 @@ class GetExportData(Resource):
                 else:
                     return make_response(export_text_data(project.id), 200)
             except Exception as e:
-                msg=f"Could not export data: {e}"
-                status=404
+                msg = f"Could not export data: {e}"
+                status = 404
         else:
-            msg="User is not authorized to export data."
-            status=401
+            msg = "User is not authorized to export data."
+            status = 401
 
         return make_response(jsonify({"message": msg}), status)
 
@@ -894,17 +894,17 @@ class GetImageData(Resource):
     """
 
     def __init__(self):
-        self.reqparse=reqparse.RequestParser()
+        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
 
     @ jwt_required()
     def get(self):
-        args=self.reqparse.parse_args()
-        data=ProjectData.query.get(args.data_id)
+        args = self.reqparse.parse_args()
+        data = ProjectData.query.get(args.data_id)
         if not data or (
                 data.project.project_type != ProjectType.IMAGE_CLASSIFICATION):
-            msg="Data is not an image."
-            status=406
+            msg = "Data is not an image."
+            status = 406
         else:
             try:
                 return make_response(send_file(
@@ -912,8 +912,8 @@ class GetImageData(Resource):
                     attachment_filename=data.file_name,
                     as_attachment=True), 200)
             except Exception as e:
-                msg=f"Could not get image: {e}"
-                status=404
+                msg = f"Could not get image: {e}"
+                status = 404
         return make_response(jsonify({"message": msg}), status)
 
 
@@ -925,7 +925,7 @@ class Reset(Resource):
 
     def get(self):
         reset_db()
-        admin=User("Admin", "Admin", "admin@admin", "password", True)
+        admin = User("Admin", "Admin", "admin@admin", "password", True)
         try_add(admin)
 
 
