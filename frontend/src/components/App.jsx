@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+
 import HTTPLauncher from '../services/HTTPLauncher';
+import userAuth from '../services/userAuth';
 
 // Pages
 import Home from '../pages/Home';
@@ -9,10 +11,10 @@ import NotFound from '../pages/404';
 import Login from '../pages/Login';
 import Labeling from '../pages/Labeling';
 import EditProject from '../pages/EditProject';
-import { UserProvider } from '../contexts/UserContext';
 
 // Components
 import ProtectedRoute from './ProtectedRoute';
+import { UserProvider } from '../contexts/UserContext';
 
 // Styles
 import '../css/App.css';
@@ -59,8 +61,7 @@ axios.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
         return axios.request(originalRequest);
       }
-      localStorage.removeItem('gutentag-accesstoken');
-      localStorage.removeItem('gutentag-refreshtoken');
+      userAuth.clearTokens();
     }
 
     return error;

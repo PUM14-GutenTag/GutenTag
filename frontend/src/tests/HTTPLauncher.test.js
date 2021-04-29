@@ -177,14 +177,16 @@ describe('sendCreateProject', () => {
   });
 });
 
-describe('sendGetUserName', () => {
+describe('sendGetUserInfo', () => {
   test('Correct request', async () => {
     await testUtil.resetDB();
     await testUtil.createUser();
 
-    const response = await HTTPLauncher.sendGetUserName();
+    const response = await HTTPLauncher.sendGetUserInfo();
     expect(response.status).toBe(200);
     expect(response.data.name).toBe('Nameer Sur');
+    expect(response.data.email).toBe('mail@gmail.com');
+    expect(response.data.access_level).toBe(5);
   });
 });
 
