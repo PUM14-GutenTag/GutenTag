@@ -484,7 +484,7 @@ describe('sendCreateDocumentClassificationLabel request', () => {
     expect(labelResponse.status).toBe(200);
 
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
-    expect(Object.values(getLabelResponse.data)[0].label).toBe('new label');
+    expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });
 });
 
@@ -511,7 +511,7 @@ describe('sendCreateSequenceLabel request', () => {
     expect(labelResponse.status).toBe(200);
 
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
-    expect(Object.values(getLabelResponse.data)[0].label).toBe('new label');
+    expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });
 });
 
@@ -540,7 +540,7 @@ describe('sendCreateSequenceToSequenceLabel request', () => {
     const labelResponse = await HTTPLauncher.sendCreateSequenceToSequenceLabel(1, 'new label');
     expect(labelResponse.status).toBe(200);
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
-    expect(Object.values(getLabelResponse.data)[0].label).toBe('new label');
+    expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });
 });
 
@@ -578,7 +578,7 @@ describe('sendCreateImageClassificationLabel request', () => {
     expect(labelResponse.status).toBe(200);
 
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
-    expect(Object.values(getLabelResponse.data)[0].label).toBe('new label');
+    expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });
 });
 
@@ -608,13 +608,13 @@ describe('sendRemoveLabel', () => {
     expect(labelResponse.status).toBe(200);
 
     const getLabelResponse1 = await HTTPLauncher.sendGetLabel(projectID, 1);
-    expect(Object.values(getLabelResponse1.data)[0].label).toBe('new label');
+    expect(Object.values(getLabelResponse1.data.labels)[0].label).toBe('new label');
 
     const deleteResponse = await HTTPLauncher.sendRemoveLabel(labelResponse.data.id);
     expect(deleteResponse.status).toBe(200);
 
     const getLabelResponse2 = await HTTPLauncher.sendGetLabel(projectID, 1);
-    expect(Object.keys(getLabelResponse2.data).length).toBe(0);
+    expect(Object.keys(getLabelResponse2.data.labels).length).toBe(0);
   });
 });
 
