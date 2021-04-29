@@ -20,56 +20,54 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
   };
 
   return (
-    <>
-      <div
-        className="project-container"
-        onMouseDown={toggleInfo}
-        role="button"
-        style={{ backgroundColor: selectedColor }}
-      >
-        <div className="title-container" aria-hidden="true">
-          <h1>{name}</h1>
-          <ProgressBar now={50} striped id="progress-bar-project" />
-        </div>
-        {showInfo ? (
-          <div className="projectInfo">
-            <div className="left-info">
-              <p>Type: {projectTypeNames[projectType - 1]}</p>
-              <p>Progress: 1/4 </p>
-              <p>Started: {created}</p>
-              <Button
-                variant="outline-primary"
-                as={Link}
-                to={{
-                  pathname: '/labeling',
-                  state: {
-                    projectType,
-                    id,
-                  },
-                }}
-              >
-                Start
-              </Button>
-            </div>
-          </div>
-        ) : null}
-        {showEditButton && (
-          <Link
-            className="edit-link"
-            to={{
-              pathname: '/edit-project',
-              state: {
-                id,
-                name,
-                projectType,
-              },
-            }}
-          >
-            <GearFill color="#063954" />
-          </Link>
-        )}
+    <div
+      className="project-container"
+      onMouseDown={toggleInfo}
+      role="button"
+      style={{ backgroundColor: selectedColor }}
+    >
+      <div className="title-container" aria-hidden="true">
+        <h1>{name}</h1>
+        <ProgressBar now={50} striped id="progress-bar-project" />
       </div>
-    </>
+      {showInfo ? (
+        <div className="projectInfo">
+          <div className="left-info">
+            <p>Type: {projectTypeNames[projectType - 1]}</p>
+            <p>Progress: 1/4 </p>
+            <p>Started: {created}</p>
+            <Button
+              variant="outline-primary"
+              as={Link}
+              to={{
+                pathname: '/labeling',
+                state: {
+                  projectType,
+                  id,
+                },
+              }}
+            >
+              Start
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      {showEditButton && (
+        <Link
+          className="edit-link"
+          to={{
+            pathname: '/edit-project',
+            state: {
+              id,
+              name,
+              projectType,
+            },
+          }}
+        >
+          <GearFill color="#063954" />
+        </Link>
+      )}
+    </div>
   );
 };
 
