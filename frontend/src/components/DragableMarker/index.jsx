@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './styles.css';
 
-import { Direction } from './components/Resizer/constants';
 import Resizer from './components/Resizer';
 import MarkerHeader from './components/MarkerHeader';
 
-const Marker = () => {
+const Marker = ({ onSubmit }) => {
   const [pressed, setPressed] = useState(false);
 
   const markerRef = useRef(null);
@@ -16,66 +15,6 @@ const Marker = () => {
     const { x, y } = marker.getBoundingClientRect();
     marker.style.left = `${x + movementX}px`;
     marker.style.top = `${y + movementY}px`;
-  };
-
-  const handleResize = (direction, movementX, movementY) => {
-    const marker = markerRef.current;
-    const { width, height, x, y } = marker.getBoundingClientRect();
-
-    const resizeTop = () => {
-      marker.style.height = `${height - movementY}px`;
-    };
-    const resizeRight = () => {
-      marker.style.width = `${width + movementX}px`;
-      marker.style.left = `${x - movementX}px`;
-    };
-    const resizeBottom = () => {
-      marker.style.height = `${height + movementY}px`;
-      marker.style.top = `${y - movementY}px`;
-    };
-    const resizeLeft = () => {
-      marker.style.width = `${width - movementX}px`;
-    };
-    switch (direction) {
-      case Direction.TopLeft:
-        resizeTop();
-        resizeLeft();
-        break;
-
-      case Direction.Top:
-        resizeTop();
-        break;
-
-      case Direction.TopRight:
-        resizeTop();
-        resizeRight();
-        break;
-
-      case Direction.Right:
-        resizeRight();
-        break;
-
-      case Direction.BottomRight:
-        resizeBottom();
-        resizeRight();
-        break;
-
-      case Direction.Bottom:
-        resizeBottom();
-        break;
-
-      case Direction.BottomLeft:
-        resizeBottom();
-        resizeLeft();
-        break;
-
-      case Direction.Left:
-        resizeLeft();
-        break;
-
-      default:
-        break;
-    }
   };
 
   const handleMouseDown = () => setPressed(true);
@@ -100,8 +39,8 @@ const Marker = () => {
 
   return (
     <div className="marker" ref={markerRef} onMouseDown={handleMouseDown}>
-      <Resizer onResize={handleResize} />
-      <MarkerHeader />
+      <Resizer reference={markerRef} />
+      <MarkerHeader onSubmit={onSubmit} />
     </div>
   );
 };

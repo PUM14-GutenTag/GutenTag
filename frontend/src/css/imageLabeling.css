@@ -5,7 +5,3 @@ img {
   -o-user-select: none;
   user-select: none;
 }
-.img-container {
-  background-color: rgba(red, green, blue, 0.5);
-  z-index: 100;
-}

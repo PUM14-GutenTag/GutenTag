@@ -2,14 +2,74 @@ import React, { useEffect, useState } from 'react';
 import { Direction } from './constants';
 import './styles.css';
 
-const Resizer = ({ onResize }) => {
+const Resizer = ({ reference }) => {
   const [direction, setDirection] = useState('');
   const [pressed, setPressed] = useState(false);
+
+  const handleResize = (direction, movementX, movementY) => {
+    const marker = reference.current;
+    const { width, height, x, y } = marker.getBoundingClientRect();
+
+    const resizeTop = () => {
+      marker.style.height = `${height - movementY}px`;
+    };
+    const resizeRight = () => {
+      marker.style.width = `${width + movementX}px`;
+      marker.style.left = `${x - movementX}px`;
+    };
+    const resizeBottom = () => {
+      marker.style.height = `${height + movementY}px`;
+      marker.style.top = `${y - movementY}px`;
+    };
+    const resizeLeft = () => {
+      marker.style.width = `${width - movementX}px`;
+    };
+    switch (direction) {
+      case Direction.TopLeft:
+        resizeTop();
+        resizeLeft();
+        break;
+
+      case Direction.Top:
+        resizeTop();
+        break;
+
+      case Direction.TopRight:
+        resizeTop();
+        resizeRight();
+        break;
+
+      case Direction.Right:
+        resizeRight();
+        break;
+
+      case Direction.BottomRight:
+        resizeBottom();
+        resizeRight();
+        break;
+
+      case Direction.Bottom:
+        resizeBottom();
+        break;
+
+      case Direction.BottomLeft:
+        resizeBottom();
+        resizeLeft();
+        break;
+
+      case Direction.Left:
+        resizeLeft();
+        break;
+
+      default:
+        break;
+    }
+  };
 
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!direction) return;
-      onResize(direction, e.movementX, e.movementY);
+      handleResize(direction, e.movementX, e.movementY);
     };
     if (pressed) {
       window.addEventListener('mousemove', handleMouseMove);
@@ -17,7 +77,7 @@ const Resizer = ({ onResize }) => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [pressed, direction, onResize]);
+  }, [pressed, direction, handleResize]);
 
   useEffect(() => {
     const handleMouseUp = () => setPressed(false);
