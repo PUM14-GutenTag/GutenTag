@@ -11,6 +11,7 @@ Component that shows the specifics for document classification
 const SequenceToSequence = ({ data, dataPointId, getSetLabels, textBoxSize }) => {
   const inputRef = useRef();
 
+  /* Adds label to a datapoint and and updates what labels are being displayed to the user */
   const addLabel = async (event) => {
     event.preventDefault();
     await HTTPLauncher.sendCreateSequenceToSequenceLabel(dataPointId, inputRef.current.value);

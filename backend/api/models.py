@@ -9,6 +9,8 @@ from api.database_handler import check_types
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
+LIST_SIDE_LENGTH = 5
+LIST_LENGTH = 2 * LIST_SIDE_LENGTH + 1
 
 
 class ProjectType(IntEnum):
@@ -187,9 +189,6 @@ class Project(db.Model):
     users = db.relationship(
         "User", secondary=access_control, back_populates="projects")
 
-    LIST_SIDE_LENGTH = 5
-    LIST_LENGTH = 2 * LIST_SIDE_LENGTH + 1
-
     def __init__(self, project_name, project_type):
         check_types([(project_name, str), (project_type, int)])
         if not ProjectType.has_value(project_type):
@@ -203,8 +202,6 @@ class Project(db.Model):
         number. The middle value will be the first value in project_data
         that is unlabeled by the user.
         """
-        LIST_SIDE_LENGTH = self.LIST_SIDE_LENGTH
-        LIST_LENGTH = self.LIST_LENGTH
 
         index = 0
         all_labeled = False
@@ -261,8 +258,8 @@ class Project(db.Model):
                     list_of_data.append({})
             else:
                 list_of_data = \
-                    data_points[index - self.LIST_SIDE_LENGTH:index
-                                + self.LIST_SIDE_LENGTH + 1]
+                    data_points[index - LIST_SIDE_LENGTH:index
+                                + LIST_SIDE_LENGTH + 1]
         else:
             list_of_data = data_points[:]
             for i in range(LIST_SIDE_LENGTH - index):
@@ -282,7 +279,7 @@ class Project(db.Model):
         check_types([(index, int)])
         data_points = self.data
         try:
-            data = data_points[index + self.LIST_SIDE_LENGTH]
+            data = data_points[index + LIST_SIDE_LENGTH]
             data_point = {}
             data_point["id"] = data.id
             data_point["data"] = data.text_data
@@ -298,8 +295,8 @@ class Project(db.Model):
         """
         check_types([(index, int)])
         data_points = self.data
-        if index - self.LIST_SIDE_LENGTH >= 0:
-            data = data_points[index - self.LIST_SIDE_LENGTH]
+        if index - LIST_SIDE_LENGTH >= 0:
+            data = data_points[index - LIST_SIDE_LENGTH]
             data_point = {}
             data_point["id"] = data.id
             data_point["data"] = data.text_data
@@ -389,7 +386,8 @@ class ProjectImageData(ProjectData):
 class Label(db.Model):
     """
     Label contains the label for a certain piece of data. Base class that
-    should not be instantiated.
+    should not be instantiated. All children to Label must implement
+    a format_json-function.
     """
     __tablename__ = "label"
 
@@ -436,6 +434,16 @@ class DocumentClassificationLabel(Label):
         self.label = label_str
         self.is_prelabel = is_prelabel
 
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label
+            }
+        }
+
 
 class SequenceLabel(Label):
     """
@@ -470,6 +478,18 @@ class SequenceLabel(Label):
         self.end = end
         self.is_prelabel = is_prelabel
 
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label,
+                "begin": self.begin,
+                "end": self.end
+            }
+        }
+
 
 class SequenceToSequenceLabel(Label):
     """
@@ -494,6 +514,16 @@ class SequenceToSequenceLabel(Label):
         self.user_id = user_id
         self.label = label_str
         self.is_prelabel = is_prelabel
+
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label
+            }
+        }
 
 
 class ImageClassificationLabel(Label):
@@ -530,3 +560,19 @@ class ImageClassificationLabel(Label):
         self.x2 = coord2[0]
         self.y2 = coord2[1]
         self.is_prelabel = is_prelabel
+
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label,
+                "coordinates": {
+                    "x1": self.x1,
+                    "x2": self.x2,
+                    "y1": self.y1,
+                    "y2": self.y2
+                }
+            }
+        }

@@ -3,8 +3,9 @@ import Badge from 'react-bootstrap/Badge';
 import PropTypes from 'prop-types';
 import '../css/Label.css';
 
+/* Creates a label for a datapoint and add delete button for label */
 const Label = ({ labelId, label, deleteLabel }) => {
-  // generates random light color
+  // Generates random light color
   const generateRandomColor = () => {
     const green = Math.floor(1 + Math.random() * 256 * 1.7);
     const blue = Math.floor(2 + Math.random() * 256 * 1.2);

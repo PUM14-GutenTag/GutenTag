@@ -514,86 +514,34 @@ class GetLabel(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument(
-            "data_id", type=int, required=False, default=None)
+        self.reqparse.add_argument("data_id", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
-        if args.data_id is not None:
-            labels = Label.query.filter_by(
-                data_id=args.data_id, user_id=user.id).all()
+        labels = Label.query.filter_by(
+            data_id=args.data_id, user_id=user.id).all()
 
-            res = {}
+        res = {}
 
-            if labels and project:
-                if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-                    for label in labels:
-                        res.update(self.format_document_classification(label))
-                if project.project_type == ProjectType.SEQUENCE_LABELING:
-                    for label in labels:
-                        res.update(self.format_sequence_labeling(label))
-                if project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-                    for label in labels:
-                        res.update(self.format_sequence_to_sequence(label))
-                if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
-                    for label in labels:
-                        res.update(self.format_image_classification(label))
-
-            return res
+        if labels and project:
+            for label in labels:
+                res.update(label.format_json())
+            status = 200
+            msg = "Labels retrieved"
+        elif project:
+            print("inproj")
+            status = 200
+            msg = f"No labels by {user.first_name} " + (
+                f"{user.last_name} found in project {project.name}")
         else:
-            return jsonify({"message": "Not implemented"})
+            status = 401
+            msg = f"No project with id {args.project_id} found"
 
-    def format_document_classification(self, label):
-        return {
-            label.id: {
-                "label_id": label.id,
-                "data_id": label.data_id,
-                "user_id": label.user_id,
-                "label": label.label,
-            }
-        }
-
-    def format_sequence_labeling(self, label):
-        return {
-            label.id: {
-                "label_id": label.id,
-                "data_id": label.data_id,
-                "user_id": label.user_id,
-                "label": label.label,
-                "begin": label.begin,
-                "end": label.end,
-            }
-        }
-
-    def format_sequence_to_sequence(self, label):
-        return {
-            label.id: {
-                "label_id": label.id,
-                "data_id": label.data_id,
-                "user_id": label.user_id,
-                "label": label.label,
-            }
-        }
-
-    def format_image_classification(self, label):
-        return {
-            label.id: {
-                "label_id": label.id,
-                "data_id": label.data_id,
-                "user_id": label.user_id,
-                "label": label.label,
-                "coordinates": {
-                    "x1": label.x1,
-                    "x2": label.x2,
-                    "y1": label.y1,
-                    "y2": label.y2
-                }
-            }
-        }
+        return make_response(jsonify({"message": msg, "labels": res}), status)
 
 
 class CreateDocumentClassificationLabel(Resource):
@@ -606,7 +554,7 @@ class CreateDocumentClassificationLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -644,7 +592,7 @@ class CreateSequenceLabel(Resource):
         self.reqparse.add_argument("begin", type=int, required=True)
         self.reqparse.add_argument("end", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -679,7 +627,7 @@ class CreateSequenceToSequenceLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -719,7 +667,7 @@ class CreateImageClassificationLabel(Resource):
         self.reqparse.add_argument("x2", type=int, required=True)
         self.reqparse.add_argument("y2", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -755,7 +703,7 @@ class DeleteLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("label_id", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def delete(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -787,7 +735,7 @@ class FetchUserName(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         msg = "Succesfully got user information."
@@ -807,7 +755,7 @@ class FetchUsers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         user = User.get_by_email(get_jwt_identity())
 
@@ -839,7 +787,7 @@ class FetchUserProjects(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         user_projects = {}
@@ -878,7 +826,7 @@ class GetExportData(Resource):
                                    required=False,
                                    action="append")
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
@@ -917,7 +865,7 @@ class GetImageData(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         data = ProjectData.query.get(args.data_id)

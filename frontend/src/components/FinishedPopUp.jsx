@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import '../css/FinishedPopUp.css';
 
+/* Pop up for when the user has labeled all datapoints in a project */
 const FinishedPopUp = () => {
   return (
     <Modal.Dialog>

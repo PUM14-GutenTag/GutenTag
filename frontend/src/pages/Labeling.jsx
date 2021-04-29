@@ -16,6 +16,7 @@ import Label from '../components/Label';
 Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
+  const CURRENT_DATA = 5;
   const { projectType, id } = location.state;
 
   const [labels, setLabels] = useState([]);
@@ -29,10 +30,10 @@ const Labeling = ({ location }) => {
   const projectId = id;
   // fetch all labels for a given datapoint
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
-    if (dataPoints[5]) {
-      const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[5].id);
-      if (!(Object.keys(response.data).length === 0)) {
-        setLabels(Object.values(response.data));
+    if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
+      const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[CURRENT_DATA].id);
+      if (Object.keys(response.data.labels).length !== 0) {
+        setLabels(Object.values(response.data.labels));
       } else {
         setLabels([]);
       }
@@ -41,7 +42,7 @@ const Labeling = ({ location }) => {
 
   // Choose size of the text to use depending on the length of the text
   const textBoxSize = () => {
-    const data = listOfDataPoints[5].data;
+    const data = listOfDataPoints[CURRENT_DATA].data;
     if (data.length < 18) {
       return 'small-text';
     }
@@ -57,7 +58,7 @@ const Labeling = ({ location }) => {
     getSetLabels();
   };
 
-  // Get 5 new datapoints from database, runs when entering a project
+  // Get a list of new datapoints from database, runs when entering a project
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
 
@@ -93,7 +94,7 @@ const Labeling = ({ location }) => {
 
   // Get earlier datapoint, and delete data point out of scope from list
   const getLastData = async () => {
-    const tempLocalIndex = 4;
+    const tempLocalIndex = CURRENT_DATA - 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
     if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
       const tempIndex = index - 1;
@@ -112,7 +113,7 @@ const Labeling = ({ location }) => {
 
   // Get next datapoint, and delete data point out of scope from list
   const nextData = async () => {
-    const tempLocalIndex = 6;
+    const tempLocalIndex = CURRENT_DATA + 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
     if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
       const tempIndex = index + 1;
@@ -132,12 +133,17 @@ const Labeling = ({ location }) => {
 
   // select what project type showed be displayed bases on project type
   const selectProjectComponent = (typeOfProject) => {
-    if (listOfDataPoints[5]) {
+    // {}
+    if (
+      listOfDataPoints.length > 0 &&
+      listOfDataPoints[CURRENT_DATA] &&
+      Object.keys(listOfDataPoints[CURRENT_DATA]).length !== 0
+    ) {
       if (typeOfProject === 1) {
         return (
           <DocumentClassification
-            data={listOfDataPoints[5].data}
-            dataPointId={parseInt(listOfDataPoints[5].id, 10)}
+            data={listOfDataPoints[CURRENT_DATA].data}
+            dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
           />
@@ -146,27 +152,22 @@ const Labeling = ({ location }) => {
       if (typeOfProject === 3) {
         return (
           <SequenceToSequence
-            data={listOfDataPoints[5].data}
-            dataPointId={parseInt(listOfDataPoints[5].id, 10)}
+            data={listOfDataPoints[CURRENT_DATA].data}
+            dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
           />
         );
       }
     }
-
-    return <div>This should not show</div>;
+    return <></>;
   };
 
   const suggestionLabels = (typeOfProject) => {
     /* Choose for which project types label suggestions should appear */
     // Seq to Seq should not display suggestions
     if (typeOfProject !== 3) {
-      return (
-        <>
-          <hr className="hr-title" data-content="Suggestions" />
-        </>
-      );
+      return <hr className="hr-title" data-content="Suggestions" />;
     }
     return <></>;
   };
