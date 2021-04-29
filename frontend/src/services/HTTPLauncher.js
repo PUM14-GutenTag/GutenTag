@@ -143,6 +143,15 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to get all users related to a project.
+  static sendGetProjectUsers(projectID) {
+    return axios.get('get-project-users', {
+      headers: authHeader(),
+      params: { project_id: projectID },
+    });
+  }
+
+  // Send HTTP-request to get all users projects.
   static sendGetUserProjects() {
     return axios.get('get-user-projects', {
       headers: authHeader(),

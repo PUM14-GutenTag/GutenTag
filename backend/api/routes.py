@@ -739,12 +739,12 @@ class FetchUserName(Resource):
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         msg = "Succesfully got user information."
-        name = current_user.first_name + " " + current_user.last_name
+        name = f"{current_user.first_name} {current_user.last_name}"
 
-        return jsonify({
+        return make_response(jsonify({
             "name": name,
             "message": msg
-        })
+        }), 200)
 
 
 class FetchUsers(Resource):
@@ -766,7 +766,7 @@ class FetchUsers(Resource):
             users = User.query.all()
             for user in users:
                 user_info[user.id] = {
-                    "name": user.first_name + " " + user.last_name,
+                    "name": f"{user.first_name} {user.last_name}",
                     "email": user.email,
                     "admin": user.access_level
                 }
@@ -777,6 +777,38 @@ class FetchUsers(Resource):
         else:
             msg = "User is not authorized to fetch users."
             return jsonify({"msg": msg})
+
+
+class FetchProjectUsers(Resource):
+    """
+    Fetch all users that is authorizeed to the project.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        current_user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+        users = []
+        users_email = []
+        msg = "Fetching users failed."
+        status = 400
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            users = project.users
+
+            for user in users:
+                users_email.append(user.email)
+
+            msg = "Users received."
+            status = 200
+
+        return make_response(jsonify({"msg": msg, "users": users_email}),
+                             status)
 
 
 class FetchUserProjects(Resource):
@@ -792,26 +824,27 @@ class FetchUserProjects(Resource):
         current_user = User.get_by_email(get_jwt_identity())
         user_projects = {}
         projects = []
+        msg = "No projects found"
+        status = 404
 
         if current_user.access_level >= AccessLevel.ADMIN:
             projects = Project.query.all()
         else:
             projects = current_user.projects
 
-        if not projects:
-            return make_response(jsonify({"message": "No projects found"}),
-                                 404)
+        if projects:
+            for project in projects:
+                user_projects[project.id] = {
+                    "id": project.id,
+                    "name": project.name,
+                    "type": project.project_type,
+                    "created": project.created
+                }
+            msg = "Retrieved user projects"
+            status = 200
 
-        for project in projects:
-            user_projects[project.id] = {
-                "id": project.id,
-                "name": project.name,
-                "type": project.project_type,
-                "created": project.created
-            }
-
-        return make_response(jsonify({"msg": "Retrieved user projects",
-                                      "projects": user_projects}), 200)
+        return make_response(jsonify({"msg": msg,
+                                      "projects": user_projects}), status)
 
 
 class GetExportData(Resource):
@@ -918,6 +951,7 @@ rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
 rest.add_resource(FetchUserName, '/get-user-name')
 rest.add_resource(FetchUsers, '/get-users')
+rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")
