@@ -159,6 +159,7 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             textBoxSize={textBoxSize()}
             labels={labels}
+            setData={setListOfDataPoints}
           />
         );
       }

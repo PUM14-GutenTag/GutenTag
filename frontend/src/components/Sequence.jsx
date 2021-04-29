@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import PropTypes, { objectOf } from 'prop-types';
+import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import '../css/Sequence.css';
-import Label from './Label';
 import HTTPLauncher from '../services/HTTPLauncher';
 
 /*
@@ -11,7 +10,7 @@ fixa så det bara är en knapp som används för toggle och inte två
 gör så att det inte går att trycka i själva knap
  */
 
-const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
+const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels,setData }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
@@ -21,7 +20,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
     event.preventDefault();
     if (inputRef.current.value !== '') {
       // sendCreateSequenceLabel(dataID, label, begin, end)
-      const response = await HTTPLauncher.sendCreateSequenceLabel(
+      await HTTPLauncher.sendCreateSequenceLabel(
         dataPointId,
         inputRef.current.value,
         startIndex,
@@ -41,6 +40,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
       selectedText.toString() !== '' &&
       selectedText.toString() !== ' '
     ) {
+      console.log("fist iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
       const indexBefore = selectedText.getRangeAt(0).startOffset - 1;
       const indexAfter = selectedText.getRangeAt(0).endOffset;
       if (
@@ -50,6 +50,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
         (selectedText.anchorNode.data[indexAfter] === undefined ||
           selectedText.anchorNode.data[indexAfter] === ' ')
       ) {
+        console.log("second iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         setSelection(selectedText.toString());
         setStartIndex(selectedText.getRangeAt(0).startOffset);
         setEndIndex(selectedText.getRangeAt(0).endOffset - 1);
@@ -58,32 +59,23 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
   };
 
   const markTextData = () => {
-    // console.log('DATA: ', data); // all the text data
-
-    // console.log('LABELS: ', labels); // want to get the label start index and end index
-    // want to geth the color
-    // let originalTex = data;
-    // iterate over labels
-
-    // labels.forEach((element) => console.log('this is element', element));
-
     if (labels.length > 0) {
-      let str = data;
+      let str = data.slice();
 
-      const begin = labels[0].begin;
-      const end = labels[0].end;
-      console.log('begin: ', begin, ' end: ', end);
-
-      str = `${str.substr(0, begin)}<span class="hilite">${str.substr(
+      for (let i = 0; i < labels.length; i++) {
+        const begin = labels[i].begin;
+        const end = labels[i].end;
+        str = `${str.substr(0, begin)}<span class="hilite">${str.substr(
         begin,
         end - begin + 1
-      )}</span>${str.substr(end + 1)}`;
+      )}</span>${str.substr(end + 1)}`;}
       // do functuion, return value, do function, return value
-
-      return <p>{str}</p>;
+      
+      
+      return <div dangerouslySetInnerHTML={{ __html: str }} />;
     }
 
-    return 'hej';
+    return `${data}`;
   };
 
   useEffect(() => {
@@ -109,9 +101,9 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
     <div className="sequence-container">
       <hr className="hr-title" data-content="Text data" />
       <div className="text-box-container">
-        <p id="text-box-container" className={textBoxSize}>
+        <div id="text-box-container" className={textBoxSize}>
           {markTextData()}
-        </p>
+        </div>
       </div>
       <hr className="hr-title" data-content="Add new sequence label" />
       <div className="label-container">
