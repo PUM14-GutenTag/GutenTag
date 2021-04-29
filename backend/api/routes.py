@@ -30,8 +30,7 @@ from api.database_handler import (
 from api.parser import (
     import_text_data,
     import_image_data,
-    export_text_data,
-    export_image_data
+    export_data
 )
 
 
@@ -345,7 +344,6 @@ class AddNewTextData(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
-        project = Project.query.get(args.project_id)
 
         if "json_file" not in request.files:
             msg = "No JSON file uploaded."
@@ -363,13 +361,10 @@ class AddNewTextData(Resource):
                               Must be in "f"{TEXT_EXTENSIONS}")}), 406)
 
             try:
-                project = Project.query.get(project.id)
-                import_text_data(project.id, json.load(json_file))
+                import_text_data(args.project_id, json.load(json_file))
                 msg = "Data added."
                 status = 200
             except Exception as e:
-                import traceback
-                traceback.print_exc()
                 msg = f"Could not add data: {e}"
 
         return make_response(jsonify({"message": msg}), status)
@@ -420,7 +415,8 @@ class AddNewImageData(Resource):
             image_dict = {secure_filename(
                 file.filename): file.read() for file in image_files}
             try:
-                import_image_data(project.id, json.load(json_file), image_dict)
+                import_image_data(args.project_id, json.load(json_file),
+                                  image_dict)
                 msg = "Data added."
                 status = 200
             except Exception as e:
@@ -873,12 +869,12 @@ class GetExportData(Resource):
             try:
                 if (project.project_type == ProjectType.IMAGE_CLASSIFICATION):
                     return make_response(send_file(
-                        export_image_data(project.id),
+                        export_data(project.id),
                         attachment_filename=f"{project.name}.zip",
                         as_attachment=True
                     ), 200)
                 else:
-                    return make_response(export_text_data(project.id), 200)
+                    return make_response(export_data(project.id), 200)
             except Exception as e:
                 msg = f"Could not export data: {e}"
                 status = 404

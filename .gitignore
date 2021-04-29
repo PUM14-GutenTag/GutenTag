@@ -179,3 +179,6 @@ tags
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
+# Large dataset files
+test_resources/extra/*

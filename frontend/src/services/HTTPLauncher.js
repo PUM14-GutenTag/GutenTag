@@ -198,12 +198,13 @@ class HTTPLauncher {
         },
     ]
   */
-  static sendAddNewTextData(projectID, JSONFile) {
+  static sendAddNewTextData(projectID, JSONFile, onUploadProgress) {
     const formData = new FormData();
     formData.append('project_id', projectID);
     formData.append('json_file', JSONFile);
     return axios.post('add-text-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
+      onUploadProgress,
     });
   }
 
@@ -220,15 +221,16 @@ class HTTPLauncher {
         },
         ...
     ]
-  */
+   */
 
-  static sendAddNewImageData(projectID, JSONFile, imageFiles) {
+  static sendAddNewImageData(projectID, JSONFile, imageFiles, onUploadProgress) {
     const formData = new FormData();
     formData.append('project_id', projectID);
     formData.append('json_file', JSONFile);
     [...imageFiles].forEach((img) => formData.append('images', img));
     return axios.post('add-image-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
+      onUploadProgress,
     });
   }
 
@@ -395,7 +397,7 @@ class HTTPLauncher {
         ]
     }
   */
-  static sendGetExportData(projectID /* , filters = [] */) {
+  static sendGetExportData(projectID, onDownloadProgress /* , filters = [] */) {
     // FIXME
     // const params = new URLSearchParams();
     // params.append('headers', authHeader());
@@ -411,6 +413,7 @@ class HTTPLauncher {
       params: {
         project_id: projectID,
       },
+      onDownloadProgress,
     });
   }
 
