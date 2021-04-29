@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 
 import HTTPLauncher from '../services/HTTPLauncher';
@@ -73,8 +74,8 @@ const ImportForm = ({ projectID, projectType, className }) => {
   };
 
   return (
-    <Form className={className}>
-      <Form.Row>
+    <Form className={`center-importform ${className}`}>
+      <Row>
         <Form.File
           id="text-upload"
           ref={textRef}
@@ -92,12 +93,12 @@ const ImportForm = ({ projectID, projectType, className }) => {
             onChange={(e) => setImageFiles(e.target.files)}
           />
         )}
-      </Form.Row>
-      <Form.Row>
-        <Button disabled={!importEnabled} onClick={handleImport}>
-          Submit
-        </Button>
-      </Form.Row>
+      </Row>
+      <br />
+      <Button className="dark" margin-bottom="1em" disabled={!importEnabled} onClick={handleImport}>
+        Submit
+      </Button>
+      {/* Probably should switch this out for built-in form validation. */}
       <Form.Label>{status}</Form.Label>
     </Form>
   );

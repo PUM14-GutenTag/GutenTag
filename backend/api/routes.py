@@ -6,6 +6,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
 )
+from enum import IntEnum
 from werkzeug.utils import secure_filename
 from api import rest
 from api.models import (
@@ -44,6 +45,15 @@ TEXT_EXTENSIONS = {"json"}
 def allowed_extension(filename, allowed):
     return "." in filename and \
            filename.rsplit(".", 1)[1].lower() in allowed
+
+
+class GetDataType(IntEnum):
+    """
+    Enum for the different types of getting data.
+    """
+    GET_LIST = 0
+    GET_NEXT_VALUE = 1
+    GET_EARLIER_VALUE = -1
 
 
 class CreateUser(Resource):
@@ -424,7 +434,8 @@ class GetNewData(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument("amount", type=int, required=True)
+        self.reqparse.add_argument("type", type=int, required=True)
+        self.reqparse.add_argument("index", type=int, required=True)
 
     @jwt_required()
     def get(self):
@@ -437,17 +448,96 @@ class GetNewData(Resource):
                                  404)
 
         if user.access_level >= AccessLevel.ADMIN:
+            status = 200
             try:
-                return make_response(jsonify(project.get_data(
-                    user.id, args.amount)), 200)
+                if args.type == GetDataType.GET_EARLIER_VALUE:
+                    return make_response(jsonify(project.get_earlier_data(
+                        args.index)), status)
+                elif args.type == GetDataType.GET_LIST:
+                    return make_response(jsonify(project.get_data(
+                        user.id)), status)
+                elif args.type == GetDataType.GET_NEXT_VALUE:
+                    return make_response(jsonify(project.get_next_data(
+                        args.index)), status)
+                else:
+                    msg = "Wrong type of input."
+                    status = 404
+
             except Exception as e:
-                msg = f"Could not add data: {e}"
+                msg = f"Could not get data: {e}"
                 status = 404
         else:
-            msg = "User is not authorized to add data."
+            msg = "User is not authorized to get data."
             status = 401
 
         return make_response(jsonify({"message": msg}), status)
+
+
+class GetAmountOfData(Resource):
+    """
+    Endpoint to retrieve amount of data in a project and amount
+    of data labeled by a user in the same project.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        user_id = user.id
+        project = Project.query.get(args.project_id)
+        amountOfData = len(project.data)
+        user_labels = 0
+        for data in project.data:
+            for label in data.labels:
+                if (user_id == label.user_id):
+                    user_labels += 1
+                    break
+        return make_response(jsonify({"dataAmount": amountOfData,
+                                      "labeledByUser": user_labels}), 200)
+
+
+class GetLabel(Resource):
+    """
+    Endpoint to retrieve labels either
+    by userid and labelid, or all labels
+    by a user.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+        self.reqparse.add_argument("data_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+
+        labels = Label.query.filter_by(
+            data_id=args.data_id, user_id=user.id).all()
+
+        res = {}
+
+        if labels and project:
+            for label in labels:
+                res.update(label.format_json())
+            status = 200
+            msg = "Labels retrieved"
+        elif project:
+            print("inproj")
+            status = 200
+            msg = f"No labels by {user.first_name} " + (
+                f"{user.last_name} found in project {project.name}")
+        else:
+            status = 401
+            msg = f"No project with id {args.project_id} found"
+
+        return make_response(jsonify({"message": msg, "labels": res}), status)
 
 
 class CreateDocumentClassificationLabel(Resource):
@@ -645,12 +735,12 @@ class FetchUserName(Resource):
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         msg = "Succesfully got user information."
-        name = current_user.first_name + " " + current_user.last_name
+        name = f"{current_user.first_name} {current_user.last_name}"
 
-        return jsonify({
+        return make_response(jsonify({
             "name": name,
             "message": msg
-        })
+        }), 200)
 
 
 class FetchUsers(Resource):
@@ -672,7 +762,7 @@ class FetchUsers(Resource):
             users = User.query.all()
             for user in users:
                 user_info[user.id] = {
-                    "name": user.first_name + " " + user.last_name,
+                    "name": f"{user.first_name} {user.last_name}",
                     "email": user.email,
                     "admin": user.access_level
                 }
@@ -683,6 +773,38 @@ class FetchUsers(Resource):
         else:
             msg = "User is not authorized to fetch users."
             return jsonify({"msg": msg})
+
+
+class FetchProjectUsers(Resource):
+    """
+    Fetch all users that is authorizeed to the project.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        current_user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+        users = []
+        users_email = []
+        msg = "Fetching users failed."
+        status = 400
+
+        if current_user.access_level >= AccessLevel.ADMIN:
+            users = project.users
+
+            for user in users:
+                users_email.append(user.email)
+
+            msg = "Users received."
+            status = 200
+
+        return make_response(jsonify({"msg": msg, "users": users_email}),
+                             status)
 
 
 class FetchUserProjects(Resource):
@@ -698,26 +820,27 @@ class FetchUserProjects(Resource):
         current_user = User.get_by_email(get_jwt_identity())
         user_projects = {}
         projects = []
+        msg = "No projects found"
+        status = 404
 
         if current_user.access_level >= AccessLevel.ADMIN:
             projects = Project.query.all()
         else:
             projects = current_user.projects
 
-        if not projects:
-            return make_response(jsonify({"message": "No projects found"}),
-                                 404)
+        if projects:
+            for project in projects:
+                user_projects[project.id] = {
+                    "id": project.id,
+                    "name": project.name,
+                    "type": project.project_type,
+                    "created": project.created
+                }
+            msg = "Retrieved user projects"
+            status = 200
 
-        for project in projects:
-            user_projects[project.id] = {
-                "id": project.id,
-                "name": project.name,
-                "type": project.project_type,
-                "created": project.created
-            }
-
-        return make_response(jsonify({"msg": "Retrieved user projects",
-                                      "projects": user_projects}), 200)
+        return make_response(jsonify({"msg": msg,
+                                      "projects": user_projects}), status)
 
 
 class GetExportData(Resource):
@@ -815,6 +938,8 @@ rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
 rest.add_resource(GetNewData, "/get-data")
+rest.add_resource(GetAmountOfData, "/get-data-amount")
+rest.add_resource(GetLabel, "/get-label")
 rest.add_resource(CreateDocumentClassificationLabel, "/label-document")
 rest.add_resource(CreateSequenceLabel, "/label-sequence")
 rest.add_resource(CreateSequenceToSequenceLabel, "/label-sequence-to-sequence")
@@ -822,6 +947,7 @@ rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
 rest.add_resource(FetchUserName, '/get-user-name')
 rest.add_resource(FetchUsers, '/get-users')
+rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")

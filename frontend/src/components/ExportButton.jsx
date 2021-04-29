@@ -33,12 +33,12 @@ const ExportButton = ({ projectID, projectType, fileName, className }) => {
   };
 
   return (
-    <div className={className}>
-      <Button disabled={!exportEnabled} onClick={handleExport}>
+    <>
+      <Button className={`dark ${className}`} disabled={!exportEnabled} onClick={handleExport}>
         Export all data
       </Button>
       <span>{status}</span>
-    </div>
+    </>
   );
 };
 

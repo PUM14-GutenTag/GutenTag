@@ -143,6 +143,15 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to get all users related to a project.
+  static sendGetProjectUsers(projectID) {
+    return axios.get('get-project-users', {
+      headers: authHeader(),
+      params: { project_id: projectID },
+    });
+  }
+
+  // Send HTTP-request to get all users projects.
   static sendGetUserProjects() {
     return axios.get('get-user-projects', {
       headers: authHeader(),
@@ -213,6 +222,7 @@ class HTTPLauncher {
         ...
     ]
    */
+
   static sendAddNewImageData(projectID, JSONFile, imageFiles, onUploadProgress) {
     const formData = new FormData();
     formData.append('project_id', projectID);
@@ -225,10 +235,25 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to fetch datapoints to be labelled.
-  static sendGetData(projectID, amount = 1) {
+  static sendGetData(projectID, type, index = 0) {
     return axios.get('get-data', {
       headers: authHeader(),
-      params: { project_id: projectID, amount },
+      params: { project_id: projectID, type, index },
+    });
+  }
+
+  static sendGetAmountOfData(projectID) {
+    return axios.get('get-data-amount', {
+      headers: authHeader(),
+      params: { project_id: projectID },
+    });
+  }
+
+  // Send HTTP-request to fetch datapoints to be labelled.
+  static sendGetLabel(projectID, dataID) {
+    return axios.get('get-label', {
+      headers: authHeader(),
+      params: { project_id: projectID, data_id: dataID },
     });
   }
 

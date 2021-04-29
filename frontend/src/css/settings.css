@@ -8,8 +8,8 @@ div.row,
 
 button.pass {
   color: white;
-  background-color: #FF9800;
-  border-color: #FF9800;
+  background-color: #ff9800;
+  border-color: #ff9800;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   margin: 1em;
   padding: 0.7em;
@@ -20,8 +20,8 @@ button.pass {
 
 button.pass:hover {
   color: white;
-  background-color: #FF9800;
-  border-color: #FF9800;
+  background-color: #ff9800;
+  border-color: #ff9800;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
 }
 
@@ -29,15 +29,15 @@ button.pass:not(:disabled):not(.disabled):active,
 button.pass:focus,
 button.pass:not(:disabled):not(.disabled):active:focus {
   color: white;
-  background-color: #FF9800;
-  border-color: #FF9800;
+  background-color: #ff9800;
+  border-color: #ff9800;
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
 }
 
 button.generic {
   color: white;
-  background-color: #00C8C8;
-  border-color: #00C8C8;
+  background-color: #00c8c8;
+  border-color: #00c8c8;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   margin: 1em;
   padding: 0.7em;
@@ -48,8 +48,8 @@ button.generic {
 
 button.generic:hover {
   color: white;
-  background-color: #00C8C8;
-  border-color: #00C8C8;
+  background-color: #00c8c8;
+  border-color: #00c8c8;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
 }
 
@@ -57,8 +57,8 @@ button.generic:not(:disabled):not(.disabled):active,
 button.generic:focus,
 button.generic:not(:disabled):not(.disabled):active:focus {
   color: white;
-  background-color: #00C8C8;
-  border-color: #00C8C8;
+  background-color: #00c8c8;
+  border-color: #00c8c8;
   color: #063954;
   background-color: #cdffff;
   border-color: #cdffff;
@@ -142,8 +142,4 @@ svg.remove {
   width: 1.1em;
   height: 1.1em;
   margin-right: 0.2em;
-}
-
-td.right {
-  text-align: end;
 }
