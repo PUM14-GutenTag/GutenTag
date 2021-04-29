@@ -5,7 +5,7 @@ import { Direction } from './components/Resizer/constants';
 import Resizer from './components/Resizer';
 import MarkerHeader from './components/MarkerHeader';
 
-const Marker = ({ children }) => {
+const Marker = () => {
   const [pressed, setPressed] = useState(false);
 
   const markerRef = useRef(null);
@@ -24,17 +24,17 @@ const Marker = ({ children }) => {
 
     const resizeTop = () => {
       marker.style.height = `${height - movementY}px`;
-      marker.style.top = `${y + movementY}px`;
     };
     const resizeRight = () => {
       marker.style.width = `${width + movementX}px`;
+      marker.style.left = `${x - movementX}px`;
     };
     const resizeBottom = () => {
       marker.style.height = `${height + movementY}px`;
+      marker.style.top = `${y - movementY}px`;
     };
     const resizeLeft = () => {
       marker.style.width = `${width - movementX}px`;
-      marker.style.left = `${x + movementX}px`;
     };
     switch (direction) {
       case Direction.TopLeft:
@@ -100,13 +100,8 @@ const Marker = ({ children }) => {
 
   return (
     <div className="marker" ref={markerRef} onMouseDown={handleMouseDown}>
-      <div className="marker-container">
-        <div className="move-container">
-          <Resizer onResize={handleResize} />
-          <MarkerHeader />
-          <div className="marker-content">{children}</div>
-        </div>
-      </div>
+      <Resizer onResize={handleResize} />
+      <MarkerHeader />
     </div>
   );
 };

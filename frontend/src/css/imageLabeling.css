@@ -1,6 +1,11 @@
-#marker {
+img {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.img-container {
+  background-color: rgba(red, green, blue, 0.5);
   z-index: 100;
-  position: absolute;
-
-  border: 2px dashed rgba(0, 0, 0, 1);
 }

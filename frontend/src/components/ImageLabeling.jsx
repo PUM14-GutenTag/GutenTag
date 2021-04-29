@@ -1,15 +1,13 @@
 import React from 'react';
 import '../css/imageLabeling.css';
 import DragableMarker from './DragableMarker';
-import Panel from './Panel';
 
 const ImageLabeling = () => {
   return (
     <div className="image-container">
       <h1>Image</h1>
       <div>
-        <DragableMarker>Content</DragableMarker>
-        <Panel />
+        <DragableMarker></DragableMarker>
         <img
           height="500px"
           alt="img"
