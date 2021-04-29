@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
-import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/Sequence.css';
 import Label from './Label';
 // import HTTPLauncher from '../services/HTTPLauncher';
@@ -71,15 +70,17 @@ const Sequence = ({ data, dataPointId }) => {
 
   return (
     <div className="sequence-container">
-      <hr className="hr-title" data-content="Suggestions" />
-      <h4>Display label suggestions</h4>
       <hr className="hr-title" data-content="Text data" />
       <div className="text-box-container">
         <p id="text-box-container">{data}</p>
       </div>
-      <hr className="hr-title" data-content="Add new label" />
+      <hr className="hr-title" data-content="Add new sequence label" />
       <div className="label-container">
-        <div className="display-text">{selection}</div>
+        <div className="selected-text-box">
+            <p className="selected-text">
+            {selection}
+            </p>
+            </div>
         <Form onSubmit={addLabel} className="sequence-form">
           <Form.Group className="group-seq">
             <input
@@ -89,17 +90,16 @@ const Sequence = ({ data, dataPointId }) => {
               required
               ref={inputRef}
             />
-            <button className="btn btn-primary" type="button" onClick={addLabel}>
-              {/* change type to submit */}
-              Add new label
-            </button>
           </Form.Group>
         </Form>
+        <button className="btn btn-primary add-seq-btn" type="button" onClick={addLabel}>
+            {/* change type to submit */}
+            Add new label
+        </button>
       </div>
       <p>
         Selected Text: {selection}, Start index: {startIndex}, End index: {endIndex}
       </p>
-      <hr className="hr-title" data-content="Labels" />
       {labels.map((label) => (
         <div key={label.id}>
           <Label label={label.label} data={label.data} />

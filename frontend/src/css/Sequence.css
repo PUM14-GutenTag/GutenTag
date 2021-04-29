@@ -1,29 +1,47 @@
 .label-container {
     display: flex;
-    border: 1px solid black;
-    flex: 4;
-    justify-content: space-between;
-  }
-  
-  .display-text {
-    flex: 1;
-    flex-basis: 200px;
-    width: 100%;
-    border: blueviolet dotted 2px;
-  }
-  
-  .sequence-form {
-    display: flex;
-    width: 100%;
-    background-color: brown;
-    flex: 1;
     height: 100%;
+    }
+  
+  .selected-text-box {
+    flex: 3;
+    border: 1px solid rgb(216, 216, 216);
+    font-size: 20px;
+    position: relative;
+    display: flex;
+    padding-bottom: 0;
+    border-radius: 15px;
+  }
+
+  .selected-text-box  .selected-text{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(219, 219, 219);
+    font-size: 20px;
+    text-align: center;
+    align-items: center;
+    border-radius: 15px;
+    justify-content: center;
+    overflow-y:auto;
   }
   
-  .input-seq {
-    display: flex;
-    flex: 1;
-    border-radius: 15%;
-    height: 100%;
-    justify-content: stretch;
+  
+  .sequence-form{
+      flex:2;
+      position:relative;
+      width: 100%;
+      
+  }
+ 
+  .sequence-form .group-seq{
+      width: 100%;
+      height: 100%;
+      position:absolute;
+      justify-content: center;
+  
+  }
+
+  .add-seq-btn{
+      flex:1;
   }
