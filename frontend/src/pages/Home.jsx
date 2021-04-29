@@ -22,7 +22,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchData();
-  });
+  }, []);
 
   return (
     <Layout title="Home">
