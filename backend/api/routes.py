@@ -739,7 +739,7 @@ class FetchUserName(Resource):
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
         msg = "Succesfully got user information."
-        name = current_user.first_name + " " + current_user.last_name
+        name = f"{current_user.first_name} {current_user.last_name}"
 
         return make_response(jsonify({
             "name": name,
@@ -766,7 +766,7 @@ class FetchUsers(Resource):
             users = User.query.all()
             for user in users:
                 user_info[user.id] = {
-                    "name": user.first_name + " " + user.last_name,
+                    "name": f"{user.first_name} {user.last_name}",
                     "email": user.email,
                     "admin": user.access_level
                 }
