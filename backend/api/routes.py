@@ -827,20 +827,6 @@ class FetchUserProjects(Resource):
         else:
             projects = current_user.projects
 
-<<<<<<< HEAD
-        if not projects:
-            return make_response(jsonify({
-                "message": "No projects found", "projects": []}),
-                404)
-
-        for project in projects:
-            user_projects[project.id] = {
-                "id": project.id,
-                "name": project.name,
-                "type": project.project_type,
-                "created": project.created
-            }
-=======
         if projects:
             for project in projects:
                 user_projects[project.id] = {
@@ -851,7 +837,6 @@ class FetchUserProjects(Resource):
                 }
             msg = "Retrieved user projects"
             status = 200
->>>>>>> main
 
         return make_response(jsonify({"msg": msg,
                                       "projects": user_projects}), status)
