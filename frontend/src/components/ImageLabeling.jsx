@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '../css/imageLabeling.css';
 import DragableMarker from './DragableMarker';
 
 const ImageLabeling = () => {
-  const [corners, setCorners] = useState({
-    topLeft: 0,
-    topRight: 0,
-    buttomLeft: 0,
-    buttomRight: 0,
-  });
-
   const handleSubmit = (left, top, height, width) => {
     console.log('Handle Submit');
   };

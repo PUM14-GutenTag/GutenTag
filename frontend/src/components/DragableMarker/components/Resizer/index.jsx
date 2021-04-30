@@ -5,24 +5,25 @@ import './styles.css';
 const Resizer = ({ reference }) => {
   const [direction, setDirection] = useState('');
   const [pressed, setPressed] = useState(false);
-
+  // eslint-disable-next-line
   const handleResize = (direction, movementX, movementY) => {
     const marker = reference.current;
     const { width, height, x, y } = marker.getBoundingClientRect();
 
     const resizeTop = () => {
       marker.style.height = `${height - movementY}px`;
+      marker.style.top = `${y + movementY}px`;
     };
     const resizeRight = () => {
       marker.style.width = `${width + movementX}px`;
-      marker.style.left = `${x - movementX}px`;
+      marker.style.right = `${x - movementX}px`;
     };
     const resizeBottom = () => {
       marker.style.height = `${height + movementY}px`;
-      marker.style.top = `${y - movementY}px`;
     };
     const resizeLeft = () => {
       marker.style.width = `${width - movementX}px`;
+      marker.style.left = `${x + movementX}px`;
     };
     switch (direction) {
       case Direction.TopLeft:
