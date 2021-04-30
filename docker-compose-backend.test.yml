@@ -15,6 +15,7 @@ services:
       context: ./backend
     volumes:
       - ./backend:/usr/src/backend
+      - ./test_resources:/usr/src/backend/Test/res
     depends_on:
       - db
     ports:

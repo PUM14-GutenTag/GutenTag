@@ -3,13 +3,14 @@ This file contains all database models and associated methods.
 """
 import datetime
 import io
-import random
 from enum import IntEnum
 from api import db
 from api.database_handler import check_types
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
+LIST_SIDE_LENGTH = 5
+LIST_LENGTH = 2 * LIST_SIDE_LENGTH + 1
 
 
 class ProjectType(IntEnum):
@@ -195,40 +196,114 @@ class Project(db.Model):
         self.name = project_name
         self.project_type = project_type
 
-    def get_data(self, user_id, amount):
+    def get_data(self, user_id):
         """
-        Function for retrieving datapoints that
-        are previously unlabeled by the user
+        Returns a list with length LIST_LENGTH which is always an uneven
+        number. The middle value will be the first value in project_data
+        that is unlabeled by the user.
         """
 
-        check_types([(amount, int), (user_id, int)])
+        index = 0
+        all_labeled = False
+        found_labeled = True
+        project_data = self.data
 
-        user_labels = Label.query.filter_by(user_id=user_id).all()
+        # find earliest none labeled data point
+        for data in project_data:
+            if not found_labeled:
+                break
+            found_labeled = False
+            for label in data.labels:
+                if(user_id == label.user_id):
+                    found_labeled = True
+                    index += 1
+                    break
 
-        labeled_ids = set()
-        unlabeled_data = {}
+        # Check if all data points are labeled by user
+        if index == len(project_data):
+            all_labeled = True
+            index -= 1
 
-        for label in user_labels:
-            labeled_ids.add(label.data_id)
-
+        # Make a list of objects where each object consists of id and data.
+        data_points = []
         for data in self.data:
-            if data.id not in labeled_ids:
-                if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
-                    data_item = data.file_name
-                else:
-                    data_item = data.text_data
-                unlabeled_data[data.id] = data_item
+            data_point = {}
+            if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
+                data_item = data.file_name
+            else:
+                data_item = data.text_data
+            data_point["id"] = data.id
+            data_point["data"] = data_item
+            data_points.append(data_point)
 
-        if len(unlabeled_data) > amount:
-            random_numbers = random.sample(range(len(unlabeled_data)), amount)
-            keys = list(unlabeled_data.keys())
-            random_data = {}
-            for n in random_numbers:
-                random_data[keys[n]] = unlabeled_data[keys[n]]
+        """
+        Fill out the list to always return a list of length LIST_LENGTH.
+        Checks if index is close to a border and fills out the list
+        with {} if that is the case
+        """
+        if len(data_points) > LIST_LENGTH:
 
-            return random_data
+            if index < LIST_SIDE_LENGTH:
+                list_of_data = data_points[:index + LIST_SIDE_LENGTH + 1]
+                for i in range(LIST_SIDE_LENGTH - index):
+                    list_of_data.insert(0, {})
 
-        return unlabeled_data
+            # -1 to compensate for index, -(LIST_SIDE_LENGTH) because we want
+            # LIST_SIDE_LENGTH values ahead
+
+            elif ((len(data_points) - 1) - LIST_SIDE_LENGTH) < index:
+                list_of_data = data_points[index - LIST_SIDE_LENGTH:]
+                for i in range(index - ((len(data_points) - 1)
+                                        - LIST_SIDE_LENGTH)):
+                    list_of_data.append({})
+            else:
+                list_of_data = \
+                    data_points[index - LIST_SIDE_LENGTH:index
+                                + LIST_SIDE_LENGTH + 1]
+        else:
+            list_of_data = data_points[:]
+            for i in range(LIST_SIDE_LENGTH - index):
+                list_of_data.insert(0, {})
+            for i in range(index - ((len(data_points) - 1)
+                                    - LIST_SIDE_LENGTH)):
+                list_of_data.append({})
+
+        return {"list": list_of_data, "index": index,
+                "allLabeled": all_labeled}
+
+    def get_next_data(self, index):
+        """
+        Get data LIST_SIDE_LENGTH index ahead in the list or return
+        empty object
+        """
+        check_types([(index, int)])
+        data_points = self.data
+        try:
+            data = data_points[index + LIST_SIDE_LENGTH]
+            data_point = {}
+            data_point["id"] = data.id
+            data_point["data"] = data.text_data
+            next_data = data_point
+        except IndexError:
+            next_data = {}
+        return next_data
+
+    def get_earlier_data(self, index):
+        """
+        Get data LIST_SIDE_LENGTH index earlier in the list or return
+        empty object
+        """
+        check_types([(index, int)])
+        data_points = self.data
+        if index - LIST_SIDE_LENGTH >= 0:
+            data = data_points[index - LIST_SIDE_LENGTH]
+            data_point = {}
+            data_point["id"] = data.id
+            data_point["data"] = data.text_data
+            earlier_data = data_point
+        else:
+            earlier_data = {}
+        return earlier_data
 
 
 class ProjectData(db.Model):
@@ -311,7 +386,8 @@ class ProjectImageData(ProjectData):
 class Label(db.Model):
     """
     Label contains the label for a certain piece of data. Base class that
-    should not be instantiated.
+    should not be instantiated. All children to Label must implement
+    a format_json-function.
     """
     __tablename__ = "label"
 
@@ -358,6 +434,16 @@ class DocumentClassificationLabel(Label):
         self.label = label_str
         self.is_prelabel = is_prelabel
 
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label
+            }
+        }
+
 
 class SequenceLabel(Label):
     """
@@ -392,6 +478,18 @@ class SequenceLabel(Label):
         self.end = end
         self.is_prelabel = is_prelabel
 
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label,
+                "begin": self.begin,
+                "end": self.end
+            }
+        }
+
 
 class SequenceToSequenceLabel(Label):
     """
@@ -416,6 +514,16 @@ class SequenceToSequenceLabel(Label):
         self.user_id = user_id
         self.label = label_str
         self.is_prelabel = is_prelabel
+
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label
+            }
+        }
 
 
 class ImageClassificationLabel(Label):
@@ -452,3 +560,19 @@ class ImageClassificationLabel(Label):
         self.x2 = coord2[0]
         self.y2 = coord2[1]
         self.is_prelabel = is_prelabel
+
+    def format_json(self):
+        return {
+            self.id: {
+                "label_id": self.id,
+                "data_id": self.data_id,
+                "user_id": self.user_id,
+                "label": self.label,
+                "coordinates": {
+                    "x1": self.x1,
+                    "x2": self.x2,
+                    "y1": self.y1,
+                    "y2": self.y2
+                }
+            }
+        }

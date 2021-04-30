@@ -21,4 +21,4 @@ jobs:
         run: docker-compose run --rm frontend npm run build
 
       - name: Run tests
-        run: docker-compose run -e CI=true frontend npm test
+        run: docker-compose run -e CI=true frontend npm test -- --testPathIgnorePatterns performance.test.js

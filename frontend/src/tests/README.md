@@ -31,7 +31,7 @@ in test.js module.exports.
 All terminal commands are expected to be run from the project's root folder.
 
 1. Make sure that you are running the Docker containers beforehand.
-2. Run `docker-compose run frontend npm test` in your terminal.
+2. Run `docker-compose run frontend npm test -- --testPathIgnorePatterns performance.test.js` in your terminal. The additional argument skips running of time intensive performance tests. If you want to run the performance tests, simply run `docker-compose run frontend npm test performance.test.js`
 
 It will run all tests meeting the following [filename conventions](https://create-react-app.dev/docs/running-tests/#filename-conventions):
 
