@@ -89,7 +89,7 @@ class CreateUser(Resource):
                                       create other users."}), 401)
 
 
-class Login(Resource):
+class LoginUser(Resource):
     """
     Endpoint for logging in an user.
     """
@@ -947,7 +947,7 @@ class Reset(Resource):
 
 
 rest.add_resource(CreateUser, "/create-user")
-rest.add_resource(Login, "/login")
+rest.add_resource(LoginUser, "/login")
 rest.add_resource(ChangePassword, "/change-password")
 rest.add_resource(RefreshToken, "/refresh-token")
 rest.add_resource(Authorize, "/authorize-user")
