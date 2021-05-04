@@ -425,6 +425,13 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to get achievements which have not been displayed to the user.
+  static sendGetUnnotifiedAchievements() {
+    return axios.get('get-unnotified-achievements', {
+      headers: authHeader(),
+    });
+  }
+
   // Send HTTP-request to reset database (TODO: remove for production).
   static sendResetDatabase() {
     return axios.get('reset');

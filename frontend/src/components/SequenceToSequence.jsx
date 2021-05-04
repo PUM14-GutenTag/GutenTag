@@ -11,6 +11,11 @@ Component that shows the specifics for document classification
 const SequenceToSequence = ({ data, dataPointId, getSetLabels, textBoxSize }) => {
   const inputRef = useRef();
 
+  const getAchievements = async () => {
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    console.log('get achievements', response.data);
+  };
+
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
   const addLabel = async (event) => {
     event.preventDefault();
@@ -18,6 +23,8 @@ const SequenceToSequence = ({ data, dataPointId, getSetLabels, textBoxSize }) =>
     getSetLabels();
     inputRef.current.value = '';
     inputRef.current.focus();
+
+    getAchievements();
   };
 
   useEffect(() => {

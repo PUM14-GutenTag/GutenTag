@@ -19,7 +19,10 @@ from api.models import (
     SequenceLabel,
     SequenceToSequenceLabel,
     ImageClassificationLabel,
-    User
+    User,
+    Achievement,
+    Statistic,
+    Login
 )
 from api.database_handler import (
     reset_db,
@@ -32,6 +35,7 @@ from api.parser import (
     import_image_data,
     export_data
 )
+from api.achievements import LabelingStatistic
 
 
 """
@@ -560,12 +564,14 @@ class CreateDocumentClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                LabelingStatistic.increment_label(user.id)
                 return make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
+                print(msg)
                 status = 404
         else:
             msg = "User is not authorized to create label."
@@ -598,6 +604,7 @@ class CreateSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                LabelingStatistic.increment_label(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
                                   args.begin, args.end))), 200)
@@ -633,6 +640,7 @@ class CreateSequenceToSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                LabelingStatistic.increment_label(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
                         args.data_id, user.id, args.label)
@@ -673,6 +681,7 @@ class CreateImageClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                LabelingStatistic.increment_label(user.id)
                 return make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,
@@ -913,6 +922,18 @@ class GetImageData(Resource):
         return make_response(jsonify({"message": msg}), status)
 
 
+class GetUnnotifiedAchievements(Resource):
+    """
+    Endpoint that returns a list of achievements which have not been displayed
+    for the user.
+    """
+    @jwt_required()
+    def get(self):
+        user = User.get_by_email(get_jwt_identity())
+        achieve_list = Achievement.get_unnotified(user.id)
+        return jsonify(achieve_list)
+
+
 class Reset(Resource):
     """
     Reset defines an endpoint used to reset the database for use during
@@ -950,4 +971,5 @@ rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")
+rest.add_resource(GetUnnotifiedAchievements, "/get-unnotified-achievements")
 rest.add_resource(Reset, "/reset")

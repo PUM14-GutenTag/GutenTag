@@ -9,6 +9,8 @@ from api.database_handler import check_types
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
+
+
 LIST_SIDE_LENGTH = 5
 LIST_LENGTH = 2 * LIST_SIDE_LENGTH + 1
 
@@ -614,4 +616,20 @@ class Achievement(db.Model):
     name = db.Column(db.Text, nullable=False)
     earned = db.Column(db.DateTime, nullable=False,
                        default=datetime.datetime.now())
-    has_notified = db.Colum(db.Boolean, nullable=False, default=False)
+    has_notified = db.Column(db.Boolean, nullable=False, default=False)
+
+    def format_json(self):
+        return {
+            "name": self.name,
+            "earned": self.earned,
+        }
+
+    @staticmethod
+    def get_unnotified(user_id):
+        achieve_list = Achievement.query.filter_by(user_id=user_id,
+                                                   has_notified=False).all()
+        for achieve in achieve_list:
+            achieve.has_notified = True
+        db.session.commit()
+
+        return [achieve.format_json() for achieve in achieve_list]
