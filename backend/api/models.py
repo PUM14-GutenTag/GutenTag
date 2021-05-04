@@ -576,3 +576,42 @@ class ImageClassificationLabel(Label):
                 }
             }
         }
+
+
+class Login(db.Model):
+    """
+    Keeps track of the datetime of all user logins.
+    """
+    __tablename__ = "login"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    time = db.Column(db.DateTime, nullable=False,
+                     default=datetime.datetime.now())
+
+
+class Statistic(db.Model):
+    """
+    Keeps track of statisics of each user which can be displayed on their page
+    or used to track achievement progress.
+    """
+    __tablename__ = "statistic"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    occurances = db.Column(db.Integer, default=0, nullable=False)
+
+
+class Achievement(db.Model):
+    """
+    Contains the achievements earned by all users.
+    """
+    __tablename__ = "achievement"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    earned = db.Column(db.DateTime, nullable=False,
+                       default=datetime.datetime.now())
+    has_notified = db.Colum(db.Boolean, nullable=False, default=False)
