@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Button, Row, Col } from 'react-bootstrap';
 
 import CreateProject from '../components/CreateProject';
@@ -8,6 +9,7 @@ import AchievementCarousel from '../components/AchievementCarousel';
 import Layout from '../components/Layout';
 
 import { useUser } from '../contexts/UserContext';
+import userAuth from '../services/userAuth';
 
 import SettingPages from '../SettingPages';
 
@@ -21,11 +23,12 @@ import '../css/settings.css';
 const Settings = () => {
   const [showPage, setPageShow] = useState(SettingPages.DEFAULT);
   const { state: userState } = useUser();
+  const history = useHistory();
 
   // Sets the accesstoken to null and redirects to login page.
   const logout = () => {
-    localStorage.setItem('gutentag-accesstoken', null);
-    window.location.href = 'http://localhost:3000/';
+    userAuth.clearTokens();
+    history.push('/');
   };
 
   const toggleBack = () => {
