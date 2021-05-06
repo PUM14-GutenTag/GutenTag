@@ -614,6 +614,7 @@ class Achievement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)
     earned = db.Column(db.DateTime, nullable=False,
                        default=datetime.datetime.now())
     has_notified = db.Column(db.Boolean, nullable=False, default=False)
