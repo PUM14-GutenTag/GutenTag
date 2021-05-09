@@ -28,14 +28,17 @@ from api.database_handler import (
     reset_db,
     try_add,
     try_add_response,
-    try_delete_response
+    try_delete_response,
+    add_flush,
+    commit
 )
 from api.parser import (
     import_text_data,
     import_image_data,
     export_data
 )
-from api.achievements import LabelingStatistic
+from api.gamification import (add_stats_to_new_user,
+                              LabelingStatistic)
 
 
 """
@@ -82,7 +85,10 @@ class CreateUser(Resource):
         if user.access_level >= AccessLevel.ADMIN:
             new_user = User(args.first_name, args.last_name, args.email,
                             args.password, args.admin)
-            return make_response(jsonify(try_add_response(new_user)), 200)
+            add_flush(new_user)
+            add_stats_to_new_user(new_user.id)
+            commit()
+            return make_response(jsonify("User added."), 200)
 
         return make_response(jsonify({"id": None, "message":
                                       "You are not authorized to  \
@@ -531,7 +537,6 @@ class GetLabel(Resource):
             status = 200
             msg = "Labels retrieved"
         elif project:
-            print("inproj")
             status = 200
             msg = f"No labels by {user.first_name} " + (
                 f"{user.last_name} found in project {project.name}")
@@ -564,7 +569,7 @@ class CreateDocumentClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                LabelingStatistic.increment(user.id)
+                LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label)
@@ -604,7 +609,7 @@ class CreateSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                LabelingStatistic.increment(user.id)
+                LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
                                   args.begin, args.end))), 200)
@@ -640,7 +645,7 @@ class CreateSequenceToSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                LabelingStatistic.increment(user.id)
+                LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
                         args.data_id, user.id, args.label)
@@ -681,7 +686,7 @@ class CreateImageClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                LabelingStatistic.increment(user.id)
+                LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,
@@ -943,7 +948,9 @@ class Reset(Resource):
     def get(self):
         reset_db()
         admin = User("Admin", "Admin", "admin@admin", "password", True)
-        try_add(admin)
+        add_flush(admin)
+        add_stats_to_new_user(admin.id)
+        commit()
 
 
 rest.add_resource(CreateUser, "/create-user")

@@ -69,6 +69,8 @@ class User(db.Model):
 
     projects = db.relationship(
         "Project", secondary=access_control, back_populates="users")
+    statistics = db.relationship("Statistic")
+    achievements = db.relationship("Achievement")
 
     def __init__(self, first_name, last_name, email, password, isAdmin=False):
         check_types([(first_name, str), (last_name, str), (email, str),
@@ -615,8 +617,7 @@ class Achievement(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
-    earned = db.Column(db.DateTime, nullable=False,
-                       default=datetime.datetime.now())
+    earned = db.Column(db.DateTime)
     has_notified = db.Column(db.Boolean, nullable=False, default=False)
 
     def format_json(self):
@@ -627,10 +628,21 @@ class Achievement(db.Model):
 
     @staticmethod
     def get_unnotified(user_id):
-        achieve_list = Achievement.query.filter_by(user_id=user_id,
-                                                   has_notified=False).all()
+        achieve_list = Achievement.query.filter(
+            Achievement.user_id == user_id,
+            Achievement.earned.isnot(None),
+            Achievement.has_notified.is_(False)
+        ).all()
+        print("achieve list:", achieve_list)
         for achieve in achieve_list:
             achieve.has_notified = True
         db.session.commit()
 
         return [achieve.format_json() for achieve in achieve_list]
+
+    def __repr__(self):
+        return (
+            f"<Achievement(id={self.id}, name={self.name}, "
+            f"description={self.description}, earned={self.earned}, "
+            f"has_notified={self.has_notified}, user_Id={self.user_id})>"
+        )
