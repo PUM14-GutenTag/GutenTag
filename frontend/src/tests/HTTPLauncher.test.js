@@ -697,3 +697,45 @@ describe('sendGetExportData', () => {
     expect(response.status).toBe(200);
   });
 });
+
+describe.only('sendGetUnnotifiedAchievements', () => {
+  test('Labeling single achievement', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1, 'Document');
+
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
+    );
+
+    await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'label 0');
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    console.log(response);
+    // Expecting Labeling Bronze III achievement.
+    expect(response.status).toBe(200);
+    expect(response.data.length).toBe(1);
+  });
+
+  test('Labeling multiple achievements achievement', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1, 'Document');
+
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
+    );
+
+    const promises = [];
+    for (let i = 0; i < 5; i += 1) {
+      promises.push(HTTPLauncher.sendCreateDocumentClassificationLabel(1, `label ${i}`));
+    }
+    await Promise.all(promises);
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    console.log(response);
+    // Expecting Labeling Bronze III and Bronze II achievements for 1 and 5 labels.
+    expect(response.status).toBe(200);
+    expect(response.data.length).toBe(2);
+  });
+});
