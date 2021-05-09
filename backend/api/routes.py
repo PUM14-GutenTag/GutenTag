@@ -38,7 +38,12 @@ from api.parser import (
     export_data
 )
 from api.gamification import (add_stats_to_new_user,
-                              LabelingStatistic)
+                              LabelingStatistic,
+                              ProjectStatistic,
+                              LoginStatistic,
+                              WorkdayLoginStatistic,
+                              ImportStatistic,
+                              ExportStatistic)
 
 
 """
@@ -119,6 +124,8 @@ class LoginUser(Resource):
                 access_token, refresh_token = None, None
                 status = 401
             else:
+                LoginStatistic.update(user.id)
+                # WorkdayLoginStatistic.update(user.id)
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
                 status = 200
@@ -271,6 +278,7 @@ class NewProject(Resource):
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
+                ProjectStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     Project(args.project_name, args.project_type)
                 )), 200)
@@ -370,6 +378,8 @@ class AddNewTextData(Resource):
 
             try:
                 import_text_data(args.project_id, json.load(json_file))
+                ImportStatistic.update(user.id)
+                commit()
                 msg = "Data added."
                 status = 200
             except Exception as e:
@@ -425,6 +435,8 @@ class AddNewImageData(Resource):
             try:
                 import_image_data(args.project_id, json.load(json_file),
                                   image_dict)
+                ImportStatistic.update(user.id)
+                commit()
                 msg = "Data added."
                 status = 200
             except Exception as e:
@@ -880,14 +892,17 @@ class GetExportData(Resource):
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
+                data = export_data(project.id)
+                ExportStatistic.update(user.id)
+                commit()
                 if (project.project_type == ProjectType.IMAGE_CLASSIFICATION):
                     return make_response(send_file(
-                        export_data(project.id),
+                        data,
                         attachment_filename=f"{project.name}.zip",
                         as_attachment=True
                     ), 200)
                 else:
-                    return make_response(export_data(project.id), 200)
+                    return make_response(data, 200)
             except Exception as e:
                 msg = f"Could not export data: {e}"
                 status = 404

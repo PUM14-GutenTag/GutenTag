@@ -628,6 +628,11 @@ class Achievement(db.Model):
 
     @staticmethod
     def get_unnotified(user_id):
+        # print("achieve list:", Achievement.query.filter(
+        #     Achievement.user_id == user_id
+        #     # Achievement.earned.isnot(None),
+        #     # Achievement.has_notified.is_(False)
+        # ).all())
         achieve_list = Achievement.query.filter(
             Achievement.user_id == user_id,
             Achievement.earned.isnot(None),
@@ -644,5 +649,5 @@ class Achievement(db.Model):
         return (
             f"<Achievement(id={self.id}, name={self.name}, "
             f"description={self.description}, earned={self.earned}, "
-            f"has_notified={self.has_notified}, user_Id={self.user_id})>"
+            f"has_notified={self.has_notified}, user_id={self.user_id})>"
         )
