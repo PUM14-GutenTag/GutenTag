@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 // Cropper library
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
-import { propTypes } from 'react-bootstrap/esm/Image';
 import HTTPLauncher from '../services/HTTPLauncher';
 
 /*
@@ -48,6 +48,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
   // Sends a request to the database for the img source and sets it in a state
   const getImage = async (id) => {
     const response = await HTTPLauncher.sendGetImageData(id);
+    console.log(response);
     const source = URL.createObjectURL(response.data);
     if (imgSource != null) URL.revokeObjectURL(imgSource);
     setImageSource(source);
@@ -104,8 +105,8 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
 };
 
 ImageLabeling.propTypes = {
-  dataPointId: propTypes.number.isRequired,
-  getSetLabels: propTypes.func.isRequired,
+  dataPointId: PropTypes.number.isRequired,
+  getSetLabels: PropTypes.func.isRequired,
 };
 
 export default ImageLabeling;
