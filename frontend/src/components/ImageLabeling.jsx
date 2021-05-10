@@ -1,65 +1,66 @@
 import React, { useEffect, useRef, useState } from 'react';
-import '../css/imageLabeling.css';
+import Form from 'react-bootstrap/Form';
+// Cropper library
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
-import { saveAs } from 'file-saver';
+import { propTypes } from 'react-bootstrap/esm/Image';
 import HTTPLauncher from '../services/HTTPLauncher';
 
-// eslint-disable-next-line
-// import img from '../tests/out/ILSVRC2012_val_00000003.JPEG';
-// const bigJoe =
-//   'https://scontent-arn2-1.xx.fbcdn.net/v/t1.6435-9/52835846_10212407730083577_1812354183186087936_n.jpg?_nc_cat=101&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=WT0nZMJrx34AX_Lx0UU&tn=2xc4Z9PGvpJTnJ9L&_nc_ht=scontent-arn2-1.xx&oh=444c9260966921498402b6ecbb694902&oe=60AE1408';
-// eslint-disable-next-line
-// const imgg = 'https://i.imgur.com/lFd4waN.jpg';
-const ImageLabeling = ({ data, dataPointId }) => {
-  const [cropper, setCropper] = useState();
+/*
+Component that shows a image, you are able to crop the img with a label
+*/
+const ImageLabeling = ({ dataPointId, getSetLabels }) => {
+  const inputRef = useRef();
+  const cropperRef = useRef();
+
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
   const [imgSource, setImageSource] = useState(null);
+  const [cropper, setCropper] = useState();
 
+  // Returns the relevant data from the cropper
   const getCropData = () => {
     if (typeof cropper !== 'undefined') {
       const width = cropper.getCroppedCanvas().width;
       const height = cropper.getCroppedCanvas().height;
       return [x, y, width, height];
     }
+    return [x, y, 0, 0];
   };
 
-  const getImage = async (id) => {
-    console.log('getImage');
-    console.log(data);
-    const response = await HTTPLauncher.sendGetImageData(id);
-    console.log(response);
-    // const blob = new Blob([response.data], { type: 'image/jpeg' });
-    const source = URL.createObjectURL(response.data);
-    // console.log(blob);
-    console.log(source);
-    if (imgSource != null) URL.revokeObjectURL(imgSource);
-    setImageSource(source);
-    // saveAs(response.data, `file.jpeg`);
-  };
-
-  useEffect(() => {
-    console.log('UseEffect');
-    getImage(dataPointId);
-  }, [dataPointId]);
-
-  const handleSubmit = (e) => {
+  // Adds label to the datapoint and updates the labels that are being shown for the user
+  const addLabel = async (event) => {
+    event.preventDefault();
     const cropData = getCropData();
-    const dataID = 1;
-    console.log('Handle Submit');
-    console.log(getCropData());
-
-    HTTPLauncher.sendCreateImageClassificationLabel(
-      dataID,
+    await HTTPLauncher.sendCreateImageClassificationLabel(
+      dataPointId,
+      inputRef.current.value,
       cropData[0],
       cropData[1],
       cropData[2],
       cropData[3]
     );
+    getSetLabels();
+    inputRef.current.value = '';
+    inputRef.current.focus();
   };
-  const cropperRef = useRef(null);
 
+  // Sends a request to the database for the img source and sets it in a state
+  const getImage = async (id) => {
+    const response = await HTTPLauncher.sendGetImageData(id);
+    const source = URL.createObjectURL(response.data);
+    if (imgSource != null) URL.revokeObjectURL(imgSource);
+    setImageSource(source);
+  };
+
+  // What to happen when we change datapoint to label
+  useEffect(() => {
+    inputRef.current.value = '';
+    inputRef.current.focus();
+    getImage(dataPointId);
+  }, [dataPointId]);
+
+  // Sets X and Y states when cropping
   const onCrop = (e) => {
     setX(e.detail.x);
     setY(e.detail.y);
@@ -70,7 +71,7 @@ const ImageLabeling = ({ data, dataPointId }) => {
       <div>
         <Cropper
           src={imgSource}
-          style={{ height: 500, width: '100%' }}
+          style={{ height: 400, width: '100%' }}
           // Cropper.js options
           initialAspectRatio={16 / 9}
           guides={false}
@@ -80,12 +81,31 @@ const ImageLabeling = ({ data, dataPointId }) => {
             setCropper(instance);
           }}
         />
-
-        <button type="button" style={{ float: 'right' }} onClick={handleSubmit}>
-          Submit
-        </button>
+        <hr className="hr-title" data-content="Add new label" />
+        <div className="form-container">
+          <Form onSubmit={addLabel}>
+            <Form.Group controlId="form.name" className="form-group">
+              <input
+                type="text"
+                placeholder="Enter label..."
+                required
+                className="input-box"
+                ref={inputRef}
+              />
+              <button className="btn btn-primary label-btn" type="submit">
+                Label
+              </button>
+            </Form.Group>
+          </Form>
+        </div>
       </div>
     </div>
   );
 };
+
+ImageLabeling.propTypes = {
+  dataPointId: propTypes.number.isRequired,
+  getSetLabels: propTypes.func.isRequired,
+};
+
 export default ImageLabeling;

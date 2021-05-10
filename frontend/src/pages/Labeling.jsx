@@ -126,7 +126,6 @@ const Labeling = ({ location }) => {
         getDataTypeEnum.next_value,
         tempIndex
       );
-      console.log('RESPONSE:', response);
       tempListOfDataPoints.push(response.data);
       setListOfDataPoints(tempListOfDataPoints);
       getSetLabels(tempListOfDataPoints);
@@ -154,7 +153,7 @@ const Labeling = ({ location }) => {
       if (typeOfProject === ProjectType.IMAGE_CLASSIFICATION) {
         return (
           <ImageLabeling
-            data={listOfDataPoints[CURRENT_DATA].data}
+            // data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
           />
