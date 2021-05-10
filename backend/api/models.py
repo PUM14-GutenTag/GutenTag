@@ -621,9 +621,14 @@ class Achievement(db.Model):
     has_notified = db.Column(db.Boolean, nullable=False, default=False)
 
     def format_json(self):
+        if self.earned is None:
+            earned = ""
+        else:
+            earned = self.earned.strftime("%d %B %Y")
         return {
             "name": self.name,
-            "earned": self.earned,
+            "description": self.description,
+            "earned": earned
         }
 
     @staticmethod

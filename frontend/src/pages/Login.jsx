@@ -33,9 +33,7 @@ function Login() {
     event.preventDefault();
 
     setValidated(true);
-    const responseLogin = await HTTPLauncher.sendLogin(email, password);
-    const { access_token: accessToken, refresh_token: refreshToken } = responseLogin.data;
-    userAuth.setTokens(accessToken, refreshToken);
+    await HTTPLauncher.sendLogin(email, password);
     history.push('/home');
   };
 

@@ -716,7 +716,7 @@ describe.only('sendGetUnnotifiedAchievements', () => {
     expect(response.data.length).toBe(2);
   });
 
-  test.only('Importer achievement', async () => {
+  test('Importer achievement', async () => {
     await testUtil.resetDB();
     await testUtil.createUser();
     const projectID = await testUtil.createProject(1, 'Document');
@@ -734,7 +734,7 @@ describe.only('sendGetUnnotifiedAchievements', () => {
     expect(response.data.length).toBe(1);
   });
 
-  test.only('Exporter achievement', async () => {
+  test('Exporter achievement', async () => {
     await testUtil.resetDB();
     await testUtil.createUser();
     const projectID = await testUtil.createProject(1, 'Document');

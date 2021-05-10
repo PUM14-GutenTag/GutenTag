@@ -126,6 +126,7 @@ class LoginUser(Resource):
             else:
                 LoginStatistic.update(user.id)
                 # WorkdayLoginStatistic.update(user.id)
+                commit()
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
                 status = 200
