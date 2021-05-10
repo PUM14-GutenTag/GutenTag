@@ -21,7 +21,7 @@ class BaseStatistic():
         """
         return Statistic.query.filter_by(name=cls.statistic_name,
                                          user_id=user_id
-                                         ).occurances
+                                         ).one().occurances
 
     @classmethod
     def instantiate(cls, user_id):
@@ -36,6 +36,8 @@ class BaseStatistic():
 
     @classmethod
     def instantiate_achievement_models(cls, user_id):
+        """
+        """
         raise NotImplementedError()
 
     @classmethod
@@ -43,6 +45,23 @@ class BaseStatistic():
         """
         """
         raise NotImplementedError()
+
+
+class BooleanStatistic(BaseStatistic):
+    """
+    """
+    achievement_name = None
+    achievement_description = None
+
+    @classmethod
+    def instantiate_achievement_models(cls, user_id):
+        """
+        """
+        db.session.add(Achievement(
+            name=cls.achievement_name,
+            description=cls.achievement_description,
+            user_id=user_id
+        ))
 
 
 class RankStatistic(BaseStatistic):
@@ -55,15 +74,14 @@ class RankStatistic(BaseStatistic):
         """
         """
         cls.update_occurances(user_id)
-        stat = Statistic.query.filter_by(name=cls.statistic_name,
-                                         user_id=user_id).one()
+        occurances = cls.get_occurances(user_id)
 
         # Check if new achievement attained.
-        print(stat.occurances)
-        if stat.occurances in cls.ranks.keys():
+        print("occurances", occurances)
+        if occurances in cls.ranks.keys():
             new_achieve = Achievement.query.filter_by(
                 user_id=user_id,
-                name=cls.ranks[stat.occurances][0],
+                name=cls.ranks[occurances][0],
             ).one()
             if (new_achieve):
                 new_achieve.earned = datetime.datetime.now()
@@ -118,6 +136,109 @@ class IncrementStatistic(RankStatistic):
 #              CONCRETE CLASSES
 ###################################################
 
+class LoginStatistic(RankStatistic):
+    """
+    """
+    statistic_name = "Logins"
+    ranks = {
+        1: ("First time", "Log in for the first time"),
+    }
+
+    @classmethod
+    def get_occurances(cls, user_id):
+        """
+        """
+        return len(Login.query.filter_by(user_id=user_id).all())
+
+    @classmethod
+    def update_occurances(cls, user_id):
+        """
+        """
+        add_flush(Login(user_id=user_id))
+
+# class WeekendLoginStatistic(RankStatistic):
+#     """
+#     """
+#     statistic_name = "Weekend logins"
+#     ranks = {
+#         1: ("First time", "Log in on a weekend"),
+#     }
+
+#     @classmethod
+#     def get_occurances(cls, user_id):
+#         """
+#         """
+#         logins = Login.query.filter(
+#             Login.user_id==user_id,
+#             # Login.time.weekday()
+#         ).all()
+#         return len()
+
+#     @classmethod
+#     def update_occurances(cls, user_id):
+#         """
+#         """
+#         add_flush(Login(user_id=user_id))
+
+
+class WorkdayLoginStatistic(BaseStatistic):
+    """
+    """
+    statistic_name = "Workday logins"
+    ranks = {
+        2: ("I'm back", "Log in two workdays in a row"),
+        7: ("Workday champion", "Log in every workday for a week"),
+        14: ("All I do is work", "Log in every workday for two weeks"),
+        21: ("Work! Work! Work!", "Log in every workday for three weeks"),
+        30: ("Employee of the month", "Log in every workday for a month")
+    }
+
+    @classmethod
+    def update(cls, user_id):
+        """
+        """
+        cls.update_occurances(user_id)
+        occurances = cls.get_occurances(user_id)
+
+        # Check if new achievement attained.
+        print("occurances", occurances)
+        workday_ranks = [calc_workdays_in_days(k) for k in cls.ranks.keys()]
+        if occurances in workday_ranks:
+            new_achieve = Achievement.query.filter_by(
+                user_id=user_id,
+                name=cls.ranks[occurances][0],
+            ).one()
+            if (new_achieve):
+                new_achieve.earned = datetime.datetime.now()
+            print("new achieve:", new_achieve)
+            db.session.flush()
+
+    @classmethod
+    def instantiate_achievement_models(cls, user_id):
+        """
+        """
+        add_list = []
+        for k, v in cls.ranks.items():
+            achieve = Achievement(
+                name=v[0],
+                description=v[1],
+                user_id=user_id
+            )
+            add_list.append(achieve)
+        db.session.add_all(add_list)
+
+    @classmethod
+    def update_occurances(cls, user_id):
+        stat = Statistic.query.filter_by(
+            name=cls.statistic_name,
+            user_id=user_id
+        ).one()
+
+        logins = Login.query.filter_by(user_id=user_id).all()
+        workday_streak = calc_workday_streak([log.time for log in logins])
+        stat.occurances = workday_streak
+
+
 class LabelingStatistic(IncrementStatistic):
     """
     """
@@ -171,15 +292,6 @@ class ExportStatistic(IncrementStatistic):
     }
 
 
-class LoginStatistic(IncrementStatistic):
-    """
-    """
-    statistic_name = "Logins"
-    ranks = {
-        1: ("First time", "Log in for the first time"),
-    }
-
-
 # TODO: Don't currently have a way of measuring individual progress in project.
 #
 # class CompletedProjectStatistic(IncrementStatistic):
@@ -190,99 +302,6 @@ class LoginStatistic(IncrementStatistic):
 #         1: ("Screw it let's do it", "Reach 100% completion in one project"),
 #         2: ("Another one", "Reach 100% completion in two projects")
 #     }
-
-
-class WorkdayLoginStatistic(RankStatistic):
-    """
-    """
-    statistic_name = "Workday logins"
-    ranks = {
-        2: ("I'm back", "Log in two workdays in a row"),
-        7: ("Workday champion", "Log in every workday for a week"),
-        14: ("All I do is work", "Log in every workday for two weeks"),
-        21: ("Work! Work! Work!", "Log in every workday for three weeks"),
-        30: ("Employee of the month", "Log in every workday for a month")
-    }
-
-    @classmethod
-    def update_occurances(cls, user_id):
-        stat = Statistic.query.filter_by(
-            name=cls.statistic_name,
-            user_id=user_id
-        ).one()
-
-        logins = Login.query.filter_by(user_id=user_id).all()
-        workday_streak = calc_workday_streak([log.time for log in logins])
-        stat.occurances = workday_streak
-
-# class LoginStatistic(BaseStatistic):
-#     """
-#     """
-#     statistic_name = "Logins"
-
-#     @classmethod
-#     def instantiate_achievement_models(cls):
-#         add_list = []
-#         for k in cls.ranks.keys():
-#             stat = Statistic(name=cls.get_achievement_name(k),
-#                              description=cls.get_achievement_description(k))
-#             add_list.append(stat)
-#         db.session.add_all(add_list)
-
-#     @classmethod
-#     def update(cls, user_id):
-#         """
-#         """
-#         super().update(user_id)
-
-#         # Check if new achievement attained
-#         logins = Login.query.filter_by(user_id=user_id).all()
-
-#         workday_streak = calc_workday_streak([log.time for log in logins])
-#         new_achieves = []
-
-#         if workday_streak >= calc_workdays_in_days(30):
-#             achieve_name = "Employee of the month"
-#             achieve_desc = "Log in every business day for a month"
-#             new_achieves.append((achieve_name, achieve_desc))
-#         elif workday_streak >= calc_workdays_in_days(21):
-#             achieve_name = "Work! Work! Work!"
-#             achieve_desc = "Log in every business day for three weeks"
-#             new_achieves.append((achieve_name, achieve_desc))
-#         elif workday_streak >= calc_workdays_in_days(14):
-#             achieve_name = "All I do is work"
-#             achieve_desc = "Log in every business day for two weeks"
-#             new_achieves.append((achieve_name, achieve_desc))
-#         elif workday_streak >= calc_workdays_in_days(7):
-#             achieve_name = "Business day champion"
-#             achieve_desc = "Log in every business day for a week"
-#             new_achieves.append((achieve_name, achieve_desc))
-#         elif workday_streak >= calc_workdays_in_days(2):
-#             achieve_name = "I'm back"
-#             achieve_desc = "Log in two business days in a row"
-#             new_achieves.append((achieve_name, achieve_desc))
-
-#         if (datetime.date.today().weekday > 4):
-#             achieve_name = "Leisure time"
-#             achieve_desc = "Log in on a weekend"
-#             new_achieves.append((achieve_name, achieve_desc))
-
-#         if len(logins) == 1:
-#             achieve_name = "First timer"
-#             achieve_desc = "Log in for the first time"
-#             new_achieves.append((achieve_name, achieve_desc))
-
-#         if new_achieves:
-#             achieve_list = Achievement.query.filter_by(user_id=user_id,
-#                                                        earned=True).all()
-#             earned_names = {achieve.name for achieve in achieve_list}
-#             for new in new_achieves:
-#                 if new[0] not in earned_names:
-#                     achieve = Achievement(
-#                         user_id=user_id, name=new[0], description=new[1])
-#                     try_add(achieve)
-
-#         db.session.commit()
 
 
 ###################################################
@@ -302,18 +321,18 @@ def calc_workday_streak(datetime_list):
     """
     """
     date_list = [dt.date() for dt in datetime_list]
-    unique_dates = list(dict.fromkeys(date_list)).sort(reverse=True)
-    # unique_dates.discard(datetime.date.today())
+    unique_dates = list(dict.fromkeys(date_list))
+    unique_dates.sort(reverse=True)
 
-    streak = 0
+    streak = 1
     streak_day = datetime.date.today()
     has_streak = True
     while has_streak:
-        streak_day -= - datetime.timedelta(days=1)
+        streak_day -= datetime.timedelta(days=1)
         streak_in_dates = streak_day in unique_dates
         if streak_in_dates:
             streak += 1
-        has_streak = streak_day.weekday > 4 or streak_in_dates
+        has_streak = streak_day.weekday() > 4 or streak_in_dates
 
     return streak
 
@@ -321,8 +340,8 @@ def calc_workday_streak(datetime_list):
 def calc_workdays_in_days(num_days):
     """
     """
-    from_date = datetime.date.today()
-    to_date = datetime.timedelta(days=num_days)
+    to_date = datetime.date.today()
+    from_date = datetime.date.today() - datetime.timedelta(days=num_days)
     daygenerator = (from_date + datetime.timedelta(x + 1)
                     for x in range((to_date - from_date).days))
     return sum(1 for day in daygenerator if day.weekday() < 5)
