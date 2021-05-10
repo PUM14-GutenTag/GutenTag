@@ -48,7 +48,6 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
   // Sends a request to the database for the img source and sets it in a state
   const getImage = async (id) => {
     const response = await HTTPLauncher.sendGetImageData(id);
-    console.log(response);
     const source = URL.createObjectURL(response.data);
     if (imgSource != null) URL.revokeObjectURL(imgSource);
     setImageSource(source);

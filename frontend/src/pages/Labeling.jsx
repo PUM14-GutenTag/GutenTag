@@ -153,7 +153,6 @@ const Labeling = ({ location }) => {
       if (typeOfProject === ProjectType.IMAGE_CLASSIFICATION) {
         return (
           <ImageLabeling
-            // data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
           />
