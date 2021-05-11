@@ -10,6 +10,7 @@ const CreateProject = () => {
   const [projectType, setProjectType] = useState(1);
   const [ID, setID] = useState(null);
   const [redirect, setRedirect] = useState(false);
+  const [error, setError] = useState(false);
 
   const redirectEdit = () => {
     setRedirect(true);
@@ -22,6 +23,9 @@ const CreateProject = () => {
   const submitHandler = async (event) => {
     event.preventDefault();
     const response = await HTTPLauncher.sendCreateProject(projectName, projectType);
+    if (response.data.id === null) {
+      setError(true);
+    }
     setID(response.data.id);
   };
 
@@ -59,7 +63,11 @@ const CreateProject = () => {
             </Form.Control>
           </Form.Group>
         </Row>
-
+        {error && (
+          <Row>
+            <Form.Label>Could not create project</Form.Label>
+          </Row>
+        )}
         <Button className="dark" variant="primary" type="submit">
           Submit
         </Button>
