@@ -11,6 +11,7 @@ const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
 const Home = () => {
   const [projects, setProjects] = useState([]);
   const { state: userState } = useUser();
+  const [filter, setFilter] = useState('');
 
   const fetchData = async () => {
     const result = await HTTPLauncher.sendGetUserProjects();
@@ -20,6 +21,13 @@ const Home = () => {
     }
   };
 
+  // Filters users based on projectname or projecttype.
+  const filterFunc = (project) => {
+    return (
+      project.name.toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
+    );
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -27,20 +35,29 @@ const Home = () => {
   return (
     <Layout title="Home">
       <div className="home-container">
+        <input
+          className="text"
+          type="text"
+          onChange={(e) => setFilter(e.target.value)}
+          value={filter}
+          placeholder="Search for project..."
+        />
         <div className="projects-container">
           <ul>
-            {projects.map((result, i) => (
-              <li key={result.name}>
-                <Project
-                  id={result.id}
-                  created={result.created}
-                  name={result.name}
-                  projectType={result.type}
-                  selectedColor={colorList[i % colorList.length]}
-                  showEditButton={userState.isAdmin}
-                />
-              </li>
-            ))}
+            {projects
+              .filter((u) => filterFunc(u))
+              .map((result, i) => (
+                <li key={result.name}>
+                  <Project
+                    id={result.id}
+                    created={result.created}
+                    name={result.name}
+                    projectType={result.type}
+                    selectedColor={colorList[i % colorList.length]}
+                    showEditButton={userState.isAdmin}
+                  />
+                </li>
+              ))}
           </ul>
         </div>
       </div>
