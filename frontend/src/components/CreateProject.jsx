@@ -1,17 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Button, Col, Row } from 'react-bootstrap';
+import { Link, Redirect } from 'react-router-dom';
+
 import HTTPLauncher from '../services/HTTPLauncher';
 import ProjectType from '../ProjectType';
 
 const CreateProject = ({ toggleCallback }) => {
   const [projectName, setProjectName] = useState('');
   const [projectType, setProjectType] = useState(1);
+  const [id, setId] = useState();
+
+  const getID = () => {
+    console.log(id);
+    return id;
+  };
+  const redirectEdit = () => {
+    console.log('REDIRECT');
+    return (
+      <Redirect
+        to={{
+          pathname: '/edit-project',
+          state: {
+            id: getID(),
+            name: projectName,
+            projectType,
+          },
+        }}
+      />
+    );
+  };
+
+  useEffect(() => {
+    if (id !== null) redirectEdit();
+  }, [id]);
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateProject(projectName, projectType);
-    toggleCallback();
+    const response = await HTTPLauncher.sendCreateProject(projectName, projectType);
+    setId(response.data.id);
+    console.log(response);
+    // toggleCallback();
   };
 
   return (
