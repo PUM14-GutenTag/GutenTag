@@ -42,6 +42,7 @@ from api.gamification import (add_stats_to_new_user,
                               ProjectStatistic,
                               LoginStatistic,
                               WorkdayLoginStatistic,
+                              WeekendLoginStatistic,
                               ImportStatistic,
                               ExportStatistic)
 
@@ -124,8 +125,10 @@ class LoginUser(Resource):
                 access_token, refresh_token = None, None
                 status = 401
             else:
+                add_flush(Login(user_id=user.id))
                 LoginStatistic.update(user.id)
                 WorkdayLoginStatistic.update(user.id)
+                WeekendLoginStatistic.update(user.id)
                 commit()
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response

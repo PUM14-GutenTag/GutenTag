@@ -1,4 +1,5 @@
 import datetime
+from sqlalchemy.sql import extract
 from api.models import (Achievement,
                         Statistic,
                         Login)
@@ -92,7 +93,6 @@ class RankStatistic(BaseStatistic):
     def update_occurances(cls, user_id):
         """
         """
-        raise NotImplementedError()
 
     @classmethod
     def get_rank(cls, occurances):
@@ -150,35 +150,24 @@ class LoginStatistic(RankStatistic):
         """
         return len(Login.query.filter_by(user_id=user_id).all())
 
+
+class WeekendLoginStatistic(RankStatistic):
+    """
+    """
+    statistic_name = "Weekend logins"
+    ranks = {
+        1: ("Working weekends?", "Log in on a weekend"),
+    }
+
     @classmethod
-    def update_occurances(cls, user_id):
+    def get_occurances(cls, user_id):
         """
         """
-        add_flush(Login(user_id=user_id))
-
-# class WeekendLoginStatistic(RankStatistic):
-#     """
-#     """
-#     statistic_name = "Weekend logins"
-#     ranks = {
-#         1: ("First time", "Log in on a weekend"),
-#     }
-
-#     @classmethod
-#     def get_occurances(cls, user_id):
-#         """
-#         """
-#         logins = Login.query.filter(
-#             Login.user_id==user_id,
-#             # Login.time.weekday()
-#         ).all()
-#         return len()
-
-#     @classmethod
-#     def update_occurances(cls, user_id):
-#         """
-#         """
-#         add_flush(Login(user_id=user_id))
+        logins = Login.query.filter(
+            Login.user_id == user_id,
+            extract('dow', Login.time) > 4
+        ).all()
+        return len(logins)
 
 
 class WorkdayLoginStatistic(BaseStatistic):
@@ -193,7 +182,7 @@ class WorkdayLoginStatistic(BaseStatistic):
         30: ("Employee of the month", "Log in every workday for a month")
     }
 
-    @classmethod
+    @ classmethod
     def update(cls, user_id):
         """
         """
@@ -213,7 +202,7 @@ class WorkdayLoginStatistic(BaseStatistic):
             print("new achieve:", new_achieve)
             db.session.flush()
 
-    @classmethod
+    @ classmethod
     def instantiate_achievement_models(cls, user_id):
         """
         """
@@ -227,7 +216,7 @@ class WorkdayLoginStatistic(BaseStatistic):
             add_list.append(achieve)
         db.session.add_all(add_list)
 
-    @classmethod
+    @ classmethod
     def update_occurances(cls, user_id):
         stat = Statistic.query.filter_by(
             name=cls.statistic_name,
@@ -309,12 +298,15 @@ class ExportStatistic(IncrementStatistic):
 ###################################################
 
 def add_stats_to_new_user(user_id):
+    """
+    """
     LabelingStatistic.instantiate(user_id)
     ProjectStatistic.instantiate(user_id)
     ImportStatistic.instantiate(user_id)
     ExportStatistic.instantiate(user_id)
     LoginStatistic.instantiate(user_id)
     WorkdayLoginStatistic.instantiate(user_id)
+    WeekendLoginStatistic.instantiate(user_id)
 
 
 def calc_workday_streak(datetime_list):
