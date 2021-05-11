@@ -76,10 +76,17 @@ const AddUser = ({ toggleBack }) => {
             />
           </Form.Group>
         </Row>
+        <Row>
+          <Form.Group as={Col} controlId="formAdmin">
+            <Form.Check
+              className="checkbox"
+              type="checkbox"
+              label="Admin"
+              onChange={handleChange}
+            />
+          </Form.Group>
+        </Row>
 
-        <Form.Group controlId="form.checkbox">
-          <Form.Check type="checkbox" label="Admin" onChange={handleChange} />
-        </Form.Group>
         <Button className="dark" variant="primary" type="submit">
           Submit
         </Button>
