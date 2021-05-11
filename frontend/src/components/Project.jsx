@@ -22,7 +22,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
   return (
     <div
       className="project-container"
-      onMouseDown={toggleInfo}
+      onMouseUp={toggleInfo}
       aria-hidden="true"
       style={{ backgroundColor: selectedColor }}
     >
@@ -36,22 +36,22 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             <p>Type: {projectTypeNames[projectType - 1]}</p>
             <p>Progress: 1/4 </p>
             <p>Started: {created}</p>
-            <Button
-              variant="outline-primary"
-              as={Link}
-              to={{
-                pathname: '/labeling',
-                state: {
-                  projectType,
-                  id,
-                },
-              }}
-            >
-              Start
-            </Button>
           </div>
         </div>
       ) : null}
+      <Button
+        variant="outline-primary"
+        as={Link}
+        to={{
+          pathname: '/labeling',
+          state: {
+            projectType,
+            id,
+          },
+        }}
+      >
+        Start
+      </Button>
       {showEditButton && (
         <Link
           className="edit-link"
