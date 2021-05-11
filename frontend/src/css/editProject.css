@@ -1,0 +1,39 @@
+div.col,
+#center {
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.center-importform {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+div.row {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+#row-align,
+#image-upload,
+#text-upload {
+  text-align: center;
+  display: flex;
+}
+
+svg.add {
+  color: #32cd32;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.2em;
+}
+
+svg.remove {
+  color: #f52882;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.2em;
+}

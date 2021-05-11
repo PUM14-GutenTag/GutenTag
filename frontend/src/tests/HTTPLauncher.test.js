@@ -1,7 +1,9 @@
-/* Integrations tests for HTTPLauncher.js, and in turn api.routes.py. */
+/* Integration tests for HTTPLauncher.js, and in turn api.routes.py. */
+
 import fs from 'fs';
 import path from 'path';
 
+import testUtil from './testUtil';
 import HTTPLauncher from '../services/HTTPLauncher';
 
 const textDir = path.join(__dirname, 'res/text');
@@ -12,22 +14,6 @@ beforeAll(() => {
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 });
 
-const getTextFile = (filename) => {
-  const filepath = path.resolve(textDir, filename);
-  return new File([fs.readFileSync(filepath)], path.basename(filepath));
-};
-
-const getJSONObject = (filename) => {
-  const filepath = path.resolve(textDir, filename);
-  return JSON.parse(fs.readFileSync(filepath));
-};
-
-const arrayBufferToJSONObject = async (arrayBuffer) => {
-  const blob = new Blob([arrayBuffer]);
-  const text = await new Response(blob).text();
-  return JSON.parse(text);
-};
-
 const images = [
   'ILSVRC2012_val_00000001.JPEG',
   'ILSVRC2012_val_00000002.JPEG',
@@ -37,32 +23,10 @@ const images = [
   return new File([fs.readFileSync(filepath, { encoding: 'base64' })], path.basename(filepath));
 });
 
-const createUser = async (admin = true) => {
-  const email = 'mail@gmail.com';
-  const password = 'pass';
-  const initialAdminLogin = await HTTPLauncher.sendLogin('admin@admin', 'password');
-  localStorage.setItem('gutentag-accesstoken', initialAdminLogin.data.access_token);
-  await HTTPLauncher.sendCreateUser('Nameer', 'Sur', password, email, admin);
-  const response = await HTTPLauncher.sendLogin(email, password);
-  localStorage.setItem('gutentag-accesstoken', response.data.access_token);
-  localStorage.setItem('gutentag-refreshtoken', response.data.refresh_token);
-
-  return email;
-};
-
-const createProject = async (type, name = 'Test Project') => {
-  const response = await HTTPLauncher.sendCreateProject(name, type);
-  return response.data.id;
-};
-
-const resetDB = async () => {
-  await HTTPLauncher.sendResetDatabase();
-};
-
 describe('sendCreateUser and sendLogin requests', () => {
   test('Correct admin', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
     const loginResponse = await HTTPLauncher.sendLogin('mail@gmail.com', 'pass');
     expect(loginResponse.status).toBe(200);
@@ -73,8 +37,8 @@ describe('sendCreateUser and sendLogin requests', () => {
 
 describe('sendChangePassword request', () => {
   test('Succesfully change password of own user', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
     const changePwResponse = await HTTPLauncher.sendChangePassword('pass', 'bass');
     expect(changePwResponse.status).toBe(200);
@@ -91,8 +55,8 @@ describe('sendChangePassword request', () => {
   });
 
   test('Unsuccesfully change password of own user', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
     try {
       await HTTPLauncher.sendChangePassword('bass', 'pass');
@@ -115,8 +79,8 @@ describe('sendChangePassword request', () => {
 
 describe('sendChangePasswordOther request', () => {
   test('Succesfully change password of own user', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
     const email = 'normal@gmail.com';
     const password = 'pass';
@@ -153,7 +117,7 @@ describe('sendChangePasswordOther request', () => {
 
 describe('sendRefreshToken request', () => {
   test('Request without user', async () => {
-    await resetDB();
+    await testUtil.resetDB();
 
     await HTTPLauncher.sendRefreshToken().catch((e) => {
       expect(e.response.status).toBe(401);
@@ -161,8 +125,8 @@ describe('sendRefreshToken request', () => {
   });
 
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
     const response = await HTTPLauncher.sendRefreshToken();
     expect(response.status).toBe(200);
@@ -175,13 +139,13 @@ describe('sendRefreshToken request', () => {
 
 describe('sendAuthorizeUser request', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
     const email = 'normal@gmail.com';
     const password = 'pass';
     await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, false);
-    const projectID = await createProject(1);
+    const projectID = await testUtil.createProject(1);
     const response = await HTTPLauncher.sendAuthorizeUser(projectID, email);
     expect(response.status).toBe(200);
   });
@@ -189,12 +153,12 @@ describe('sendAuthorizeUser request', () => {
 
 describe('sendDeauthorizeUser request', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const email = 'normal@gmail.com';
     const password = 'pass';
     await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, false);
-    const projectID = await createProject(1);
+    const projectID = await testUtil.createProject(1);
 
     await HTTPLauncher.sendAuthorizeUser(projectID, email);
     const deAuthorizeReponse = await HTTPLauncher.sendDeauthorizeUser(projectID, email);
@@ -204,8 +168,8 @@ describe('sendDeauthorizeUser request', () => {
 
 describe('sendCreateProject', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
     const response = await HTTPLauncher.sendCreateProject('Project Exodus', 1);
     expect(response.status).toBe(200);
@@ -213,23 +177,42 @@ describe('sendCreateProject', () => {
   });
 });
 
-describe('sendGetUserName', () => {
+describe('sendGetUserInfo', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
-    const response = await HTTPLauncher.sendGetUserName();
+    const response = await HTTPLauncher.sendGetUserInfo();
     expect(response.status).toBe(200);
     expect(response.data.name).toBe('Nameer Sur');
+    expect(response.data.email).toBe('mail@gmail.com');
+    expect(response.data.access_level).toBe(5);
+  });
+});
+
+describe('sendGetProjectUsers', () => {
+  test('Correct request', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1);
+
+    const email = 'normal@gmail.com';
+    const password = 'pass';
+    await HTTPLauncher.sendCreateUser('Reeman', 'Rus', password, email, false);
+    await HTTPLauncher.sendAuthorizeUser(projectID, email);
+
+    const response = await HTTPLauncher.sendGetProjectUsers(projectID);
+    expect(response.status).toBe(200);
+    expect(response.data.users[0]).toBe(email);
   });
 });
 
 describe('sendGetUserProjects', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser(true);
-    await createProject(1, 'Project 1');
-    await createProject(2, 'Project 2');
+    await testUtil.resetDB();
+    await testUtil.createUser(true);
+    await testUtil.createProject(1, 'Project 1');
+    await testUtil.createProject(2, 'Project 2');
 
     const response = await HTTPLauncher.sendGetUserProjects();
     expect(response.status).toBe(200);
@@ -240,9 +223,9 @@ describe('sendGetUserProjects', () => {
 
 describe('sendDeleteProject request', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
-    const projectID = await createProject(1);
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1);
 
     const response = await HTTPLauncher.sendDeleteProject(projectID);
     expect(response.status).toBe(200);
@@ -252,8 +235,8 @@ describe('sendDeleteProject request', () => {
 
 describe('sendDeleteUser request', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
 
     const email = 'normal@gmail.com';
     const password = 'pass';
@@ -282,42 +265,42 @@ describe('sendDeleteUser request', () => {
 
 describe('sendAddNewTextData request', () => {
   test('Document classification request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 1;
-    const projectID = await createProject(projectType);
+    const projectID = await testUtil.createProject(projectType);
 
     const response = await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_document_classification.json')
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
     );
     expect(response.status).toBe(200);
     expect(response.data.message).toBe('Data added.');
   });
 
   test('Sequence request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 2;
-    const projectID = await createProject(projectType);
+    const projectID = await testUtil.createProject(projectType);
 
     const response = await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_sequence.json')
+      testUtil.getTextFile(textDir, 'input_sequence.json')
     );
     expect(response.status).toBe(200);
     expect(response.data.message).toBe('Data added.');
   });
 
   test('Sequence to sequence request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 3;
-    const projectID = await createProject(projectType);
+    const projectID = await testUtil.createProject(projectType);
 
     const response = await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_sequence_to_sequence.json')
+      testUtil.getTextFile(textDir, 'input_sequence_to_sequence.json')
     );
     expect(response.status).toBe(200);
     expect(response.data.message).toBe('Data added.');
@@ -326,14 +309,14 @@ describe('sendAddNewTextData request', () => {
 
 describe('sendAddNewImageData request', () => {
   test('Image classification request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 4;
-    const projectID = await createProject(projectType);
+    const projectID = await testUtil.createProject(projectType);
 
     const response = await HTTPLauncher.sendAddNewImageData(
       projectID,
-      getTextFile('input_image_classification.json'),
+      testUtil.getTextFile(textDir, 'input_image_classification.json'),
       images
     );
     expect(response.status).toBe(200);
@@ -343,14 +326,14 @@ describe('sendAddNewImageData request', () => {
 
 describe('sendGetData request', () => {
   test('Document classification project', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 1;
-    const projectID = await createProject(projectType, 'Document');
+    const projectID = await testUtil.createProject(projectType, 'Document');
 
     await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_document_classification.json')
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
     );
     const response = await HTTPLauncher.sendGetData(projectID, 0);
     expect(response.status).toBe(200);
@@ -364,44 +347,21 @@ describe('sendGetData request', () => {
       }
     });
     expect(counter).toBe(3);
-    const originalTexts = getJSONObject('input_document_classification.json').map(
-      (obj) => obj.text
-    );
+    const originalTexts = testUtil
+      .getJSONObject(textDir, 'input_document_classification.json')
+      .map((obj) => obj.text);
     textList.forEach((text) => expect(originalTexts).toContain(text));
   });
 
   test('Sequence labeling project', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 2;
-    const projectID = await createProject(projectType, 'Sequence');
-
-    await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
-    const response = await HTTPLauncher.sendGetData(projectID, 0);
-    expect(response.status).toBe(200);
-    expect(response.data.list.length).toBe(11);
-    let counter = 0;
-    const textList = [];
-    response.data.list.forEach((obj) => {
-      if (!(Object.keys(obj).length === 0)) {
-        counter += 1;
-        textList.push(obj.data);
-      }
-    });
-    expect(counter).toBe(3);
-    const originalTexts = getJSONObject('input_sequence.json').map((obj) => obj.text);
-    textList.forEach((text) => expect(originalTexts).toContain(text));
-  });
-
-  test('Sequence to sequence project', async () => {
-    await resetDB();
-    await createUser();
-    const projectType = 3;
-    const projectID = await createProject(projectType, 'SeqToSeq');
+    const projectID = await testUtil.createProject(projectType, 'Sequence');
 
     await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_sequence_to_sequence.json')
+      testUtil.getTextFile(textDir, 'input_sequence.json')
     );
     const response = await HTTPLauncher.sendGetData(projectID, 0);
     expect(response.status).toBe(200);
@@ -415,19 +375,49 @@ describe('sendGetData request', () => {
       }
     });
     expect(counter).toBe(3);
-    const originalTexts = getJSONObject('input_sequence_to_sequence.json').map((obj) => obj.text);
+    const originalTexts = testUtil
+      .getJSONObject(textDir, 'input_sequence.json')
+      .map((obj) => obj.text);
+    textList.forEach((text) => expect(originalTexts).toContain(text));
+  });
+
+  test('Sequence to sequence project', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectType = 3;
+    const projectID = await testUtil.createProject(projectType, 'SeqToSeq');
+
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_sequence_to_sequence.json')
+    );
+    const response = await HTTPLauncher.sendGetData(projectID, 0);
+    expect(response.status).toBe(200);
+    expect(response.data.list.length).toBe(11);
+    let counter = 0;
+    const textList = [];
+    response.data.list.forEach((obj) => {
+      if (!(Object.keys(obj).length === 0)) {
+        counter += 1;
+        textList.push(obj.data);
+      }
+    });
+    expect(counter).toBe(3);
+    const originalTexts = testUtil
+      .getJSONObject(textDir, 'input_sequence_to_sequence.json')
+      .map((obj) => obj.text);
     textList.forEach((text) => expect(originalTexts).toContain(text));
   });
 
   test('Image classification project', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 4;
-    const projectID = await createProject(projectType);
+    const projectID = await testUtil.createProject(projectType);
 
     await HTTPLauncher.sendAddNewImageData(
       projectID,
-      getTextFile('input_image_classification.json'),
+      testUtil.getTextFile(textDir, 'input_image_classification.json'),
       images
     );
 
@@ -446,7 +436,9 @@ describe('sendGetData request', () => {
       }
     });
     expect(counter).toBe(3);
-    const fileNames = getJSONObject('input_image_classification.json').map((obj) => obj.file_name);
+    const fileNames = testUtil
+      .getJSONObject(textDir, 'input_image_classification.json')
+      .map((obj) => obj.file_name);
     dataPointList.forEach((name) => expect(fileNames).toContain(name[1]));
 
     // eslint-disable-next-line no-restricted-syntax
@@ -461,14 +453,14 @@ describe('sendGetData request', () => {
 
 describe('sendCreateDocumentClassificationLabel request', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 1;
-    const projectID = await createProject(projectType, 'Document');
+    const projectID = await testUtil.createProject(projectType, 'Document');
 
     await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_document_classification.json')
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
     );
     const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
     expect(getDataResponse.status).toBe(200);
@@ -490,12 +482,15 @@ describe('sendCreateDocumentClassificationLabel request', () => {
 
 describe('sendCreateSequenceLabel request', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 2;
-    const projectID = await createProject(projectType, 'Sequence');
+    const projectID = await testUtil.createProject(projectType, 'Sequence');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_sequence.json')
+    );
     const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
     expect(getDataResponse.status).toBe(200);
     expect(getDataResponse.data.list.length).toBe(11);
@@ -517,14 +512,14 @@ describe('sendCreateSequenceLabel request', () => {
 
 describe('sendCreateSequenceToSequenceLabel request', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 3;
-    const projectID = await createProject(projectType, 'Sequence To Sequence');
+    const projectID = await testUtil.createProject(projectType, 'Sequence To Sequence');
 
     await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_sequence_to_sequence.json')
+      testUtil.getTextFile(textDir, 'input_sequence_to_sequence.json')
     );
     const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
     expect(getDataResponse.status).toBe(200);
@@ -546,14 +541,14 @@ describe('sendCreateSequenceToSequenceLabel request', () => {
 
 describe('sendCreateImageClassificationLabel request', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 4;
-    const projectID = await createProject(projectType);
+    const projectID = await testUtil.createProject(projectType);
 
     await HTTPLauncher.sendAddNewImageData(
       projectID,
-      getTextFile('input_image_classification.json'),
+      testUtil.getTextFile(textDir, 'input_image_classification.json'),
       images
     );
     const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
@@ -584,14 +579,14 @@ describe('sendCreateImageClassificationLabel request', () => {
 
 describe('sendRemoveLabel', () => {
   test('Correct request', async () => {
-    await resetDB();
-    await createUser();
+    await testUtil.resetDB();
+    await testUtil.createUser();
     const projectType = 1;
-    const projectID = await createProject(projectType, 'Document');
+    const projectID = await testUtil.createProject(projectType, 'Document');
 
     await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_document_classification.json')
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
     );
     const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
     expect(getDataResponse.status).toBe(200);
@@ -620,76 +615,79 @@ describe('sendRemoveLabel', () => {
 
 describe('sendGetExportData', () => {
   test('Document classification project', async () => {
-    await resetDB();
-    await createUser();
-    const projectID = await createProject(1, 'Document');
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1, 'Document');
 
     await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_document_classification.json')
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
     );
     await HTTPLauncher.sendGetData(projectID, 0);
     await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const responseObj = await arrayBufferToJSONObject(response.data);
+    const responseObj = await testUtil.arrayBufferToJSONObject(response.data);
     const texts = responseObj.data.map((d) => d.text);
 
-    getJSONObject('input_document_classification.json').forEach((obj) => {
+    testUtil.getJSONObject(textDir, 'input_document_classification.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
     });
   });
 
   test('Sequence project', async () => {
-    await resetDB();
-    await createUser();
-    const projectID = await createProject(2, 'Sequence');
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(2, 'Sequence');
 
-    await HTTPLauncher.sendAddNewTextData(projectID, getTextFile('input_sequence.json'));
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_sequence.json')
+    );
     await HTTPLauncher.sendGetData(projectID, 0);
     await HTTPLauncher.sendCreateSequenceLabel(1, 'new label', 0, 3);
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const responseObj = await arrayBufferToJSONObject(response.data);
+    const responseObj = await testUtil.arrayBufferToJSONObject(response.data);
     const texts = responseObj.data.map((d) => d.text);
 
-    getJSONObject('input_sequence.json').forEach((obj) => {
+    testUtil.getJSONObject(textDir, 'input_sequence.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
     });
   });
 
   test('Sequence to sequence project', async () => {
-    await resetDB();
-    await createUser();
-    const projectID = await createProject(3, 'Sequence to sequence');
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(3, 'Sequence to sequence');
 
     await HTTPLauncher.sendAddNewTextData(
       projectID,
-      getTextFile('input_sequence_to_sequence.json')
+      testUtil.getTextFile(textDir, 'input_sequence_to_sequence.json')
     );
     await HTTPLauncher.sendGetData(projectID, 0);
     await HTTPLauncher.sendCreateSequenceToSequenceLabel(1, 'new label');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
-    const responseObj = await arrayBufferToJSONObject(response.data);
+    const responseObj = await testUtil.arrayBufferToJSONObject(response.data);
     const texts = responseObj.data.map((d) => d.text);
 
-    getJSONObject('input_sequence_to_sequence.json').forEach((obj) => {
+    testUtil.getJSONObject(textDir, 'input_sequence_to_sequence.json').forEach((obj) => {
       expect(texts).toContain(obj.text);
     });
   });
 
   test('Image classification project', async () => {
-    await resetDB();
-    await createUser();
-    const projectID = await createProject(4, 'Image');
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(4, 'Image');
 
     await HTTPLauncher.sendAddNewImageData(
       projectID,
-      getTextFile('input_image_classification.json'),
+      testUtil.getTextFile(textDir, 'input_image_classification.json'),
       images
     );
     await HTTPLauncher.sendGetData(projectID, 0);

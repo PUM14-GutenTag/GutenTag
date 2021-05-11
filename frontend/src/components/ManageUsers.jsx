@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Trash } from 'react-bootstrap-icons';
 
 import HTTPLauncher from '../services/HTTPLauncher';
-
+import { useUser } from '../contexts/UserContext';
 import AddUser from './AddUser';
 
 /**
@@ -17,7 +17,7 @@ const ManageUsers = ({ toggleCallback }) => {
   const [filter, setFilter] = useState('');
   const [showWarning, setShowWarning] = useState(false);
   const [userRemove, setUserRemove] = useState('');
-  const [userName, setUserName] = useState('');
+  const { state: userState } = useUser();
 
   const handleClose = () => setShowWarning(false);
   const handleShow = (user) => {
@@ -25,20 +25,14 @@ const ManageUsers = ({ toggleCallback }) => {
     setUserRemove(user[1]);
   };
 
-  // Fetches the logged in users name from backend.
-  const fetchName = async () => {
-    const response = await HTTPLauncher.sendGetUserName();
-    return response.data.name;
-  };
-
   // Fetches all users from beckend and sorts them in an array.
   const fetchData = async () => {
     const result = await HTTPLauncher.sendGetUsers();
     const dataArray = Object.values(result.data.users);
-    const mapedDataArray = dataArray.map((userObject) => Object.values(userObject));
-    mapedDataArray.sort((a, b) => {
-      const nameA = a[2].toUpperCase();
-      const nameB = b[2].toUpperCase();
+    // const mapedDataArray = dataArray.map((userObject) => Object.values(userObject));
+    dataArray.sort((a, b) => {
+      const nameA = a.name.toUpperCase();
+      const nameB = b.name.toUpperCase();
       if (nameA < nameB) {
         return -1;
       }
@@ -47,13 +41,12 @@ const ManageUsers = ({ toggleCallback }) => {
       }
       return 0;
     });
-    setUsers(mapedDataArray);
+    setUsers(dataArray);
   };
 
   useEffect(() => {
     if (showUsers) {
       fetchData();
-      fetchName().then((n) => setUserName(n));
     }
   }, [showUsers]);
 
@@ -64,8 +57,8 @@ const ManageUsers = ({ toggleCallback }) => {
   // Filters users based on input.
   const filterFunc = (user) => {
     return (
-      user[2].toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
-      user[1].toUpperCase().indexOf(filter.toUpperCase()) > -1
+      user.name.toUpperCase().indexOf(filter.toUpperCase()) > -1 ||
+      user.email.toUpperCase().indexOf(filter.toUpperCase()) > -1
     );
   };
 
@@ -106,11 +99,11 @@ const ManageUsers = ({ toggleCallback }) => {
               .filter((u) => filterFunc(u))
               .map((result) => (
                 <tr key={result}>
-                  <td>{result[2]}</td>
-                  <td>{result[1]}</td>
-                  <td>{result[0] === 5 ? 'yes' : 'no'}</td>
+                  <td>{result.name}</td>
+                  <td>{result.email}</td>
+                  <td>{result.admin === 5 ? 'yes' : 'no'}</td>
                   <td className="right">
-                    {userName !== result[2] && (
+                    {userState.email !== result.email && (
                       <Trash className="remove" onClick={() => handleShow(result)} />
                     )}
                   </td>

@@ -9,6 +9,13 @@ const reducer = (state, action) => {
         ...state,
         isAdmin: action.value,
       };
+    case 'SET_USER_INFO':
+      return {
+        ...state,
+        name: action.value.name,
+        email: action.value.email,
+        isAdmin: action.value.isAdmin,
+      };
     default:
       return state;
   }

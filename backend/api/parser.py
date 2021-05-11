@@ -1,15 +1,16 @@
+from collections import defaultdict
 from io import BytesIO
 import zipfile
 import time
 import json
-from api.database_handler import (add_flush,
-                                  add_list_flush,
+from api.database_handler import (db,
                                   commit)
 from api.models import (Project,
                         ProjectData,
                         ProjectTextData,
                         ProjectImageData,
                         ProjectType,
+                        Label,
                         DocumentClassificationLabel,
                         ImageClassificationLabel,
                         SequenceLabel,
@@ -59,37 +60,50 @@ def import_text_data(project_id, json_data):
     if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Incorrect project type.")
 
+    num_items = len(json_data)
+    print(f"Adding {num_items} items to '{project.name}'...")
+    data_list = []
     for obj in json_data:
         text = obj.get("text")
         if text is None:
             raise ValueError(f"'{obj}' is missing 'text' entry")
         project_data = ProjectTextData(project.id, text)
-        add_flush(project_data)
+        data_list.append(project_data)
+
+    db.session.add_all(data_list)
+    db.session.flush()
+
+    print(f"Adding labels to '{project.name}'...")
+    label_list = []
+    for i, obj in enumerate(json_data):
+        data = data_list[i]
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-                prelabels = [
+                label_list += [
                     DocumentClassificationLabel(
-                        project_data.id, None, lab, is_prelabel=True)
+                        data.id, None, lab, is_prelabel=True)
                     for lab in set(labels)
                 ]
             elif project.project_type == ProjectType.SEQUENCE_LABELING:
-                prelabels = [
-                    SequenceLabel(project_data.id, None, lab, begin, end,
+                label_list += [
+                    SequenceLabel(data.id, None, lab, begin, end,
                                   is_prelabel=True)
                     for begin, end, lab in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-                prelabels = [
-                    SequenceToSequenceLabel(project_data.id, None, lab,
+                label_list += [
+                    SequenceToSequenceLabel(data.id, None, lab,
                                             is_prelabel=True)
-                    for lab in labels]
+                    for lab in labels
+                ]
             else:
                 raise ValueError(
                     f"Invalid project type: {project.project_type}.")
 
-            add_list_flush(prelabels)
+    db.session.add_all(label_list)
     commit()
+    print(f"Finished adding {num_items} items to '{project.name}'...")
 
 
 def import_image_data(project_id, json_data, images):
@@ -111,7 +125,7 @@ def import_image_data(project_id, json_data, images):
     """
     # Validate that json_data matches images.
     if (len(images) != len(json_data)):
-        raise ValueError(f"Number of data objects ({len(json_data)} must "
+        raise ValueError(f"Number of data objects ({len(json_data)}) must "
                          f"match number of images ({len(images)}).")
     image_names = {obj["file_name"] for obj in json_data}
     image_file_names = set(images.keys())
@@ -138,22 +152,37 @@ def import_image_data(project_id, json_data, images):
     if project.project_type != ProjectType.IMAGE_CLASSIFICATION:
         raise ValueError("Incorrect project type.")
 
+    num_items = len(json_data)
+    print(f"Adding {num_items} items to '{project.name}'...")
+
+    data_list = []
     for obj in json_data:
         file_name = obj.get("file_name")
         if file_name is None:
             raise ValueError(f"'{obj}' is missing 'file_name' entry")
-        project_data = ProjectImageData(project.id, file_name,
-                                        images[file_name])
-        add_flush(project_data)
+        data_list.append(ProjectImageData(project.id, file_name,
+                                          images[file_name]))
+
+    db.session.add_all(data_list)
+    db.session.flush()
+
+    print(f"Adding labels to '{project.name}'...")
+    label_list = []
+    for i, obj in enumerate(json_data):
+        data = data_list[i]
         labels = obj.get("labels")
         if isinstance(labels, list) and labels:
-            prelabels = [
-                ImageClassificationLabel(project_data.id, None, lab, tuple(p1),
-                                         tuple(p2), is_prelabel=True)
-                for p1, p2, lab in labels
-            ]
-            add_list_flush(prelabels)
+            if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
+                label_list += [
+                    ImageClassificationLabel(data.id, None, lab,
+                                             tuple(p1), tuple(p2),
+                                             is_prelabel=True)
+                    for p1, p2, lab in labels
+                ]
+
+    db.session.add_all(label_list)
     commit()
+    print(f"Finished adding {num_items} items to '{project.name}'...")
 
 
 def get_standard_dict(project):
@@ -168,10 +197,37 @@ def get_standard_dict(project):
     }
 
 
-def export_text_data(project_id, filters=None):
+def write_zip_entry(file_name, date_time, data, file):
     """
-    Export all data from a text-based project with the given id.
+    Write an individual file to a zip archive.
+    """
+    data_zip = zipfile.ZipInfo(file_name)
+    data_zip.date_time = date_time
+    data_zip.compress_type = zipfile.ZIP_DEFLATED
+    file.writestr(data_zip, data)
+
+
+def get_image_zip(project_id, project_name, json_data, filters=None):
+    """
+    Create a zip file in memory containing the project's images and a
+    descriptive JSON file.
+    """
+    all_data = ProjectImageData.query.filter_by(project_id=project_id).all()
+    date_time = time.localtime(time.time())[:6]
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, "w") as zf:
+        for data in all_data:
+            write_zip_entry(data.file_name, date_time, data.image_data, zf)
+        write_zip_entry(f"{project_name}.json", date_time, json_data, zf)
+    memory_file.seek(0)
+    return memory_file
+
+
+def export_data(project_id, filters=None):
+    """
+    Export all data from a project with the given id.
     The returned JSON object's shape depends on the project type.
+    Image projects return a zip containing all images and the JSON file.
 
     Document classification:
     {
@@ -221,72 +277,8 @@ def export_text_data(project_id, filters=None):
             ...
         ]
     }
-    """
-    if filters is not None:
-        raise NotImplementedError("Filters are not yet supported.")
 
-    project = Project.query.get(project_id)
-    if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
-        raise ValueError("Incorrect project type")
-
-    result = get_standard_dict(project)
-    for data in ProjectData.query.filter_by(project_id=project_id):
-        if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-            entry = {
-                "text": data.text_data,
-                "labels": [lab.label for lab in data.labels]
-            }
-        elif project.project_type == ProjectType.SEQUENCE_LABELING:
-            entry = {
-                "text": data.text_data,
-                "labels": [
-                    [lab.begin, lab.end, lab.label] for lab in data.labels
-                ]
-            }
-        elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-            entry = {
-                "text": data.text_data,
-                "labels": [lab.label for lab in data.labels]
-            }
-        else:
-            raise ValueError(f"Invalid project type: {project.project_type}")
-        result["data"].append(entry)
-
-    return result
-
-
-def write_zip_entry(file_name, date_time, data, file):
-    """
-    Write an individual file to a zip archive.
-    """
-    data_zip = zipfile.ZipInfo(file_name)
-    data_zip.date_time = date_time
-    data_zip.compress_type = zipfile.ZIP_DEFLATED
-    file.writestr(data_zip, data)
-
-
-def get_image_zip(project_id, project_name, json_data, filters=None):
-    """
-    Create a zip file in memory containing the project's images and a
-    descriptive JSON file.
-    """
-    all_data = ProjectImageData.query.filter_by(project_id=project_id).all()
-    date_time = time.localtime(time.time())[:6]
-    memory_file = BytesIO()
-    with zipfile.ZipFile(memory_file, "w") as zf:
-        for data in all_data:
-            write_zip_entry(data.file_name, date_time, data.image_data, zf)
-        write_zip_entry(f"{project_name}.json", date_time, json_data, zf)
-    memory_file.seek(0)
-    return memory_file
-
-
-def export_image_data(project_id, filters=None, with_images=True):
-    """
-    Export all data from the image classification project with the given id.
-
-    Returns a json object with the following shape, where labels are named
-    rectangles: [[x1, y1], [x2, y2], "label"]:
+    Image classification
     {
         project_id: 0,
         project_name: "project name",
@@ -308,22 +300,56 @@ def export_image_data(project_id, filters=None, with_images=True):
         raise NotImplementedError("Filters are not yet supported.")
 
     project = Project.query.get(project_id)
-    if project.project_type != ProjectType.IMAGE_CLASSIFICATION:
-        raise ValueError("Project is not of type IMAGE_CLASSIFICATION")
-
     text = get_standard_dict(project)
-    for data in ProjectData.query.filter_by(project_id=project_id).all():
-        labels = [[[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label]
-                  for lab in data.labels]
-        text["data"].append({
-            "file_name": data.file_name,
-            "id": data.id,
-            "labels": labels
-        })
 
-    if with_images:
+    data_list = ProjectData.query.filter_by(project_id=project_id).all()
+
+    num_items = len(data_list)
+    print(f"Fetching {num_items} items from '{project.name}'...")
+
+    labelClass = {
+        ProjectType.DOCUMENT_CLASSIFICATION: DocumentClassificationLabel,
+        ProjectType.SEQUENCE_LABELING: SequenceLabel,
+        ProjectType.SEQUENCE_TO_SEQUENCE: SequenceToSequenceLabel,
+        ProjectType.IMAGE_CLASSIFICATION: ImageClassificationLabel
+    }
+    label_list = db.session.query(labelClass[project.project_type]).filter(
+        Label.data.has(project_id=project_id)
+    ).all()
+
+    label_dict = defaultdict(list)
+    for lab in label_list:
+        if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
+            label = lab.label
+        elif project.project_type == ProjectType.SEQUENCE_LABELING:
+            label = [lab.begin, lab.end, lab.label]
+        elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
+            label = lab.label
+        elif project.project_type == ProjectType.IMAGE_CLASSIFICATION:
+            label = [[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label]
+        else:
+            raise ValueError(f"Invalid project type: {project.project_type}")
+        label_dict[lab.data_id].append(label)
+
+    for data in data_list:
+        entry = {
+            "id": data.id,
+            "labels": label_dict[data.id]
+        }
+        if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
+            entry["file_name"] = data.file_name
+        else:
+            entry["text"] = data.text_data
+
+        text["data"].append(entry)
+
+    if project.project_type == ProjectType.IMAGE_CLASSIFICATION:
+        print(f"Zipping files from '{project.name}'...")
         zip_file = get_image_zip(project.id, project.name,
                                  json.dumps(text, ensure_ascii=False))
-        return zip_file
+        result = zip_file
     else:
-        return text
+        result = text
+
+    print(f"Finished fetching {num_items} items from '{project.name}'...")
+    return result

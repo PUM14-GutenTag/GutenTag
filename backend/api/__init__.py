@@ -3,7 +3,8 @@
 Initialization file for the api package.
 """
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, SignallingSession
+from sqlalchemy_batch_inserts import enable_batch_inserting
 from flask_cors import CORS
 from flask_restful import Api
 from flask_bcrypt import Bcrypt
@@ -17,6 +18,7 @@ app.config['JWT_SECRET_KEY'] = 't1NP63m4wnAc4KzBAKukd7ZpKOAI4nss'
 CORS(app)
 rest = Api(app)
 db = SQLAlchemy(app)
+enable_batch_inserting(SignallingSession)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 

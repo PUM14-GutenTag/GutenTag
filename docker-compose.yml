@@ -15,6 +15,7 @@ services:
       context: ./backend
     volumes:
       - ./backend:/usr/src/backend
+      - ./test_resources:/usr/src/backend/Test/res
     depends_on:
       - db
     ports:
@@ -32,6 +33,7 @@ services:
     #tty: true # docker run -t
     volumes:
       - ./frontend/src:/usr/src/frontend/src
+      - ./test_resources:/usr/src/frontend/src/tests/res
       # - /usr/src/frontend/node_modules
     depends_on:
       - backend
