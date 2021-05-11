@@ -64,7 +64,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             },
           }}
         >
-          <GearFill color="#063954" />
+          <GearFill />
         </Link>
       )}
     </div>
