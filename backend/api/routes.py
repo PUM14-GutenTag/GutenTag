@@ -970,6 +970,18 @@ class GetAchievements(Resource):
         return jsonify([achieve.format_json() for achieve in achieve_list])
 
 
+class GetStatistics(Resource):
+    """
+    Endpoint that returns a list of all the user's achievements whether they've
+    been earned or not.
+    """
+    @jwt_required()
+    def get(self):
+        user = User.get_by_email(get_jwt_identity())
+        stat_list = Statistic.query.filter_by(user_id=user.id)
+        return jsonify([stat.format_json() for stat in stat_list])
+
+
 class Reset(Resource):
     """
     Reset defines an endpoint used to reset the database for use during
@@ -1011,4 +1023,5 @@ rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")
 rest.add_resource(GetUnnotifiedAchievements, "/get-unnotified-achievements")
 rest.add_resource(GetAchievements, "/get-achievements")
+rest.add_resource(GetStatistics, "/get-statistics")
 rest.add_resource(Reset, "/reset")

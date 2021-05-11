@@ -136,7 +136,7 @@ class IncrementStatistic(RankStatistic):
 #              CONCRETE CLASSES
 ###################################################
 
-class LoginStatistic(RankStatistic):
+class LoginStatistic(IncrementStatistic):
     """
     """
     statistic_name = "Logins"
@@ -173,7 +173,7 @@ class WeekendLoginStatistic(RankStatistic):
 class WorkdayLoginStatistic(BaseStatistic):
     """
     """
-    statistic_name = "Workday logins"
+    statistic_name = "Workday login streak"
     ranks = {
         2: ("I'm back", "Log in two workdays in a row"),
         7: ("Workday champion", "Log in every workday for a week"),
@@ -233,7 +233,7 @@ class LabelingStatistic(IncrementStatistic):
     """
     statistic_name = "Labels created"
     ranks = {
-        1: ("Labeler - Bronze III", "Create 1 label"),
+        1: ("Labeler - Bronze III", "Create your first label"),
         5: ("Labeler - Bronze II", "Create 5 labels"),
         10: ("Labeler - Bronze I", "Create 10 labels"),
         25: ("Labeler - Silver III", "Create 25 labels"),
@@ -255,7 +255,7 @@ class ProjectStatistic(IncrementStatistic):
     """
     statistic_name = "Projects created"
     ranks = {
-        1: ("Creator - Bronze III", "Create 1 projects"),
+        1: ("Creator - Bronze III", "Create your first project"),
         5: ("Creator - Bronze II", "Create 5 projects"),
         10: ("Creator - Bronze I", "Create 10 projects"),
         50: ("Creator - Silver III", "Create 25 projects"),

@@ -8,6 +8,7 @@ import CreateProject from '../components/CreateProject';
 import ChangePass from '../components/ChangePass';
 import ManageUsers from '../components/ManageUsers';
 import AchievementCarousel from '../components/AchievementCarousel';
+import StatList from '../components/StatList';
 import Layout from '../components/Layout';
 
 import { useUser } from '../contexts/UserContext';
@@ -40,9 +41,7 @@ const Settings = () => {
   const pages = [
     <div>
       <Col className="main-col">
-        <h1 className="header">{userState.name}</h1>
-        <h2>Achievements</h2>
-        <AchievementCarousel containerClass="carousel-container" />
+        <h1>{userState.name}</h1>
         {userState.isAdmin && (
           <Row id="manage-btn-row">
             <Button className="generic" onClick={() => setPageShow(SettingPages.ADD_NEW_PROJECT)}>
@@ -61,6 +60,10 @@ const Settings = () => {
             Change password
           </Button>
         </Row>
+        <h2>Achievements</h2>
+        <AchievementCarousel containerClass="carousel-container" />
+        <h2>Statistics</h2>
+        <StatList />
       </Col>
     </div>,
     <div>

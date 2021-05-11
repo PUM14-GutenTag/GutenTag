@@ -157,6 +157,6 @@ svg.remove {
   width: 90%;
 }
 
-.header {
-  margin-bottom: 1.75rem;
+.main-col > h2 {
+  margin-top: 1.75rem;
 }

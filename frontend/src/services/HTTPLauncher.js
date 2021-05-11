@@ -439,6 +439,13 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to get all statistics.
+  static sendGetStatistics() {
+    return axios.get('get-statistics', {
+      headers: authHeader(),
+    });
+  }
+
   // Send HTTP-request to reset database (TODO: remove for production).
   static sendResetDatabase() {
     return axios.get('reset');
