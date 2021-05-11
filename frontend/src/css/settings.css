@@ -143,6 +143,11 @@ svg.remove {
   margin-bottom: 0;
 }
 
+.checkbox {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
 input[type='checkbox'] {
   /* Double-sized Checkboxes */
   -ms-transform: scale(1.5); /* IE */
