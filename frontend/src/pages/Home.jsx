@@ -46,7 +46,7 @@ const Home = () => {
         <div className="projects-container">
           <ul>
             {projects
-              .filter((u) => filterFunc(u))
+              .filter((p) => filterFunc(p))
               .map((result, i) => (
                 <li key={result.name}>
                   <Project
