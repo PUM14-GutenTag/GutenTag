@@ -10,7 +10,7 @@ fixa så det bara är en knapp som används för toggle och inte två
 gör så att det inte går att trycka i själva knap
  */
 
-const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels,setData }) => {
+const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setData }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
@@ -40,7 +40,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels,setData
       selectedText.toString() !== '' &&
       selectedText.toString() !== ' '
     ) {
-      console.log("fist iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+      console.log('fist iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
       const indexBefore = selectedText.getRangeAt(0).startOffset - 1;
       const indexAfter = selectedText.getRangeAt(0).endOffset;
       if (
@@ -50,7 +50,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels,setData
         (selectedText.anchorNode.data[indexAfter] === undefined ||
           selectedText.anchorNode.data[indexAfter] === ' ')
       ) {
-        console.log("second iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+        console.log('second iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
         setSelection(selectedText.toString());
         setStartIndex(selectedText.getRangeAt(0).startOffset);
         setEndIndex(selectedText.getRangeAt(0).endOffset - 1);
@@ -66,13 +66,13 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels,setData
         const begin = labels[i].begin;
         const end = labels[i].end;
         str = `${str.substr(0, begin)}<span class="hilite">${str.substr(
-        begin,
-        end - begin + 1
-      )}</span>${str.substr(end + 1)}`;}
+          begin,
+          end - begin + 1
+        )}</span>${str.substr(end + 1)}`;
+      }
       // do functuion, return value, do function, return value
-      
-      
-      return <div dangerouslySetInnerHTML={{ __html: str }} />;
+
+      return <div id="text-box-container" dangerouslySetInnerHTML={{ __html: str }} />;
     }
 
     return `${data}`;
