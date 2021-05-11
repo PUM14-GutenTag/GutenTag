@@ -620,9 +620,7 @@ class Statistic(db.Model):
         """
         stats = self.query.filter_by(name=self.name).all()
         stats.sort(key=lambda s: s.occurances, reverse=True)
-        print(stats)
         ranking = stats.index(self) + 1
-        print(ranking)
         return ranking
 
     def __repr__(self):
@@ -663,7 +661,6 @@ class Achievement(db.Model):
             Achievement.earned.isnot(None),
             Achievement.has_notified.is_(False)
         ).all()
-        print("achieve list:", achieve_list)
         for achieve in achieve_list:
             achieve.has_notified = True
         db.session.commit()

@@ -3,7 +3,6 @@ from sqlalchemy.sql import extract
 from api.models import (Achievement,
                         Statistic,
                         Login)
-from api.database_handler import try_add, add_flush
 from api import db
 
 
@@ -13,12 +12,15 @@ from api import db
 
 class BaseStatistic():
     """
+    Abstract class that keeps track of a single statistic and its achievements.
+    This involves instantiating db models, and updating occurances.
     """
     statistic_name = None
 
     @classmethod
     def get_occurances(cls, user_id):
         """
+        Return the number of occurances for this statistic.
         """
         return Statistic.query.filter_by(name=cls.statistic_name,
                                          user_id=user_id
@@ -26,37 +28,58 @@ class BaseStatistic():
 
     @classmethod
     def instantiate(cls, user_id):
+        """
+        Create database models for a new user.
+        """
         cls.instantiate_statistic_model(user_id)
         cls.instantiate_achievement_models(user_id)
 
     @classmethod
     def instantiate_statistic_model(cls, user_id):
         """
+        Create a database model to track the user's progress on the statistic.
         """
         db.session.add(Statistic(name=cls.statistic_name, user_id=user_id))
 
     @classmethod
     def instantiate_achievement_models(cls, user_id):
         """
+        Create a database model to track the user's progress on the statistic's
+        achievements.
         """
         raise NotImplementedError()
 
     @classmethod
     def update(cls, user_id):
         """
+        Update the number of occurances.
         """
         raise NotImplementedError()
 
 
 class BooleanStatistic(BaseStatistic):
     """
+    Subclass of BaseStatistic used to track boolean statistics, that is, stats
+    that cannot occur more than once.
     """
     achievement_name = None
     achievement_description = None
 
     @classmethod
+    def get_occurances(cls, user_id):
+        """
+        Return the number of occurances for this statistic.
+        """
+        stat = Statistic.query.filter_by(name=cls.statistic_name,
+                                         user_id=user_id
+                                         ).one()
+        return stat.occurances > 0
+
+    @classmethod
     def instantiate_achievement_models(cls, user_id):
         """
+        Create a database model to track the user's progress on the statistic's
+        achievements.
         """
         db.session.add(Achievement(
             name=cls.achievement_name,
@@ -64,21 +87,41 @@ class BooleanStatistic(BaseStatistic):
             user_id=user_id
         ))
 
+    @classmethod
+    def update(cls, user_id):
+        """
+        Update the number of occurances.
+        """
+        stat = Statistic.query.filter_by(name=cls.statistic_name,
+                                         user_id=user_id
+                                         ).one()
+        if (stat.occurances < 1):
+            stat.occurances = 1
+
+            new_achieve = Achievement.query.filter_by(
+                user_id=user_id,
+                name=cls.achievement_name,
+            ).one()
+            new_achieve.earned = datetime.datetime.now()
+
+            db.session.flush()
+
 
 class RankStatistic(BaseStatistic):
     """
+    Subclass of BaseStatistic used to track achievements with multiple tiers.
     """
     ranks = None
 
     @classmethod
     def update(cls, user_id):
         """
+        Update the number of occurances.
         """
         cls.update_occurances(user_id)
         occurances = cls.get_occurances(user_id)
 
         # Check if new achievement attained.
-        print("occurances", occurances)
         if occurances in cls.ranks.keys():
             new_achieve = Achievement.query.filter_by(
                 user_id=user_id,
@@ -86,17 +129,18 @@ class RankStatistic(BaseStatistic):
             ).one()
             if (new_achieve):
                 new_achieve.earned = datetime.datetime.now()
-            print("new achieve:", new_achieve)
             db.session.flush()
 
     @classmethod
     def update_occurances(cls, user_id):
         """
+        Update the number of occurances.
         """
 
     @classmethod
     def get_rank(cls, occurances):
         """
+        Get the name of the highest achieved rank. 
         """
         earned_ranks = {
             k: v for (k, v) in cls.ranks.items() if k <= occurances}
@@ -105,6 +149,8 @@ class RankStatistic(BaseStatistic):
     @classmethod
     def instantiate_achievement_models(cls, user_id):
         """
+        Create a database model to track the user's progress on the statistic's
+        achievements.
         """
         add_list = []
         for v in cls.ranks.values():
@@ -118,9 +164,14 @@ class RankStatistic(BaseStatistic):
 
 
 class IncrementStatistic(RankStatistic):
+    """
+    Subclass of RankStatistic where the number of occurances simply increment
+    on a certain action.
+    """
     @classmethod
     def update_occurances(cls, user_id):
         """
+        Update the number of occurances.
         """
         stat = Statistic.query.filter_by(
             name=cls.statistic_name,
@@ -138,6 +189,7 @@ class IncrementStatistic(RankStatistic):
 
 class LoginStatistic(IncrementStatistic):
     """
+    Keeps track of number of logins.
     """
     statistic_name = "Logins"
     ranks = {
@@ -147,12 +199,14 @@ class LoginStatistic(IncrementStatistic):
     @classmethod
     def get_occurances(cls, user_id):
         """
+        Return the number of occurances for this statistic.
         """
         return len(Login.query.filter_by(user_id=user_id).all())
 
 
 class WeekendLoginStatistic(RankStatistic):
     """
+    Keeps track of number of logins on weekends.
     """
     statistic_name = "Weekend logins"
     ranks = {
@@ -162,6 +216,7 @@ class WeekendLoginStatistic(RankStatistic):
     @classmethod
     def get_occurances(cls, user_id):
         """
+        Return the number of occurances for this statistic.
         """
         logins = Login.query.filter(
             Login.user_id == user_id,
@@ -172,6 +227,8 @@ class WeekendLoginStatistic(RankStatistic):
 
 class WorkdayLoginStatistic(BaseStatistic):
     """
+    Keeps track of the number of consecutive weekdays the user has logged in
+    for.
     """
     statistic_name = "Workday login streak"
     ranks = {
@@ -185,12 +242,12 @@ class WorkdayLoginStatistic(BaseStatistic):
     @ classmethod
     def update(cls, user_id):
         """
+        Update the number of occurances.
         """
         cls.update_occurances(user_id)
         occurances = cls.get_occurances(user_id)
 
         # Check if new achievement attained.
-        print("occurances", occurances)
         workday_ranks = [calc_workdays_in_days(k) for k in cls.ranks.keys()]
         if occurances in workday_ranks:
             new_achieve = Achievement.query.filter_by(
@@ -199,12 +256,13 @@ class WorkdayLoginStatistic(BaseStatistic):
             ).one()
             if (new_achieve):
                 new_achieve.earned = datetime.datetime.now()
-            print("new achieve:", new_achieve)
             db.session.flush()
 
     @ classmethod
     def instantiate_achievement_models(cls, user_id):
         """
+        Create a database model to track the user's progress on the statistic's
+        achievements.
         """
         add_list = []
         for v in cls.ranks.values():
@@ -218,6 +276,9 @@ class WorkdayLoginStatistic(BaseStatistic):
 
     @ classmethod
     def update_occurances(cls, user_id):
+        """
+        Update the number of occurances.
+        """
         stat = Statistic.query.filter_by(
             name=cls.statistic_name,
             user_id=user_id
@@ -230,6 +291,7 @@ class WorkdayLoginStatistic(BaseStatistic):
 
 class LabelingStatistic(IncrementStatistic):
     """
+    Keeps track of the number of labels that user has created.
     """
     statistic_name = "Labels created"
     ranks = {
@@ -252,6 +314,7 @@ class LabelingStatistic(IncrementStatistic):
 
 class ProjectStatistic(IncrementStatistic):
     """
+    Keeps track of the number of projects the user has created.
     """
     statistic_name = "Projects created"
     ranks = {
@@ -265,6 +328,7 @@ class ProjectStatistic(IncrementStatistic):
 
 class ImportStatistic(IncrementStatistic):
     """
+    Keeps track of the number of data imports the user has done.
     """
     statistic_name = "Imports completed"
     ranks = {
@@ -274,6 +338,7 @@ class ImportStatistic(IncrementStatistic):
 
 class ExportStatistic(IncrementStatistic):
     """
+    Keeps track of the number of data exports the user has done.
     """
     statistic_name = "Exports completed"
     ranks = {
@@ -299,6 +364,7 @@ class ExportStatistic(IncrementStatistic):
 
 def add_stats_to_new_user(user_id):
     """
+    Instantiate all statistic and achievement models for a new user.
     """
     LabelingStatistic.instantiate(user_id)
     ProjectStatistic.instantiate(user_id)
@@ -311,6 +377,7 @@ def add_stats_to_new_user(user_id):
 
 def calc_workday_streak(datetime_list):
     """
+    Returns the number of consecutive workday in datetime_list.
     """
     date_list = [dt.date() for dt in datetime_list]
     unique_dates = list(dict.fromkeys(date_list))
@@ -331,6 +398,7 @@ def calc_workday_streak(datetime_list):
 
 def calc_workdays_in_days(num_days):
     """
+    Returns how many of the previous num_days are workdays.
     """
     to_date = datetime.date.today()
     from_date = datetime.date.today() - datetime.timedelta(days=num_days)

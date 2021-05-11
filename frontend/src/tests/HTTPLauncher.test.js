@@ -698,7 +698,7 @@ describe('sendGetExportData', () => {
   });
 });
 
-describe.only('sendGetUnnotifiedAchievements', () => {
+describe('sendGetUnnotifiedAchievements', () => {
   test('Project multiple achievement', async () => {
     await testUtil.resetDB();
     await testUtil.createUser();
@@ -728,7 +728,6 @@ describe.only('sendGetUnnotifiedAchievements', () => {
       testUtil.getTextFile(textDir, 'input_document_classification.json')
     );
     const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
-    console.log(response);
     // Expecting 'Importer' achievement.
     expect(response.status).toBe(200);
     expect(response.data.length).toBe(1);
@@ -748,7 +747,6 @@ describe.only('sendGetUnnotifiedAchievements', () => {
 
     await HTTPLauncher.sendGetExportData(projectID);
     const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
-    console.log(response);
     // Expecting 'Exporter' achievement.
     expect(response.status).toBe(200);
     expect(response.data.length).toBe(1);
@@ -801,7 +799,6 @@ describe.only('sendGetUnnotifiedAchievements', () => {
     await testUtil.createUser();
 
     const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
-    console.log(response);
     // Expecting 'First time' achievement.
     expect(response.status).toBe(200);
     expect(response.data.length).toBe(1);

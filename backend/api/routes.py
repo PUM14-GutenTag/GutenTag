@@ -26,7 +26,6 @@ from api.models import (
 )
 from api.database_handler import (
     reset_db,
-    try_add,
     try_add_response,
     try_delete_response,
     add_flush,
@@ -592,7 +591,6 @@ class CreateDocumentClassificationLabel(Resource):
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
-                print(msg)
                 status = 404
         else:
             msg = "User is not authorized to create label."
