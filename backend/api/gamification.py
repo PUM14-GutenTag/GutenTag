@@ -140,7 +140,7 @@ class RankStatistic(BaseStatistic):
     @classmethod
     def get_rank(cls, occurances):
         """
-        Get the name of the highest achieved rank. 
+        Get the name of the highest achieved rank.
         """
         earned_ranks = {
             k: v for (k, v) in cls.ranks.items() if k <= occurances}
