@@ -107,7 +107,7 @@ class RankStatistic(BaseStatistic):
         """
         """
         add_list = []
-        for k, v in cls.ranks.items():
+        for v in cls.ranks.values():
             achieve = Achievement(
                 name=v[0],
                 description=v[1],
@@ -218,7 +218,7 @@ class WorkdayLoginStatistic(BaseStatistic):
         """
         """
         add_list = []
-        for k, v in cls.ranks.items():
+        for v in cls.ranks.values():
             achieve = Achievement(
                 name=v[0],
                 description=v[1],
