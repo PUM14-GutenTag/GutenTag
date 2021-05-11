@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Row, Col } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 import CreateProject from '../components/CreateProject';
 import ChangePass from '../components/ChangePass';
@@ -37,21 +39,10 @@ const Settings = () => {
 
   const pages = [
     <div>
-      <Col
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <h1>Name: {userState.name}</h1>
-        <br />
-        <h1>Personal records</h1>
-        <div style={{ height: '100%', width: '90%' }}>
-          <AchievementCarousel />
-        </div>
-        <br />
+      <Col className="main-col">
+        <h1 className="header">{userState.name}</h1>
+        <h2>Achievements</h2>
+        <AchievementCarousel containerClass="carousel-container" />
         {userState.isAdmin && (
           <Row id="manage-btn-row">
             <Button className="generic" onClick={() => setPageShow(SettingPages.ADD_NEW_PROJECT)}>

@@ -622,7 +622,7 @@ class Achievement(db.Model):
 
     def format_json(self):
         if self.earned is None:
-            earned = ""
+            earned = None
         else:
             earned = self.earned.strftime("%d %B %Y")
         return {
@@ -633,11 +633,6 @@ class Achievement(db.Model):
 
     @staticmethod
     def get_unnotified(user_id):
-        # print("achieve list:", Achievement.query.filter(
-        #     Achievement.user_id == user_id
-        #     # Achievement.earned.isnot(None),
-        #     # Achievement.has_notified.is_(False)
-        # ).all())
         achieve_list = Achievement.query.filter(
             Achievement.user_id == user_id,
             Achievement.earned.isnot(None),

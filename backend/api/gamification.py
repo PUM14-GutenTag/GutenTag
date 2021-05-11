@@ -234,19 +234,19 @@ class LabelingStatistic(IncrementStatistic):
     statistic_name = "Labels created"
     ranks = {
         1: ("Labeler - Bronze III", "Create 1 label"),
-        5: ("Labeler - Bronze II", "Create 5 label"),
-        10: ("Labeler - Bronze I", "Create 10 label"),
-        25: ("Labeler - Silver III", "Create 25 label"),
-        50: ("Labeler - Silver II", "Create 50 label"),
-        75: ("Labeler - Silver I", "Create 75 label"),
-        150: ("Labeler - Gold III", "Create 150 label"),
-        250: ("Labeler - Gold II", "Create 250 label"),
-        500: ("Labeler - Gold I", "Create 500 label"),
-        1000: ("Labeler - Platinum III", "Create 1 000 label"),
-        2500: ("Labeler - Platinum II", "Create 2 500 label"),
-        5000: ("Labeler - Platinum I", "Create 5 000 label"),
-        10000: ("Labeler - Master", "Create 10 000 label"),
-        100000: ("Labeler - Grandmaster", "Create 100 000 label")
+        5: ("Labeler - Bronze II", "Create 5 labels"),
+        10: ("Labeler - Bronze I", "Create 10 labels"),
+        25: ("Labeler - Silver III", "Create 25 labels"),
+        50: ("Labeler - Silver II", "Create 50 labels"),
+        75: ("Labeler - Silver I", "Create 75 labels"),
+        150: ("Labeler - Gold III", "Create 150 labels"),
+        250: ("Labeler - Gold II", "Create 250 labels"),
+        500: ("Labeler - Gold I", "Create 500 labels"),
+        1000: ("Labeler - Platinum III", "Create 1 000 labels"),
+        2500: ("Labeler - Platinum II", "Create 2 500 labels"),
+        5000: ("Labeler - Platinum I", "Create 5 000 labels"),
+        10000: ("Labeler - Master", "Create 10 000 labels"),
+        100000: ("Labeler - Grandmaster", "Create 100 000 labels")
     }
 
 

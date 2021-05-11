@@ -432,6 +432,13 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to get all achievements.
+  static sendGetAchievements() {
+    return axios.get('get-achievements', {
+      headers: authHeader(),
+    });
+  }
+
   // Send HTTP-request to reset database (TODO: remove for production).
   static sendResetDatabase() {
     return axios.get('reset');
