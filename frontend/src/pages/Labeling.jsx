@@ -33,8 +33,9 @@ const Labeling = ({ location }) => {
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
       const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[CURRENT_DATA].id);
-      console.log(Object.values(response.data.labels));
+
       if (Object.keys(response.data.labels).length !== 0) {
+        console.log('labels: ', Object.values(response.data.labels));
         setLabels(Object.values(response.data.labels));
       } else {
         setLabels([]);

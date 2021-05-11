@@ -4,17 +4,14 @@ import Form from 'react-bootstrap/Form';
 import '../css/Sequence.css';
 import HTTPLauncher from '../services/HTTPLauncher';
 
-/*
-TODO: 
-fixa så det bara är en knapp som används för toggle och inte två
-gör så att det inte går att trycka i själva knap
- */
-
 const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setData }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
   const [selection, setSelection] = useState('');
+  // const [wordList, setWordList] = useState([]);
+  // const wordList = data.split(' ');
+  const [dataInSpans, setDataInSpans] = useState('');
 
   const addLabel = async (event) => {
     event.preventDefault();
@@ -32,6 +29,29 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setDat
     inputRef.current.focus();
   };
 
+  // add all index of words before tempWord in wordList to get startIndex, add alla index of
+  const findStartEndIndex = (startWord, endWord) => {
+    const wordList = data.split(' ');
+    // index characters
+    let tempStartIndex = 0;
+    let tempEndIndex = 0;
+    // index in list
+    const startWordIndex = wordList.indexOf(startWord);
+    const endWordIndex = wordList.indexOf(endWord);
+    console.log('startWordIndex: ', startWordIndex);
+    console.log('endWordIndex: ', endWordIndex);
+    wordList.forEach((element, index) => {
+      if (index < startWordIndex) {
+        tempStartIndex += element.length + 1;
+      } else if (index === startWordIndex) {
+        tempEndIndex = tempStartIndex + element.length - 1;
+      } else if (index <= endWordIndex) {
+        tempEndIndex += element.length + 1;
+      }
+    });
+    return { start: tempStartIndex, end: tempEndIndex };
+  };
+
   const handleSelection = () => {
     const selectedText = window.getSelection();
     if (
@@ -40,48 +60,51 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setDat
       selectedText.toString() !== '' &&
       selectedText.toString() !== ' '
     ) {
-      console.log('fist iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
-      const indexBefore = selectedText.getRangeAt(0).startOffset - 1;
-      const indexAfter = selectedText.getRangeAt(0).endOffset;
+      const currentlySelected = selectedText.toString();
+      const tempWordList = currentlySelected.split(' ');
+      const wordList = data.split(' ');
+
+      // check that selection includes only full words
+      console.log('wordList ', wordList);
+      console.log('wordList0 ', tempWordList[0]);
+      console.log('wordList-1 ', tempWordList[tempWordList.length - 1]);
+
       if (
-        selectedText.anchorNode.parentNode.id === 'text-box-container' &&
-        (selectedText.anchorNode.data[indexBefore] === ' ' ||
-          selectedText.anchorNode.data[indexBefore] === undefined) &&
-        (selectedText.anchorNode.data[indexAfter] === undefined ||
-          selectedText.anchorNode.data[indexAfter] === ' ')
+        wordList.includes(tempWordList[0]) &&
+        wordList.includes(tempWordList[tempWordList.length - 1]) &&
+        selectedText.anchorNode.parentNode.id === 'text-box-container'
       ) {
-        console.log('second iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
-        setSelection(selectedText.toString());
-        setStartIndex(selectedText.getRangeAt(0).startOffset);
-        setEndIndex(selectedText.getRangeAt(0).endOffset - 1);
+        const result = findStartEndIndex(tempWordList[0], tempWordList[tempWordList.length - 1]);
+        let unlabeledText = true;
+        labels.forEach((label) => {
+          if (
+            (result.start >= label.begin && result.start < label.end) ||
+            (result.end <= label.end && result.end > label.begin)
+          ) {
+            unlabeledText = false;
+          }
+        });
+        console.log('labels: ', labels);
+        if (unlabeledText) {
+          setSelection(selectedText.toString());
+          setStartIndex(result.start);
+          setEndIndex(result.end);
+        }
       }
     }
   };
 
-  const markTextData = () => {
-    if (labels.length > 0) {
-      let str = data.slice();
+  const styleTextData = () => {};
 
-      for (let i = 0; i < labels.length; i++) {
-        const begin = labels[i].begin;
-        const end = labels[i].end;
-        str = `${str.substr(0, begin)}<span class="hilite">${str.substr(
-          begin,
-          end - begin + 1
-        )}</span>${str.substr(end + 1)}`;
-      }
-      // do functuion, return value, do function, return value
-
-      return <div id="text-box-container" dangerouslySetInnerHTML={{ __html: str }} />;
-    }
-
-    return `${data}`;
+  const wrapWordsInSpan = (str) => {
+    const after = str.replace(/\w+/g, '<span id="text-box-container">$&</span>');
+    return <div dangerouslySetInnerHTML={{ __html: after }} />;
   };
 
   useEffect(() => {
     inputRef.current.value = '';
     inputRef.current.focus();
-
+    // setDataInSpans(wrapWordsInSpan(data));
     setSelection('');
     setStartIndex('');
     setEndIndex('');
@@ -92,18 +115,17 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setDat
   }, [labels]);
 
   useEffect(() => {
-    document.addEventListener('selectionchange', handleSelection);
-
+    document.removeEventListener('selectionchange', handleSelection);
+    addEventListener('selectionchange', handleSelection);
+    // setDataInSpans(wrapWordsInSpan(data));
     // eslint-disable-next-line
-  }, []);
+  }, [data]);
 
   return (
     <div className="sequence-container">
       <hr className="hr-title" data-content="Text data" />
-      <div className="text-box-container">
-        <div id="text-box-container" className={textBoxSize}>
-          {markTextData()}
-        </div>
+      <div id="text-box-container" className={textBoxSize}>
+        {wrapWordsInSpan(data)}
       </div>
       <hr className="hr-title" data-content="Add new sequence label" />
       <div className="label-container">
