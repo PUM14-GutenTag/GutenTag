@@ -48,10 +48,11 @@ const CreateProject = ({ toggleCallback }) => {
             </Form.Control>
           </Form.Group>
         </Row>
-
-        <Button className="dark" variant="primary" type="submit">
-          Submit
-        </Button>
+        <Row>
+          <Button className="dark" variant="primary" type="submit">
+            Submit
+          </Button>
+        </Row>
       </Form>
     </div>
   );

@@ -123,6 +123,7 @@ svg.remove {
 }
 
 /* Create Project & User Form */
+
 .create-container {
   margin: auto;
   width: 100%;
@@ -131,7 +132,7 @@ svg.remove {
 .create-container Form {
   margin: auto;
   white-space: nowrap;
-  width: 60%;
+  width: 70%;
 }
 
 .titleLabel {
