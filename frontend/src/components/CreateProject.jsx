@@ -45,6 +45,11 @@ const CreateProject = () => {
             />
           </Form.Group>
         </Row>
+        {error && (
+          <Row>
+            <Form.Label>Project name already exists</Form.Label>
+          </Row>
+        )}
         <Row>
           <Form.Group as={Col} controlId="formType">
             <Form.Label className="titleLabel">Project Type</Form.Label>
@@ -79,11 +84,6 @@ const CreateProject = () => {
                 },
               }}
             />
-          )}
-          {error && (
-            <Row>
-              <Form.Label>Could not create project</Form.Label>
-            </Row>
           )}
         </Row>
       </Form>
