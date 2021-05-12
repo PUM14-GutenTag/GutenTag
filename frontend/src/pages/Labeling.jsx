@@ -31,11 +31,12 @@ const Labeling = ({ location }) => {
   const projectId = id;
   // fetch all labels for a given datapoint
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
+    console.log('getsetlabel');
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
       const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[CURRENT_DATA].id);
 
       if (Object.keys(response.data.labels).length !== 0) {
-        console.log('labels: ', Object.values(response.data.labels));
+        // console.log('labels: ', Object.values(response.data.labels));
         setLabels(Object.values(response.data.labels));
       } else {
         setLabels([]);
@@ -82,61 +83,67 @@ const Labeling = ({ location }) => {
         setProgress((labeledByUser / response.data.dataAmount) * 100);
       }
     };
-
     getAmountOfData();
   }, [labels, projectId]);
 
   useEffect(() => {
     fetchData();
-    if (listOfDataPoints.length > 0) {
-      getSetLabels(listOfDataPoints);
-    }
-
     // eslint-disable-next-line
   }, []);
 
+  const getLastData = async (tempListOfDataPoints) => {
+    const tempIndex = index - 1;
+    setIndex(tempIndex);
+    const response = await HTTPLauncher.sendGetData(
+      projectId,
+      getDataTypeEnum.earlier_value,
+      tempIndex
+    );
+    tempListOfDataPoints.shift();
+    tempListOfDataPoints.unshift(response.data);
+    getSetLabels(tempListOfDataPoints);
+    setListOfDataPoints(tempListOfDataPoints);
+  };
+
   // Get earlier datapoint, and delete data point out of scope from list
-  const getLastData = async () => {
+  const lastData = () => {
     const tempLocalIndex = CURRENT_DATA - 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
     if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
-      const tempIndex = index - 1;
-      setIndex(tempIndex);
       tempListOfDataPoints.pop();
-      const response = await HTTPLauncher.sendGetData(
-        projectId,
-        getDataTypeEnum.earlier_value,
-        tempIndex
-      );
-      tempListOfDataPoints.unshift(response.data);
+      tempListOfDataPoints.unshift([]);
       setListOfDataPoints(tempListOfDataPoints);
-      getSetLabels(tempListOfDataPoints);
+      getLastData(tempListOfDataPoints);
     }
   };
 
+  const getNextData = async (tempListOfDataPoints) => {
+    const tempIndex = index + 1;
+    setIndex(tempIndex);
+    const response = await HTTPLauncher.sendGetData(
+      projectId,
+      getDataTypeEnum.next_value,
+      tempIndex
+    );
+
+    tempListOfDataPoints.push(response.data);
+    getSetLabels(tempListOfDataPoints);
+    setListOfDataPoints(tempListOfDataPoints);
+  };
+
   // Get next datapoint, and delete data point out of scope from list
-  const nextData = async () => {
+  const nextData = () => {
     const tempLocalIndex = CURRENT_DATA + 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
     if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
-      const tempIndex = index + 1;
-      setIndex(tempIndex);
       tempListOfDataPoints.shift();
-      const response = await HTTPLauncher.sendGetData(
-        projectId,
-        getDataTypeEnum.next_value,
-        tempIndex
-      );
-
-      tempListOfDataPoints.push(response.data);
       setListOfDataPoints(tempListOfDataPoints);
-      getSetLabels(tempListOfDataPoints);
+      getNextData(tempListOfDataPoints);
     }
   };
 
   // select what project type showed be displayed bases on project type
   const selectProjectComponent = (typeOfProject) => {
-    // {}
     if (
       listOfDataPoints.length > 0 &&
       listOfDataPoints[CURRENT_DATA] &&
@@ -160,7 +167,6 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             textBoxSize={textBoxSize()}
             labels={labels}
-            setData={setListOfDataPoints}
           />
         );
       }
@@ -175,6 +181,7 @@ const Labeling = ({ location }) => {
         );
       }
     }
+
     return <></>;
   };
 
@@ -206,7 +213,7 @@ const Labeling = ({ location }) => {
           <div className="main-content">
             <ChevronLeft
               className="right-left-arrow  make-large fa-10x arrow-btn"
-              onClick={getLastData}
+              onClick={lastData}
             />
 
             <div className="data-content">

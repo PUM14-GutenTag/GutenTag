@@ -1,17 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import '../css/Sequence.css';
 import HTTPLauncher from '../services/HTTPLauncher';
 
-const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setData }) => {
+const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
   const [selection, setSelection] = useState('');
-  // const [wordList, setWordList] = useState([]);
-  // const wordList = data.split(' ');
-  const [dataInSpans, setDataInSpans] = useState('');
+  const wordList = data.split(' ');
+  // const [dataInSpans, setDataInSpans] = useState('');
 
   const addLabel = async (event) => {
     event.preventDefault();
@@ -31,15 +30,13 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setDat
 
   // add all index of words before tempWord in wordList to get startIndex, add alla index of
   const findStartEndIndex = (startWord, endWord) => {
-    const wordList = data.split(' ');
     // index characters
     let tempStartIndex = 0;
     let tempEndIndex = 0;
     // index in list
     const startWordIndex = wordList.indexOf(startWord);
     const endWordIndex = wordList.indexOf(endWord);
-    console.log('startWordIndex: ', startWordIndex);
-    console.log('endWordIndex: ', endWordIndex);
+
     wordList.forEach((element, index) => {
       if (index < startWordIndex) {
         tempStartIndex += element.length + 1;
@@ -62,13 +59,8 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setDat
     ) {
       const currentlySelected = selectedText.toString();
       const tempWordList = currentlySelected.split(' ');
-      const wordList = data.split(' ');
 
       // check that selection includes only full words
-      console.log('wordList ', wordList);
-      console.log('wordList0 ', tempWordList[0]);
-      console.log('wordList-1 ', tempWordList[tempWordList.length - 1]);
-
       if (
         wordList.includes(tempWordList[0]) &&
         wordList.includes(tempWordList[tempWordList.length - 1]) &&
@@ -84,7 +76,6 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setDat
             unlabeledText = false;
           }
         });
-        console.log('labels: ', labels);
         if (unlabeledText) {
           setSelection(selectedText.toString());
           setStartIndex(result.start);
@@ -94,11 +85,27 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setDat
     }
   };
 
-  const styleTextData = () => {};
+  const generateRandomColor = () => {
+    const green = Math.floor(1 + Math.random() * 256 * 1.7);
+    const blue = Math.floor(2 + Math.random() * 256 * 1.2);
+    const red = Math.floor(1 + Math.random() * 256 * 1.7);
+    return `rgb(${red}, ${green}, ${blue})`;
+  };
+
+  const colorLabelData = (param1) => {
+    // if it is a label do color
+    console.log(param1);
+    // else return default black
+  };
 
   const wrapWordsInSpan = (str) => {
-    const after = str.replace(/\w+/g, '<span id="text-box-container">$&</span>');
-    return <div dangerouslySetInnerHTML={{ __html: after }} />;
+    // style={{ backgroundColor: generateRandomColor() }}
+    const textInSpans = str.replace(
+      /\w+/g,
+      `<span id="text-box-container" style="color: ${colorLabelData(`$&`)}"}>$&</span>`
+    );
+    // const textInSpans = wordList.map(word =>word.replace( `<span id="text-box-container" style="color: ${colorLabelData(word)}"}>$&</span>`))
+    return <div dangerouslySetInnerHTML={{ __html: textInSpans }} />;
   };
 
   useEffect(() => {
@@ -111,15 +118,14 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels, setDat
   }, [dataPointId]);
 
   useEffect(() => {
-    // markTextData();
-  }, [labels]);
-
-  useEffect(() => {
-    document.removeEventListener('selectionchange', handleSelection);
-    addEventListener('selectionchange', handleSelection);
+    document.addEventListener('selectionchange', handleSelection);
+    // setWordList(data.split(' '));
     // setDataInSpans(wrapWordsInSpan(data));
     // eslint-disable-next-line
-  }, [data]);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelection);
+    };
+  }, [data, labels]);
 
   return (
     <div className="sequence-container">
