@@ -6,11 +6,13 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import HTTPLauncher from '../services/HTTPLauncher';
 import DocumentClassification from '../components/DocumentClassification';
+import ImageLabeling from '../components/ImageLabeling';
 import SequenceToSequence from '../components/SequenceToSequence';
 import FinishedPopUp from '../components/FinishedPopUp';
 import '../css/Labeling.css';
 import Layout from '../components/Layout';
 import Label from '../components/Label';
+import ProjectType from '../ProjectType';
 
 /* 
 Labeling-page handles labeling functionality
@@ -124,7 +126,6 @@ const Labeling = ({ location }) => {
         getDataTypeEnum.next_value,
         tempIndex
       );
-
       tempListOfDataPoints.push(response.data);
       setListOfDataPoints(tempListOfDataPoints);
       getSetLabels(tempListOfDataPoints);
@@ -139,7 +140,7 @@ const Labeling = ({ location }) => {
       listOfDataPoints[CURRENT_DATA] &&
       Object.keys(listOfDataPoints[CURRENT_DATA]).length !== 0
     ) {
-      if (typeOfProject === 1) {
+      if (typeOfProject === ProjectType.DOCUMENT_CLASSIFICATION) {
         return (
           <DocumentClassification
             data={listOfDataPoints[CURRENT_DATA].data}
@@ -149,7 +150,15 @@ const Labeling = ({ location }) => {
           />
         );
       }
-      if (typeOfProject === 3) {
+      if (typeOfProject === ProjectType.IMAGE_CLASSIFICATION) {
+        return (
+          <ImageLabeling
+            dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
+            getSetLabels={getSetLabels}
+          />
+        );
+      }
+      if (typeOfProject === ProjectType.SEQUENCE_LABELING) {
         return (
           <SequenceToSequence
             data={listOfDataPoints[CURRENT_DATA].data}
@@ -166,7 +175,7 @@ const Labeling = ({ location }) => {
   const suggestionLabels = (typeOfProject) => {
     /* Choose for which project types label suggestions should appear */
     // Seq to Seq should not display suggestions
-    if (typeOfProject !== 3) {
+    if (typeOfProject !== ProjectType.SEQUENCE_TO_SEQUENCE) {
       return <hr className="hr-title" data-content="Suggestions" />;
     }
     return <></>;
