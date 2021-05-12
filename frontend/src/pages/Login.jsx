@@ -14,6 +14,7 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validated, setValidated] = useState(false);
+  const [validEmail, setValidEmail] = useState(true);
 
   const history = useHistory();
 
@@ -34,9 +35,13 @@ function Login() {
 
     setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
-    const { access_token: accessToken, refresh_token: refreshToken } = responseLogin.data;
-    userAuth.setTokens(accessToken, refreshToken);
-    history.push('/home');
+    console.log(responseLogin.status);
+    if (responseLogin.status !== undefined) {
+      const { access_token: accessToken, refresh_token: refreshToken } = responseLogin.data;
+      userAuth.setTokens(accessToken, refreshToken);
+      history.push('/home');
+    }
+    setValidEmail(false);
   };
 
   return (
@@ -57,9 +62,7 @@ function Login() {
               placeholder="Enter email"
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Form.Control.Feedback type="invalid">
-              Please input a valid email.
-            </Form.Control.Feedback>
+            {!validEmail && <div className="red-text">Email invalid!</div>}
           </Col>
         </Form.Group>
         <Form.Group as={Row} className="text-right" controlId="formBasicPassword">
