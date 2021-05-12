@@ -30,4 +30,10 @@ p {
 
 .edit-link {
   font-size: 1.75rem;
+  padding-left: 1rem;
+  color: #063954;
+}
+.edit-link:hover {
+  color: #007bff;
+  transition: 0.3s;
 }

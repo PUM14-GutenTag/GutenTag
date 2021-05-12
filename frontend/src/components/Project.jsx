@@ -20,8 +20,13 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
   };
 
   return (
-    <div className="project-container" style={{ backgroundColor: selectedColor }}>
-      <div className="title-container" onClick={toggleInfo} aria-hidden="true">
+    <div
+      className="project-container"
+      onMouseUp={toggleInfo}
+      aria-hidden="true"
+      style={{ backgroundColor: selectedColor }}
+    >
+      <div className="title-container" aria-hidden="true">
         <h1>{name}</h1>
         <ProgressBar now={50} striped id="progress-bar-project" />
       </div>
@@ -31,22 +36,22 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             <p>Type: {projectTypeNames[projectType - 1]}</p>
             <p>Progress: 1/4 </p>
             <p>Started: {created}</p>
-            <Button
-              variant="outline-primary"
-              as={Link}
-              to={{
-                pathname: '/labeling',
-                state: {
-                  projectType,
-                  id,
-                },
-              }}
-            >
-              Start
-            </Button>
           </div>
         </div>
       ) : null}
+      <Button
+        variant="outline-primary"
+        as={Link}
+        to={{
+          pathname: '/labeling',
+          state: {
+            projectType,
+            id,
+          },
+        }}
+      >
+        Start
+      </Button>
       {showEditButton && (
         <Link
           className="edit-link"
@@ -59,7 +64,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             },
           }}
         >
-          <GearFill color="#063954" />
+          <GearFill />
         </Link>
       )}
     </div>

@@ -837,7 +837,10 @@ class FetchUserProjects(Resource):
                 }
             msg = "Retrieved user projects"
             status = 200
-
+        else:
+            user_projects = []
+            msg = "No projects found"
+            status = 200
         return make_response(jsonify({"msg": msg,
                                       "projects": user_projects}), status)
 

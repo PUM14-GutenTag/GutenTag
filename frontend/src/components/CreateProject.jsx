@@ -63,26 +63,29 @@ const CreateProject = () => {
             </Form.Control>
           </Form.Group>
         </Row>
-        {error && (
-          <Row>
-            <Form.Label>Could not create project</Form.Label>
-          </Row>
-        )}
-        <Button className="dark" variant="primary" type="submit">
-          Submit
-        </Button>
-        {redirect && (
-          <Redirect
-            to={{
-              pathname: '/edit-project',
-              state: {
-                id: ID,
-                name: projectName,
-                projectType,
-              },
-            }}
-          />
-        )}
+
+        <Row>
+          <Button className="dark" variant="primary" type="submit">
+            Submit
+          </Button>
+          {redirect && (
+            <Redirect
+              to={{
+                pathname: '/edit-project',
+                state: {
+                  id: ID,
+                  name: projectName,
+                  projectType,
+                },
+              }}
+            />
+          )}
+          {error && (
+            <Row>
+              <Form.Label>Could not create project</Form.Label>
+            </Row>
+          )}
+        </Row>
       </Form>
     </div>
   );
