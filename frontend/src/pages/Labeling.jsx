@@ -17,7 +17,7 @@ import Label from '../components/Label';
 Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
-  const CURRENT_DATA = 5;
+  // const CURRENT_DATA = 5;
   const { projectType, id } = location.state;
 
   const [labels, setLabels] = useState([]);
@@ -25,6 +25,7 @@ const Labeling = ({ location }) => {
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
   const [progress, setProgress] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
+  const [CURRENT_DATA, setCurrentData] = useState(5);
 
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
   const type = projectType;
@@ -91,54 +92,41 @@ const Labeling = ({ location }) => {
     // eslint-disable-next-line
   }, []);
 
-  const getLastData = async (tempListOfDataPoints) => {
-    const tempIndex = index - 1;
-    setIndex(tempIndex);
-    const response = await HTTPLauncher.sendGetData(
-      projectId,
-      getDataTypeEnum.earlier_value,
-      tempIndex
-    );
-    tempListOfDataPoints.shift();
-    tempListOfDataPoints.unshift(response.data);
-    getSetLabels(tempListOfDataPoints);
-    setListOfDataPoints(tempListOfDataPoints);
-  };
-
   // Get earlier datapoint, and delete data point out of scope from list
-  const lastData = () => {
+  const getLastData = async () => {
     const tempLocalIndex = CURRENT_DATA - 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
     if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
+      const tempIndex = index - 1;
+      setIndex(tempIndex);
       tempListOfDataPoints.pop();
-      tempListOfDataPoints.unshift([]);
+      const response = await HTTPLauncher.sendGetData(
+        projectId,
+        getDataTypeEnum.earlier_value,
+        tempIndex
+      );
+      tempListOfDataPoints.unshift(response.data);
       setListOfDataPoints(tempListOfDataPoints);
-      getLastData(tempListOfDataPoints);
+      getSetLabels(tempListOfDataPoints);
     }
   };
 
-  const getNextData = async (tempListOfDataPoints) => {
-    const tempIndex = index + 1;
-    setIndex(tempIndex);
-    const response = await HTTPLauncher.sendGetData(
-      projectId,
-      getDataTypeEnum.next_value,
-      tempIndex
-    );
-
-    tempListOfDataPoints.push(response.data);
-    getSetLabels(tempListOfDataPoints);
-    setListOfDataPoints(tempListOfDataPoints);
-  };
-
   // Get next datapoint, and delete data point out of scope from list
-  const nextData = () => {
+  const nextData = async () => {
     const tempLocalIndex = CURRENT_DATA + 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
     if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
+      const tempIndex = index + 1;
+      setIndex(tempIndex);
       tempListOfDataPoints.shift();
+      const response = await HTTPLauncher.sendGetData(
+        projectId,
+        getDataTypeEnum.next_value,
+        tempIndex
+      );
+      tempListOfDataPoints.push(response.data);
       setListOfDataPoints(tempListOfDataPoints);
-      getNextData(tempListOfDataPoints);
+      getSetLabels(tempListOfDataPoints);
     }
   };
 
@@ -213,7 +201,7 @@ const Labeling = ({ location }) => {
           <div className="main-content">
             <ChevronLeft
               className="right-left-arrow  make-large fa-10x arrow-btn"
-              onClick={lastData}
+              onClick={getLastData}
             />
 
             <div className="data-content">

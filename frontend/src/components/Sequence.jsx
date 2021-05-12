@@ -102,8 +102,9 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
     // style={{ backgroundColor: generateRandomColor() }}
     const textInSpans = str.replace(
       /\w+/g,
-      `<span id="text-box-container" style="color: ${colorLabelData(`$&`)}"}>$&</span>`
+      `<span id="text-box-container" style="color: ${colorLabelData($&)}"}>$&</span>`
     );
+
     // const textInSpans = wordList.map(word =>word.replace( `<span id="text-box-container" style="color: ${colorLabelData(word)}"}>$&</span>`))
     return <div dangerouslySetInnerHTML={{ __html: textInSpans }} />;
   };
