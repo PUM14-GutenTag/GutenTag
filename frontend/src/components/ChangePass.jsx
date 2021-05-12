@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 
@@ -35,40 +35,49 @@ const ChangePass = ({ toggleCallback }) => {
     <div>
       <div className="create-container">
         <Form onSubmit={submitHandler}>
-          <Form.Group controlId="form.old">
-            <Form.Label className="titleLabel">Current password</Form.Label>
-            <Form.Control
-              className="text"
-              type="password"
-              onChange={(event) => setCurrentPass(event.target.value)}
-              placeholder="Enter current password..."
-              required
-            />
-            {!passValid && <div className="red-text">Password invalid!</div>}
-          </Form.Group>
-          <Form.Group controlId="form.new">
-            <Form.Label className="titleLabel">New password</Form.Label>
-            <Form.Control
-              className="text"
-              type="password"
-              onChange={(event) => setNewPass(event.target.value)}
-              placeholder="Enter new password..."
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="form.repeat">
-            <Form.Control
-              className="text"
-              type="password"
-              onChange={(event) => setRepeatNewPass(event.target.value)}
-              placeholder="Repeat new password..."
-              required
-            />
-            {!validateForm() && <div className="red-text">Passwords do not match!</div>}
-          </Form.Group>
-          <Button className="dark" type="submit">
-            Save
-          </Button>
+          <Row>
+            <Form.Group as={Col} controlId="form.old">
+              <Form.Label className="titleLabel">Current password</Form.Label>
+              <Form.Control
+                className="text"
+                type="password"
+                onChange={(event) => setCurrentPass(event.target.value)}
+                placeholder="Enter current password..."
+                required
+              />
+              {!passValid && <div className="red-text">Password invalid!</div>}
+            </Form.Group>
+          </Row>
+
+          <Row>
+            <Form.Group as={Col} controlId="form.new">
+              <Form.Label className="titleLabel">New password</Form.Label>
+              <Form.Control
+                className="text"
+                type="password"
+                onChange={(event) => setNewPass(event.target.value)}
+                placeholder="Enter new password..."
+                required
+              />
+            </Form.Group>
+          </Row>
+          <Row>
+            <Form.Group as={Col} controlId="form.repeat">
+              <Form.Control
+                className="text"
+                type="password"
+                onChange={(event) => setRepeatNewPass(event.target.value)}
+                placeholder="Repeat new password..."
+                required
+              />
+              {!validateForm() && <div className="red-text">Passwords do not match!</div>}
+            </Form.Group>
+          </Row>
+          <Row>
+            <Button className="dark" type="submit">
+              Save
+            </Button>
+          </Row>
         </Form>
       </div>
     </div>
