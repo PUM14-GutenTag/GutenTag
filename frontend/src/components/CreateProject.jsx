@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom';
 import HTTPLauncher from '../services/HTTPLauncher';
 import ProjectType from '../ProjectType';
 
+/* Component for creating a project */
 const CreateProject = () => {
   const [projectName, setProjectName] = useState('');
   const [projectType, setProjectType] = useState(1);
@@ -12,14 +13,12 @@ const CreateProject = () => {
   const [redirect, setRedirect] = useState(false);
   const [error, setError] = useState(false);
 
-  const redirectEdit = () => {
-    setRedirect(true);
-  };
-
+  // When we get an ID we redirect to edit that project
   useEffect(() => {
-    if (ID !== null) redirectEdit();
+    if (ID !== null) setRedirect(true);
   }, [ID]);
 
+  // Creates a project in the backend
   const submitHandler = async (event) => {
     event.preventDefault();
     const response = await HTTPLauncher.sendCreateProject(projectName, projectType);
