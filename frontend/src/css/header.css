@@ -5,13 +5,14 @@
 
 .container.navbar-container,
 #navbar-content {
-  max-width: 1320px;
   padding-left: 0em;
   padding-right: 7em;
 }
 
 .navbar-collapse {
   text-align: center;
+  padding-left: 0em;
+  padding-right: 0em;
 }
 
 .logo {
@@ -37,4 +38,12 @@ a.nav-link.text-label,
   padding-bottom: 0.125em;
   position: relative;
   color: #063954;
+}
+
+@media screen and (max-width: 767px) {
+  .container.navbar-container,
+  #navbar-content {
+    padding-left: 0em;
+    padding-right: 0em;
+  }
 }
