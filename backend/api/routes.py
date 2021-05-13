@@ -441,8 +441,6 @@ class GetNewData(Resource):
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
-        print("HRERE:", project in user.projects)
-
         if not project:
             return make_response(jsonify({"message": "Invalid project id"}),
                                  404)
@@ -529,7 +527,6 @@ class GetLabel(Resource):
             status = 200
             msg = "Labels retrieved"
         elif project:
-            print("inproj")
             status = 200
             msg = f"No labels by {user.first_name} " + (
                 f"{user.last_name} found in project {project.name}")
