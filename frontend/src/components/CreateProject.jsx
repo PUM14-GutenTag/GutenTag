@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom';
+
 import HTTPLauncher from '../services/HTTPLauncher';
 import ProjectType from '../ProjectType';
 
-const CreateProject = ({ toggleCallback }) => {
+/* Component for creating a project */
+const CreateProject = () => {
   const [projectName, setProjectName] = useState('');
   const [projectType, setProjectType] = useState(1);
+  const [ID, setID] = useState(null);
+  const [redirect, setRedirect] = useState(false);
+  const [error, setError] = useState(false);
 
+  // When we get an ID we redirect to edit that project
+  useEffect(() => {
+    if (ID !== null) setRedirect(true);
+  }, [ID]);
+
+  // Creates a project in the backend
   const submitHandler = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateProject(projectName, projectType);
-    toggleCallback();
+    const response = await HTTPLauncher.sendCreateProject(projectName, projectType);
+    if (response.data.id === null) {
+      setError(true);
+    }
+    setID(response.data.id);
   };
 
   return (
@@ -30,6 +44,11 @@ const CreateProject = ({ toggleCallback }) => {
             />
           </Form.Group>
         </Row>
+        {error && (
+          <Row>
+            <Form.Label>Project name already exists</Form.Label>
+          </Row>
+        )}
         <Row>
           <Form.Group as={Col} controlId="formType">
             <Form.Label className="titleLabel">Project Type</Form.Label>
@@ -48,18 +67,27 @@ const CreateProject = ({ toggleCallback }) => {
             </Form.Control>
           </Form.Group>
         </Row>
+
         <Row>
           <Button className="dark" variant="primary" type="submit">
             Submit
           </Button>
+          {redirect && (
+            <Redirect
+              to={{
+                pathname: '/edit-project',
+                state: {
+                  id: ID,
+                  name: projectName,
+                  projectType,
+                },
+              }}
+            />
+          )}
         </Row>
       </Form>
     </div>
   );
-};
-
-CreateProject.propTypes = {
-  toggleCallback: PropTypes.func.isRequired,
 };
 
 export default CreateProject;
