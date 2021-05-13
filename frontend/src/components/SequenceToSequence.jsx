@@ -8,13 +8,23 @@ import '../css/SequenceToSequence.css';
 /* 
 Component that shows the specifics for document classification 
 */
-const SequenceToSequence = ({ data, dataPointId, getSetLabels, textBoxSize }) => {
+const SequenceToSequence = ({
+  data,
+  dataPointId,
+  getSetLabels,
+  textBoxSize,
+  generateRandomColor,
+}) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
   const addLabel = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateSequenceToSequenceLabel(dataPointId, inputRef.current.value);
+    await HTTPLauncher.sendCreateSequenceToSequenceLabel(
+      dataPointId,
+      inputRef.current.value,
+      generateRandomColor()
+    );
     getSetLabels();
     inputRef.current.value = '';
     inputRef.current.focus();
@@ -54,6 +64,7 @@ const SequenceToSequence = ({ data, dataPointId, getSetLabels, textBoxSize }) =>
 SequenceToSequence.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
+  generateRandomColor: PropTypes.func.isRequired,
   getSetLabels: PropTypes.func.isRequired,
   textBoxSize: PropTypes.string.isRequired,
 };

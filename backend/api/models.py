@@ -397,6 +397,7 @@ class Label(db.Model):
                                                   ondelete="CASCADE"))
     data = db.relationship("ProjectData", back_populates="labels")
     label = db.Column(db.Text, nullable=False)
+    color = db.Column(db.Text, nullable=False)
     is_prelabel = db.Column(db.Boolean)
     updated = db.Column(db.DateTime, nullable=False,
                         default=datetime.datetime.now())
@@ -423,8 +424,8 @@ class DocumentClassificationLabel(Label):
         'polymorphic_identity': ProjectType.DOCUMENT_CLASSIFICATION,
     }
 
-    def __init__(self, data_id, user_id, label_str, is_prelabel=False):
-        args = [(data_id, int), (label_str, str)]
+    def __init__(self, data_id, user_id, label_str, color, is_prelabel=False):
+        args = [(data_id, int), (label_str, str), (color, str)]
         if user_id is not None:
             args.append((user_id, int))
         check_types(args)
@@ -433,6 +434,7 @@ class DocumentClassificationLabel(Label):
         self.user_id = user_id
         self.label = label_str
         self.is_prelabel = is_prelabel
+        self.color = color
 
     def format_json(self):
         return {
@@ -440,7 +442,8 @@ class DocumentClassificationLabel(Label):
                 "label_id": self.id,
                 "data_id": self.data_id,
                 "user_id": self.user_id,
-                "label": self.label
+                "label": self.label,
+                "color": self.color
             }
         }
 
@@ -460,13 +463,13 @@ class SequenceLabel(Label):
         'polymorphic_identity': ProjectType.SEQUENCE_LABELING,
     }
 
-    def __init__(self, data_id, user_id, label_str, begin, end,
+    def __init__(self, data_id, user_id, label_str, begin, end, color,
                  is_prelabel=False):
         """
         Create a sequence label and add it to a ProjectData.
         """
         args = [(data_id, int), (label_str, str),
-                (begin, int), (begin, int)]
+                (begin, int), (begin, int), (color, str)]
         if user_id is not None:
             args.append((user_id, int))
         check_types(args)
@@ -476,6 +479,7 @@ class SequenceLabel(Label):
         self.label = label_str
         self.begin = begin
         self.end = end
+        self.color = color
         self.is_prelabel = is_prelabel
 
     def format_json(self):
@@ -486,7 +490,8 @@ class SequenceLabel(Label):
                 "user_id": self.user_id,
                 "label": self.label,
                 "begin": self.begin,
-                "end": self.end
+                "end": self.end,
+                "color": self.color
             }
         }
 
@@ -504,8 +509,8 @@ class SequenceToSequenceLabel(Label):
         'polymorphic_identity': ProjectType.SEQUENCE_TO_SEQUENCE,
     }
 
-    def __init__(self, data_id, user_id, label_str, is_prelabel=False):
-        args = [(data_id, int), (label_str, str)]
+    def __init__(self, data_id, user_id, label_str, color, is_prelabel=False):
+        args = [(data_id, int), (label_str, str), (color, str)]
         if user_id is not None:
             args.append((user_id, int))
         check_types(args)
@@ -514,6 +519,7 @@ class SequenceToSequenceLabel(Label):
         self.user_id = user_id
         self.label = label_str
         self.is_prelabel = is_prelabel
+        self.color = color
 
     def format_json(self):
         return {
@@ -521,7 +527,8 @@ class SequenceToSequenceLabel(Label):
                 "label_id": self.id,
                 "data_id": self.data_id,
                 "user_id": self.user_id,
-                "label": self.label
+                "label": self.label,
+                "color": self.color
             }
         }
 
@@ -544,10 +551,10 @@ class ImageClassificationLabel(Label):
         'polymorphic_identity': ProjectType.IMAGE_CLASSIFICATION,
     }
 
-    def __init__(self, data_id, user_id, label_str, coord1, coord2,
+    def __init__(self, data_id, user_id, label_str, coord1, coord2, color,
                  is_prelabel=False):
         args = [(data_id, int), (label_str, str),
-                (coord1, tuple), (coord2, tuple)]
+                (coord1, tuple), (coord2, tuple), (color, str)]
         if user_id is not None:
             args.append((user_id, int))
         check_types(args)
@@ -560,12 +567,14 @@ class ImageClassificationLabel(Label):
         self.x2 = coord2[0]
         self.y2 = coord2[1]
         self.is_prelabel = is_prelabel
+        self.color = color
 
     def format_json(self):
         return {
             self.id: {
                 "label_id": self.id,
                 "data_id": self.data_id,
+                "color": self.color,
                 "user_id": self.user_id,
                 "label": self.label,
                 "coordinates": {

@@ -4,7 +4,14 @@ import Form from 'react-bootstrap/Form';
 import '../css/Sequence.css';
 import HTTPLauncher from '../services/HTTPLauncher';
 
-const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
+const Sequence = ({
+  data,
+  dataPointId,
+  getSetLabels,
+  textBoxSize,
+  labels,
+  generateRandomColor,
+}) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
@@ -19,7 +26,8 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
         dataPointId,
         inputRef.current.value,
         startIndex,
-        endIndex
+        endIndex,
+        generateRandomColor()
       );
       getSetLabels();
     }
@@ -94,19 +102,18 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
     /*
     Highlightes word in if it has been labeled
     */
-    let highLightColor = "black";
-    
-    //check if word is labeled
-    labels.forEach(label => {
-      //only complete words can be labeled therefore end index does not need to be checked
-      if (label.begin <= startingIndex && label.end > startingIndex){
+    let highLightColor = 'black';
+
+    // check if word is labeled
+    labels.forEach((label) => {
+      // only complete words can be labeled therefore end index does not need to be checked
+      if (label.begin <= startingIndex && label.end > startingIndex) {
         // TODO: should add check of data id to determine specific color in the future
-        highLightColor = "#3A6FE8"; //NOTE: this is only temporary and should be REMOVED
+        highLightColor = label.color; // NOTE: this is only temporary and should be REMOVED
       }
     });
     return highLightColor;
   };
-
 
   const wrapWordsInSpan = (str) => {
     /*
@@ -114,7 +121,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
     */
     const textInSpans = str.replace(
       /\w+/g,
-      (p1,p2) => `<span id="text-box-container" style="color: ${highLightWord(p2)}"}>${p1}</span>`
+      (p1, p2) => `<span id="text-box-container" style="color: ${highLightWord(p2)}"}>${p1}</span>`
     );
     return <div dangerouslySetInnerHTML={{ __html: textInSpans }} />;
   };
@@ -129,13 +136,13 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
 
   useEffect(() => {
     document.addEventListener('selectionchange', handleSelection);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     return () => {
       document.removeEventListener('selectionchange', handleSelection);
     };
+    // eslint-disable-next-line
   }, [data, labels]);
 
-  
   return (
     <div className="sequence-container">
       <hr className="hr-title" data-content="Text data" />
@@ -168,6 +175,7 @@ Sequence.propTypes = {
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
   textBoxSize: PropTypes.string.isRequired,
+  generateRandomColor: PropTypes.func.isRequired,
   labels: PropTypes.arrayOf(
     PropTypes.shape({
       begin: PropTypes.number.isRequired,

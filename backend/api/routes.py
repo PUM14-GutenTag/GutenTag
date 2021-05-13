@@ -341,14 +341,19 @@ class AddNewTextData(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
+        print("before")
 
         if "json_file" not in request.files:
             msg = "No JSON file uploaded."
             status = 406
+            print("first")
         elif user.access_level < AccessLevel.ADMIN:
+            print("second")
+            print("access", user.access_level)
             msg = "User is not authorized to add data."
             status = 401
         else:
+            print("third")
             json_file = request.files["json_file"]
             if not allowed_extension(json_file.filename, TEXT_EXTENSIONS):
                 return make_response(
@@ -362,6 +367,7 @@ class AddNewTextData(Resource):
                 msg = "Data added."
                 status = 200
             except Exception as e:
+                print("hej vi är fel")
                 msg = f"Could not add data: {e}"
 
         return make_response(jsonify({"message": msg}), status)
@@ -546,6 +552,7 @@ class CreateDocumentClassificationLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -561,7 +568,7 @@ class CreateDocumentClassificationLabel(Resource):
             try:
                 return make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
-                        args.data_id, user.id, args.label)
+                        args.data_id, user.id, args.label, args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
@@ -583,6 +590,7 @@ class CreateSequenceLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
         self.reqparse.add_argument("begin", type=int, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
         self.reqparse.add_argument("end", type=int, required=True)
 
     @jwt_required()
@@ -599,7 +607,7 @@ class CreateSequenceLabel(Resource):
             try:
                 return make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
-                                  args.begin, args.end))), 200)
+                                  args.begin, args.end, args.color))), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -619,6 +627,7 @@ class CreateSequenceToSequenceLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -634,7 +643,7 @@ class CreateSequenceToSequenceLabel(Resource):
             try:
                 return make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
-                        args.data_id, user.id, args.label)
+                        args.data_id, user.id, args.label, args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
@@ -659,6 +668,7 @@ class CreateImageClassificationLabel(Resource):
         self.reqparse.add_argument("y1", type=int, required=True)
         self.reqparse.add_argument("x2", type=int, required=True)
         self.reqparse.add_argument("y2", type=int, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -675,7 +685,7 @@ class CreateImageClassificationLabel(Resource):
                 return make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,
-                        (args.x1, args.y1), (args.x2, args.y2))
+                        (args.x1, args.y1), (args.x2, args.y2), args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"

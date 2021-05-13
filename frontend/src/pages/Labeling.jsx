@@ -54,6 +54,14 @@ const Labeling = ({ location }) => {
     return 'large-text';
   };
 
+  // Generates random light color
+  const generateRandomColor = () => {
+    const green = Math.floor(Math.random() * (256 - 175 + 1) + 175);
+    const blue = Math.floor(Math.random() * (256 - 175 + 1) + 175);
+    const red = Math.floor(Math.random() * (256 - 175 + 1) + 175);
+    return `rgb(${red}, ${green}, ${blue})`;
+  };
+
   // Function which can be called through callbacks to remove label
   const deleteLabel = async (labelId) => {
     await HTTPLauncher.sendRemoveLabel(labelId);
@@ -63,7 +71,7 @@ const Labeling = ({ location }) => {
   // Get a list of new datapoints from database, runs when entering a project
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
-
+    console.log(response);
     setListOfDataPoints(response.data.list);
     setIndex(response.data.index);
     getSetLabels(response.data.list);
@@ -141,6 +149,7 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
+            generateRandomColor={generateRandomColor}
           />
         );
       }
@@ -152,6 +161,7 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             textBoxSize={textBoxSize()}
             labels={labels}
+            generateRandomColor={generateRandomColor}
           />
         );
       }
@@ -162,6 +172,7 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
+            generateRandomColor={generateRandomColor}
           />
         );
       }
@@ -217,6 +228,7 @@ const Labeling = ({ location }) => {
                       labelId={oneLabel.label_id}
                       label={oneLabel.label}
                       deleteLabel={deleteLabel}
+                      color={oneLabel.color}
                     />
                   </div>
                 ))}

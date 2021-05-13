@@ -2,11 +2,11 @@
   {
     "text": "Alex is going to Los Angeles in California",
     "labels": [
-      [0, 3, "PER"],
-      [16, 27, "LOC"],
-      [31, 41, "LOC"]
+      [0, 3, "PER", "#3A6FE8"],
+      [16, 27, "LOC", "#3A6FE8"],
+      [31, 41, "LOC", "#3A6FE8"]
     ]
   },
-  { "text": "Peter Blackburn", "labels": [[0, 15, "PER"]] },
+  { "text": "Peter Blackburn", "labels": [[0, 15, "PER", "#3A6FE8"]] },
   { "text": "President Obama", "labels": [] }
 ]

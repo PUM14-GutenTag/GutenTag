@@ -78,27 +78,29 @@ def import_text_data(project_id, json_data):
     for i, obj in enumerate(json_data):
         data = data_list[i]
         labels = obj.get("labels")
+        print(json_data)
         if isinstance(labels, list) and labels:
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
                 label_list += [
                     DocumentClassificationLabel(
-                        data.id, None, lab, is_prelabel=True)
-                    for lab in set(labels)
+                        data.id, None, lab, color, is_prelabel=True)
+                    for lab, color in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_LABELING:
                 label_list += [
-                    SequenceLabel(data.id, None, lab, begin, end,
+                    SequenceLabel(data.id, None, lab, begin, end, color,
                                   is_prelabel=True)
-                    for begin, end, lab in labels
+                    for begin, end, color, lab in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
                 label_list += [
-                    SequenceToSequenceLabel(data.id, None, lab,
+                    SequenceToSequenceLabel(data.id, None, lab, color,
                                             is_prelabel=True)
-                    for lab in labels
+                    for lab, color in labels
                 ]
             else:
                 raise ValueError(
+
                     f"Invalid project type: {project.project_type}.")
 
     db.session.add_all(label_list)
@@ -175,9 +177,9 @@ def import_image_data(project_id, json_data, images):
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
                 label_list += [
                     ImageClassificationLabel(data.id, None, lab,
-                                             tuple(p1), tuple(p2),
+                                             tuple(p1), tuple(p2), color,
                                              is_prelabel=True)
-                    for p1, p2, lab in labels
+                    for p1, p2, lab, color in labels
                 ]
 
     db.session.add_all(label_list)
@@ -320,13 +322,13 @@ def export_data(project_id, filters=None):
     label_dict = defaultdict(list)
     for lab in label_list:
         if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-            label = lab.label
+            label = [lab.label, lab.color]
         elif project.project_type == ProjectType.SEQUENCE_LABELING:
-            label = [lab.begin, lab.end, lab.label]
+            label = [lab.begin, lab.end, lab.label, lab.color]
         elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-            label = lab.label
+            label = [lab.label, lab.color]
         elif project.project_type == ProjectType.IMAGE_CLASSIFICATION:
-            label = [[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label]
+            label = [[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label, lab.color]
         else:
             raise ValueError(f"Invalid project type: {project.project_type}")
         label_dict[lab.data_id].append(label)

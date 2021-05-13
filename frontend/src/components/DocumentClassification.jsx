@@ -7,13 +7,23 @@ import '../css/DocumentClassification.css';
 /* 
 Component that shows the specifics for document classification 
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize }) => {
+const DocumentClassification = ({
+  data,
+  dataPointId,
+  getSetLabels,
+  textBoxSize,
+  generateRandomColor,
+}) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
   const addLabel = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateDocumentClassificationLabel(dataPointId, inputRef.current.value);
+    await HTTPLauncher.sendCreateDocumentClassificationLabel(
+      dataPointId,
+      inputRef.current.value,
+      generateRandomColor()
+    );
     getSetLabels();
     inputRef.current.value = '';
     inputRef.current.focus();
@@ -53,6 +63,7 @@ const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize }
 DocumentClassification.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
+  generateRandomColor: PropTypes.func.isRequired,
   getSetLabels: PropTypes.func.isRequired,
   textBoxSize: PropTypes.string.isRequired,
 };
