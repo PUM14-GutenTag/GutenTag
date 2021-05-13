@@ -470,7 +470,7 @@ class GetNewData(Resource):
             return make_response(jsonify({"message": "Invalid project id"}),
                                  404)
 
-        if user.access_level >= AccessLevel.ADMIN:
+        if project in user.projects or user.access_level >= AccessLevel.ADMIN:
             status = 200
             try:
                 if args.type == GetDataType.GET_EARLIER_VALUE:

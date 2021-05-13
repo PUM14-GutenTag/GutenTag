@@ -59,7 +59,8 @@ const App = () => {
       (response) => {
         if (response.config.url.includes('login')) {
           const { access_token: accessToken, refresh_token: refreshToken } = response.data;
-          userAuth.setTokens(accessToken, refreshToken);
+          userAuth.setAccessToken(accessToken);
+          userAuth.setRefreshToken(refreshToken);
         }
 
         displayAchievements(response);
@@ -73,7 +74,7 @@ const App = () => {
         if (response.status === 401 && !originalRequest.url.includes('refresh-token')) {
           const tokenResponse = await HTTPLauncher.sendRefreshToken();
           if (tokenResponse.status === 200) {
-            localStorage.setItem('gutentag-accesstoken', tokenResponse.data.access_token);
+            userAuth.setAccessToken(tokenResponse.data.access_token);
             originalRequest.headers.Authorization = `Bearer ${tokenResponse.data.access_token}`;
             return axios.request(originalRequest);
           }

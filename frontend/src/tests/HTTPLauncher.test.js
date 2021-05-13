@@ -421,33 +421,9 @@ describe('sendGetData request', () => {
       images
     );
 
-    const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
+    const getDataResponse = await HTTPLauncher.sendGetImageData(projectID);
     expect(getDataResponse.status).toBe(200);
-    expect(getDataResponse.data.list.length).toBe(11);
-    let counter = 0;
-    const dataPointList = [];
-    getDataResponse.data.list.forEach((obj) => {
-      if (!(Object.keys(obj).length === 0)) {
-        counter += 1;
-        const data = [];
-        data.push(obj.id);
-        data.push(obj.data);
-        dataPointList.push(data);
-      }
-    });
-    expect(counter).toBe(3);
-    const fileNames = testUtil
-      .getJSONObject(textDir, 'input_image_classification.json')
-      .map((obj) => obj.file_name);
-    dataPointList.forEach((name) => expect(fileNames).toContain(name[1]));
-
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const [id, name] of dataPointList) {
-      const imageResponse = await HTTPLauncher.sendGetImageData(id);
-
-      const filepath = path.resolve(outDir, name);
-      fs.writeFileSync(filepath, imageResponse.data, { encoding: 'base64' });
-    }
+    expect(getDataResponse.data.type).toBe('image/jpeg');
   });
 });
 
@@ -553,15 +529,6 @@ describe('sendCreateImageClassificationLabel request', () => {
     );
     const getDataResponse = await HTTPLauncher.sendGetData(projectID, 0);
     expect(getDataResponse.status).toBe(200);
-    expect(getDataResponse.data.list.length).toBe(11);
-    let counter = 0;
-    getDataResponse.data.list.forEach((obj) => {
-      if (!(Object.keys(obj).length === 0)) {
-        counter += 1;
-      }
-    });
-    expect(counter).toBe(3);
-
     const labelResponse = await HTTPLauncher.sendCreateImageClassificationLabel(
       1,
       'new label',
@@ -571,7 +538,6 @@ describe('sendCreateImageClassificationLabel request', () => {
       220
     );
     expect(labelResponse.status).toBe(200);
-
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
     expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
   });

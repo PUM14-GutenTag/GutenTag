@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Col, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import HTTPLauncher from '../services/HTTPLauncher';
 
@@ -24,50 +24,73 @@ const AddUser = ({ toggleBack }) => {
   return (
     <div className="create-container">
       <Form onSubmit={submitHandler}>
-        <Form.Group controlId="form.text">
-          <Form.Label className="titleLabel">First name</Form.Label>
-          <Form.Control
-            className="text"
-            type="text"
-            name="firstname"
-            onChange={(event) => setFirstname(event.target.value)}
-            placeholder="Enter a name..."
-            required
-          />
-          <Form.Label className="titleLabel">Last name</Form.Label>
-          <Form.Control
-            className="text"
-            type="text"
-            name="lastname"
-            onChange={(event) => setLastname(event.target.value)}
-            placeholder="Enter a last name..."
-            required
-          />
-          <Form.Label className="titleLabel">Email</Form.Label>
-          <Form.Control
-            className="text"
-            type="email"
-            name="email"
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="Enter an email..."
-            required
-          />
-          <Form.Label className="titleLabel">Password</Form.Label>
-          <Form.Control
-            className="text"
-            type="password"
-            name="password"
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Enter a password..."
-            required
-          />
-        </Form.Group>
-        <Form.Group controlId="form.checkbox">
-          <Form.Check type="checkbox" label="Admin" onChange={handleChange} />
-        </Form.Group>
-        <Button className="dark" variant="primary" type="submit">
-          Submit
-        </Button>
+        <Row>
+          <Form.Group as={Col} controlId="formFirstname">
+            <Form.Label className="titleLabel">First name</Form.Label>
+            <Form.Control
+              className="text"
+              type="text"
+              name="firstname"
+              onChange={(event) => setFirstname(event.target.value)}
+              placeholder="Enter a name..."
+              required
+            />
+          </Form.Group>
+        </Row>
+        <Row>
+          <Form.Group as={Col} controlId="formLastname">
+            <Form.Label className="titleLabel">Last name</Form.Label>
+            <Form.Control
+              className="text"
+              type="text"
+              name="lastname"
+              onChange={(event) => setLastname(event.target.value)}
+              placeholder="Enter a last name..."
+              required
+            />
+          </Form.Group>
+        </Row>
+        <Row>
+          <Form.Group as={Col} controlId="formEmail">
+            <Form.Label className="titleLabel">Email</Form.Label>
+            <Form.Control
+              className="text"
+              type="email"
+              name="email"
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Enter an email..."
+              required
+            />
+          </Form.Group>
+        </Row>
+        <Row>
+          <Form.Group as={Col} controlId="formPassword">
+            <Form.Label className="titleLabel">Password</Form.Label>
+            <Form.Control
+              className="text"
+              type="password"
+              name="password"
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Enter a password..."
+              required
+            />
+          </Form.Group>
+        </Row>
+        <Row>
+          <Form.Group as={Col} controlId="formAdmin">
+            <Form.Check
+              className="checkbox"
+              type="checkbox"
+              label="Admin"
+              onChange={handleChange}
+            />
+          </Form.Group>
+        </Row>
+        <Row>
+          <Button className="dark" variant="primary" type="submit">
+            Submit
+          </Button>
+        </Row>
       </Form>
     </div>
   );

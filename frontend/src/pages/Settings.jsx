@@ -76,7 +76,7 @@ const Settings = () => {
       <Button className="dark" onClick={() => setPageShow(SettingPages.DEFAULT)}>
         Back
       </Button>
-      <CreateProject toggleCallback={toggleBack} />
+      <CreateProject />
     </div>,
     <div>
       <ManageUsers toggleCallback={toggleBack} />

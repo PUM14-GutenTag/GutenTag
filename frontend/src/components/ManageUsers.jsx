@@ -22,7 +22,7 @@ const ManageUsers = ({ toggleCallback }) => {
   const handleClose = () => setShowWarning(false);
   const handleShow = (user) => {
     setShowWarning(true);
-    setUserRemove(user[1]);
+    setUserRemove(user.email);
   };
 
   // Fetches all users from beckend and sorts them in an array.
@@ -98,7 +98,7 @@ const ManageUsers = ({ toggleCallback }) => {
             {users
               .filter((u) => filterFunc(u))
               .map((result) => (
-                <tr key={result}>
+                <tr key={result.email}>
                   <td>{result.name}</td>
                   <td>{result.email}</td>
                   <td>{result.admin === 5 ? 'yes' : 'no'}</td>

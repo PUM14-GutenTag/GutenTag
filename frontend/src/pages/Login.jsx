@@ -33,8 +33,10 @@ function Login() {
     event.preventDefault();
 
     setValidated(true);
-    await HTTPLauncher.sendLogin(email, password);
-    history.push('/home');
+    const responseLogin = await HTTPLauncher.sendLogin(email, password);
+    if (responseLogin.data !== undefined) {
+      history.push('/home');
+    }
   };
 
   return (
