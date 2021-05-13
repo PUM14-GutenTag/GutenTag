@@ -445,7 +445,7 @@ class GetNewData(Resource):
             return make_response(jsonify({"message": "Invalid project id"}),
                                  404)
 
-        if user.access_level >= AccessLevel.ADMIN:
+        if project in user.projects or user.access_level >= AccessLevel.ADMIN:
             status = 200
             try:
                 if args.type == GetDataType.GET_EARLIER_VALUE:
@@ -527,7 +527,6 @@ class GetLabel(Resource):
             status = 200
             msg = "Labels retrieved"
         elif project:
-            print("inproj")
             status = 200
             msg = f"No labels by {user.first_name} " + (
                 f"{user.last_name} found in project {project.name}")
