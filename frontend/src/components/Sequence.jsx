@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import '../css/Sequence.css';
@@ -10,12 +10,11 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
   const inputRef = useRef();
   const [selection, setSelection] = useState('');
   const wordList = data.split(' ');
-  // const [dataInSpans, setDataInSpans] = useState('');
 
   const addLabel = async (event) => {
+    /* Adds a sequnece label and resets values in input and selection box */
     event.preventDefault();
     if (inputRef.current.value !== '') {
-      // sendCreateSequenceLabel(dataID, label, begin, end)
       await HTTPLauncher.sendCreateSequenceLabel(
         dataPointId,
         inputRef.current.value,
@@ -26,6 +25,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
     }
     inputRef.current.value = '';
     inputRef.current.focus();
+    setSelection('');
   };
 
   // add all index of words before tempWord in wordList to get startIndex, add alla index of
@@ -50,6 +50,11 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
   };
 
   const handleSelection = () => {
+    /*
+    Function handeling selection event listener. Makes sure 
+    only text data and complete unlabeled words can be selected.
+    */
+
     const selectedText = window.getSelection();
     if (
       selectedText !== undefined &&
@@ -60,7 +65,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
       const currentlySelected = selectedText.toString();
       const tempWordList = currentlySelected.split(' ');
 
-      // check that selection includes only full words
+      // check that selection includes only complete words
       if (
         wordList.includes(tempWordList[0]) &&
         wordList.includes(tempWordList[tempWordList.length - 1]) &&
@@ -85,34 +90,38 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
     }
   };
 
-  const generateRandomColor = () => {
-    const green = Math.floor(1 + Math.random() * 256 * 1.7);
-    const blue = Math.floor(2 + Math.random() * 256 * 1.2);
-    const red = Math.floor(1 + Math.random() * 256 * 1.7);
-    return `rgb(${red}, ${green}, ${blue})`;
+  const highLightWord = (startingIndex) => {
+    /*
+    Highlightes word in if it has been labeled
+    */
+    let highLightColor = "black";
+    
+    //check if word is labeled
+    labels.forEach(label => {
+      //only complete words can be labeled therefore end index does not need to be checked
+      if (label.begin <= startingIndex && label.end > startingIndex){
+        // TODO: should add check of data id to determine specific color in the future
+        highLightColor = "#3A6FE8"; //NOTE: this is only temporary and should be REMOVED
+      }
+    });
+    return highLightColor;
   };
 
-  const colorLabelData = (param1) => {
-    // if it is a label do color
-    console.log(param1);
-    // else return default black
-  };
 
   const wrapWordsInSpan = (str) => {
-    // style={{ backgroundColor: generateRandomColor() }}
+    /*
+    Wrap each word in text data in span tag
+    */
     const textInSpans = str.replace(
       /\w+/g,
-      `<span id="text-box-container" style="color: ${colorLabelData($&)}"}>$&</span>`
+      (p1,p2) => `<span id="text-box-container" style="color: ${highLightWord(p2)}"}>${p1}</span>`
     );
-
-    // const textInSpans = wordList.map(word =>word.replace( `<span id="text-box-container" style="color: ${colorLabelData(word)}"}>$&</span>`))
     return <div dangerouslySetInnerHTML={{ __html: textInSpans }} />;
   };
 
   useEffect(() => {
     inputRef.current.value = '';
     inputRef.current.focus();
-    // setDataInSpans(wrapWordsInSpan(data));
     setSelection('');
     setStartIndex('');
     setEndIndex('');
@@ -120,14 +129,13 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
 
   useEffect(() => {
     document.addEventListener('selectionchange', handleSelection);
-    // setWordList(data.split(' '));
-    // setDataInSpans(wrapWordsInSpan(data));
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => {
       document.removeEventListener('selectionchange', handleSelection);
     };
-  }, [data, labels]);
+  }, [data]);
 
+  
   return (
     <div className="sequence-container">
       <hr className="hr-title" data-content="Text data" />
@@ -145,7 +153,6 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
           </Form.Group>
         </Form>
         <button className="btn btn-primary add-seq-btn" type="button" onClick={addLabel}>
-          {/* change type to submit */}
           Add new label
         </button>
       </div>

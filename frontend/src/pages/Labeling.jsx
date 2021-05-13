@@ -17,7 +17,6 @@ import Label from '../components/Label';
 Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
-  // const CURRENT_DATA = 5;
   const { projectType, id } = location.state;
 
   const [labels, setLabels] = useState([]);
@@ -25,19 +24,17 @@ const Labeling = ({ location }) => {
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
   const [progress, setProgress] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
-  const [CURRENT_DATA, setCurrentData] = useState(5);
+  const CURRENT_DATA = 5;
 
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
   const type = projectType;
   const projectId = id;
   // fetch all labels for a given datapoint
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
-    console.log('getsetlabel');
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
       const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[CURRENT_DATA].id);
 
       if (Object.keys(response.data.labels).length !== 0) {
-        // console.log('labels: ', Object.values(response.data.labels));
         setLabels(Object.values(response.data.labels));
       } else {
         setLabels([]);
