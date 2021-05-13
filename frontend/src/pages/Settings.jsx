@@ -25,6 +25,7 @@ const Settings = () => {
   // Sets the accesstoken to null and redirects to login page.
   const logout = () => {
     localStorage.setItem('gutentag-accesstoken', null);
+    localStorage.setItem('gutentag-refreshtoken', null);
     window.location.href = 'http://localhost:3000/';
   };
 

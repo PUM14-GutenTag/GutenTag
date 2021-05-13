@@ -34,9 +34,11 @@ function Login() {
 
     setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
-    const { access_token: accessToken, refresh_token: refreshToken } = responseLogin.data;
-    userAuth.setTokens(accessToken, refreshToken);
-    history.push('/home');
+    if (responseLogin.data !== undefined) {
+      const { access_token: accessToken, refresh_token: refreshToken } = responseLogin.data;
+      userAuth.setTokens(accessToken, refreshToken);
+      history.push('/home');
+    }
   };
 
   return (
