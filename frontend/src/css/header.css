@@ -3,10 +3,11 @@
   background-color: #ffffff;
 }
 
-.container.navbar-container, #navbar-content {
+.container.navbar-container,
+#navbar-content {
   max-width: 1320px;
   padding-left: 3em;
-  padding-right: 3em;
+  padding-right: 10em;
 }
 
 .navbar-collapse {
@@ -18,7 +19,9 @@
   height: 100px;
 }
 
-a.nav-link.text-label, #home-link, #settings-link {
+a.nav-link.text-label,
+#home-link,
+#settings-link {
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
