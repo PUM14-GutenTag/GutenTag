@@ -43,6 +43,7 @@ function Login() {
       setValidPass(true);
     } else if (responseLogin.response.status === 401) {
       setValidPass(false);
+      setValidEmail(true);
     }
   };
 
