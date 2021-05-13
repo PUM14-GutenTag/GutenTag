@@ -136,6 +136,7 @@ class RankStatistic(BaseStatistic):
         """
         Update the number of occurrences.
         """
+        raise NotImplementedError()
 
     @classmethod
     def get_rank(cls, occurrences):
@@ -212,6 +213,12 @@ class WeekendLoginStatistic(RankStatistic):
     ranks = {
         1: ("Working weekends?", "Log in on a weekend"),
     }
+
+    @classmethod
+    def update_occurrences(cls, user_id):
+        """
+        Update the number of occurrences.
+        """
 
     @classmethod
     def get_occurrences(cls, user_id):
