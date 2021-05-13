@@ -441,11 +441,13 @@ class GetNewData(Resource):
         user = User.get_by_email(get_jwt_identity())
         project = Project.query.get(args.project_id)
 
+        print("HRERE:", project in user.projects)
+
         if not project:
             return make_response(jsonify({"message": "Invalid project id"}),
                                  404)
 
-        if user.access_level >= AccessLevel.ADMIN:
+        if project in user.projects or user.access_level >= AccessLevel.ADMIN:
             status = 200
             try:
                 if args.type == GetDataType.GET_EARLIER_VALUE:

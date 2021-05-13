@@ -54,11 +54,12 @@ axios.interceptors.response.use(
     } = error;
 
     const originalRequest = config;
-    if (status === 401 && !originalRequest.url.includes('refresh-token')) {
+    if (status === 401 && !originalRequest.retry) {
       const response = await HTTPLauncher.sendRefreshToken();
       if (response.status === 200) {
         localStorage.setItem('gutentag-accesstoken', response.data.access_token);
         originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
+        originalRequest.retry = true;
         return axios.request(originalRequest);
       }
       userAuth.clearTokens();
