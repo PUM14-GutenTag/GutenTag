@@ -133,7 +133,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, textBoxSize, labels }) => {
     return () => {
       document.removeEventListener('selectionchange', handleSelection);
     };
-  }, [data]);
+  }, [data, labels]);
 
   
   return (
