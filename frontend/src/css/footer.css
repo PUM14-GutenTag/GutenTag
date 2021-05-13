@@ -1,8 +1,8 @@
 .main-footer {
   color: #063954;
   background-color: #ededed;
-  padding-top: 3em;
-  padding-left: 3em;
+  padding: 3em;
+  padding-bottom: 1em;
   position: relative;
   bottom: 0;
   max-width: 100%;
@@ -77,12 +77,13 @@
   }
 
   .main-footer {
-    padding-left: 1em;
+    padding: 1em;
   }
 }
 
 @media screen and (max-width: 340px) {
   .main-footer {
     padding-left: 0.5em;
+    padding-right: 0.5em;
   }
 }
