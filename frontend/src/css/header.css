@@ -6,8 +6,8 @@
 .container.navbar-container,
 #navbar-content {
   max-width: 1320px;
-  padding-left: 3em;
-  padding-right: 10em;
+  padding-left: 0em;
+  padding-right: 7em;
 }
 
 .navbar-collapse {
