@@ -604,29 +604,29 @@ class Statistic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    occurances = db.Column(db.Integer, default=0, nullable=False)
+    occurrences = db.Column(db.Integer, default=0, nullable=False)
 
     def format_json(self):
         return {
             "name": self.name,
-            "occurances": self.occurances,
+            "occurrences": self.occurrences,
             "ranking": self.user_ranking()
         }
 
     def user_ranking(self):
         """
         Returns the user's statistic ranking compared to all other users.
-        That is, how the user's occurances compare to other users.
+        That is, how the user's occurrences compare to other users.
         """
         stats = self.query.filter_by(name=self.name).all()
-        stats.sort(key=lambda s: s.occurances, reverse=True)
+        stats.sort(key=lambda s: s.occurrences, reverse=True)
         ranking = stats.index(self) + 1
         return ranking
 
     def __repr__(self):
         return (
             f"<Statistic(id={self.id}, name={self.name}, "
-            f"occurances={self.occurances}, user_id={self.user_id})>"
+            f"occurrences={self.occurrences}, user_id={self.user_id})>"
         )
 
 

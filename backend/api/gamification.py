@@ -13,18 +13,18 @@ from api import db
 class BaseStatistic():
     """
     Abstract class that keeps track of a single statistic and its achievements.
-    This involves instantiating db models, and updating occurances.
+    This involves instantiating db models, and updating occurrences.
     """
     statistic_name = None
 
     @classmethod
-    def get_occurances(cls, user_id):
+    def get_occurrences(cls, user_id):
         """
-        Return the number of occurances for this statistic.
+        Return the number of occurrences for this statistic.
         """
         return Statistic.query.filter_by(name=cls.statistic_name,
                                          user_id=user_id
-                                         ).one().occurances
+                                         ).one().occurrences
 
     @classmethod
     def instantiate(cls, user_id):
@@ -52,7 +52,7 @@ class BaseStatistic():
     @classmethod
     def update(cls, user_id):
         """
-        Update the number of occurances.
+        Update the number of occurrences.
         """
         raise NotImplementedError()
 
@@ -66,14 +66,14 @@ class BooleanStatistic(BaseStatistic):
     achievement_description = None
 
     @classmethod
-    def get_occurances(cls, user_id):
+    def get_occurrences(cls, user_id):
         """
-        Return the number of occurances for this statistic.
+        Return the number of occurrences for this statistic.
         """
         stat = Statistic.query.filter_by(name=cls.statistic_name,
                                          user_id=user_id
                                          ).one()
-        return stat.occurances > 0
+        return stat.occurrences > 0
 
     @classmethod
     def instantiate_achievement_models(cls, user_id):
@@ -90,13 +90,13 @@ class BooleanStatistic(BaseStatistic):
     @classmethod
     def update(cls, user_id):
         """
-        Update the number of occurances.
+        Update the number of occurrences.
         """
         stat = Statistic.query.filter_by(name=cls.statistic_name,
                                          user_id=user_id
                                          ).one()
-        if (stat.occurances < 1):
-            stat.occurances = 1
+        if (stat.occurrences < 1):
+            stat.occurrences = 1
 
             new_achieve = Achievement.query.filter_by(
                 user_id=user_id,
@@ -116,34 +116,34 @@ class RankStatistic(BaseStatistic):
     @classmethod
     def update(cls, user_id):
         """
-        Update the number of occurances.
+        Update the number of occurrences.
         """
-        cls.update_occurances(user_id)
-        occurances = cls.get_occurances(user_id)
+        cls.update_occurrences(user_id)
+        occurrences = cls.get_occurrences(user_id)
 
         # Check if new achievement attained.
-        if occurances in cls.ranks.keys():
+        if occurrences in cls.ranks.keys():
             new_achieve = Achievement.query.filter_by(
                 user_id=user_id,
-                name=cls.ranks[occurances][0],
+                name=cls.ranks[occurrences][0],
             ).one()
             if (new_achieve):
                 new_achieve.earned = datetime.datetime.now()
             db.session.flush()
 
     @classmethod
-    def update_occurances(cls, user_id):
+    def update_occurrences(cls, user_id):
         """
-        Update the number of occurances.
+        Update the number of occurrences.
         """
 
     @classmethod
-    def get_rank(cls, occurances):
+    def get_rank(cls, occurrences):
         """
         Get the name of the highest achieved rank.
         """
         earned_ranks = {
-            k: v for (k, v) in cls.ranks.items() if k <= occurances}
+            k: v for (k, v) in cls.ranks.items() if k <= occurrences}
         return max(earned_ranks.items(), key=lambda k: k[0])[1]
 
     @classmethod
@@ -165,13 +165,13 @@ class RankStatistic(BaseStatistic):
 
 class IncrementStatistic(RankStatistic):
     """
-    Subclass of RankStatistic where the number of occurances simply increment
+    Subclass of RankStatistic where the number of occurrences simply increment
     on a certain action.
     """
     @classmethod
-    def update_occurances(cls, user_id):
+    def update_occurrences(cls, user_id):
         """
-        Update the number of occurances.
+        Update the number of occurrences.
         """
         stat = Statistic.query.filter_by(
             name=cls.statistic_name,
@@ -179,7 +179,7 @@ class IncrementStatistic(RankStatistic):
         ).with_for_update().one()
 
         # DO NOT use += operator. Will result in race conditions.
-        stat.occurances = stat.occurances + 1
+        stat.occurrences = stat.occurrences + 1
         db.session.flush()
 
 
@@ -197,9 +197,9 @@ class LoginStatistic(IncrementStatistic):
     }
 
     @classmethod
-    def get_occurances(cls, user_id):
+    def get_occurrences(cls, user_id):
         """
-        Return the number of occurances for this statistic.
+        Return the number of occurrences for this statistic.
         """
         return len(Login.query.filter_by(user_id=user_id).all())
 
@@ -214,9 +214,9 @@ class WeekendLoginStatistic(RankStatistic):
     }
 
     @classmethod
-    def get_occurances(cls, user_id):
+    def get_occurrences(cls, user_id):
         """
-        Return the number of occurances for this statistic.
+        Return the number of occurrences for this statistic.
         """
         logins = Login.query.filter(
             Login.user_id == user_id,
@@ -242,17 +242,17 @@ class WorkdayLoginStatistic(BaseStatistic):
     @ classmethod
     def update(cls, user_id):
         """
-        Update the number of occurances.
+        Update the number of occurrences.
         """
-        cls.update_occurances(user_id)
-        occurances = cls.get_occurances(user_id)
+        cls.update_occurrences(user_id)
+        occurrences = cls.get_occurrences(user_id)
 
         # Check if new achievement attained.
         workday_ranks = [calc_workdays_in_days(k) for k in cls.ranks.keys()]
-        if occurances in workday_ranks:
+        if occurrences in workday_ranks:
             new_achieve = Achievement.query.filter_by(
                 user_id=user_id,
-                name=cls.ranks[occurances][0],
+                name=cls.ranks[occurrences][0],
             ).one()
             if (new_achieve):
                 new_achieve.earned = datetime.datetime.now()
@@ -275,9 +275,9 @@ class WorkdayLoginStatistic(BaseStatistic):
         db.session.add_all(add_list)
 
     @ classmethod
-    def update_occurances(cls, user_id):
+    def update_occurrences(cls, user_id):
         """
-        Update the number of occurances.
+        Update the number of occurrences.
         """
         stat = Statistic.query.filter_by(
             name=cls.statistic_name,
@@ -286,7 +286,7 @@ class WorkdayLoginStatistic(BaseStatistic):
 
         logins = Login.query.filter_by(user_id=user_id).all()
         workday_streak = calc_workday_streak([log.time for log in logins])
-        stat.occurances = workday_streak
+        stat.occurrences = workday_streak
 
 
 class LabelingStatistic(IncrementStatistic):

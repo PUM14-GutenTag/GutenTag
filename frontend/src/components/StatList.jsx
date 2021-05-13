@@ -22,7 +22,7 @@ const StatList = ({ className }) => {
       <thead>
         <tr>
           <th>Statistic</th>
-          <th>Occurances</th>
+          <th>Occurences</th>
           <th>Ranking</th>
         </tr>
       </thead>
@@ -30,7 +30,7 @@ const StatList = ({ className }) => {
         {stats.map((stat) => (
           <tr key={stat.name}>
             <td>{stat.name}</td>
-            <td>{stat.occurances}</td>
+            <td>{stat.occurrences}</td>
             <td>{stat.ranking}</td>
           </tr>
         ))}
