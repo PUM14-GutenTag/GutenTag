@@ -202,6 +202,8 @@ class Project(db.Model):
     def check_finished(self):
         for datapoint in self.data:
             if not datapoint.finished:
+                self.set_finished(False)
+                db.session.commit()
                 return
 
         self.set_finished(True)
@@ -213,6 +215,10 @@ class Project(db.Model):
 
     def set_labels_per_datapoint(self, amount):
         self.labels_per_datapoint = amount
+        self.check_finished
+
+        for data in self.data:
+            data.check_finished()
         db.session.commit()
 
     def get_progress(self):      
@@ -374,18 +380,16 @@ class ProjectData(db.Model):
         project = Project.query.get(self.project_id)
 
         for label in self.labels:
-            print(label)
             if label.user_id not in users and not label.is_prelabel:
-                print("--------")
-                print(label.user_id)
                 users.append(label.user_id)
-                print("Users: ", users)
         
         if len(users) >= project.labels_per_datapoint:
-            print("--------------FINISHED------------------")
             self.set_finished(True)
-            db.session.commit()
-            project.check_finished()
+        else:
+            self.set_finished(False)
+        
+        db.session.commit()
+        project.check_finished()
 
 
 class ProjectTextData(ProjectData):
@@ -466,10 +470,6 @@ class Label(db.Model):
         "polymorphic_on": project_type
     }
 
-    def test(self):
-        print("Implement label counting in models.py Label")
-
-
 class DocumentClassificationLabel(Label):
     """
     Label child for document classification projects.
@@ -493,8 +493,6 @@ class DocumentClassificationLabel(Label):
         self.user_id = user_id
         self.label = label_str
         self.is_prelabel = is_prelabel
-
-        super(DocumentClassificationLabel, self).test()
 
     def format_json(self):
         return {

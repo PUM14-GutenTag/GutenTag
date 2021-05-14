@@ -7,7 +7,7 @@ import '../css/DocumentClassification.css';
 /* 
 Component that shows the specifics for document classification 
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize, projectID }) => {
+const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize }) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */

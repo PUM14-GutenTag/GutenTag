@@ -22,7 +22,6 @@ const Home = () => {
       const dataArray = Object.values(result.data.projects);
       setProjects(dataArray);
     }
-    console.log(result.data.projects);
   };
 
   // Filters users based on projectname.

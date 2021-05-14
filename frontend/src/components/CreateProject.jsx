@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
-
 import HTTPLauncher from '../services/HTTPLauncher';
 import ProjectType from '../ProjectType';
 
@@ -100,8 +99,8 @@ const CreateProject = () => {
                 state: {
                   id: ID,
                   name: projectName,
-                  projectType: parseInt(projectType),
-                  labelsPerDatapoint: parseInt(labelsPerDatapoint),
+                  projectType: parseInt(projectType, 10),
+                  labelsPerDatapoint: parseInt(labelsPerDatapoint, 10),
                 },
               }}
             />

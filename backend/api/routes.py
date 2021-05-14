@@ -267,7 +267,6 @@ class NewProject(Resource):
                      args.labels_per_datapoint)
                 )), 200)
             except Exception as e:
-                print("Exception", e)
                 msg = f"Could not create project: {e}"
                 status = 404
         else:

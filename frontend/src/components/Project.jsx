@@ -10,8 +10,8 @@ const Project = ({
   id,
   name,
   created,
-  projectType,
   progress,
+  projectType,
   selectedColor,
   showEditButton,
   labelsPerDatapoint,
@@ -57,7 +57,6 @@ const Project = ({
           state: {
             projectType,
             id,
-            progress,
           },
         }}
       >
@@ -84,14 +83,14 @@ const Project = ({
 };
 
 Project.propTypes = {
+  showEditButton: PropTypes.bool,
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   created: PropTypes.string.isRequired,
+  progress: PropTypes.number.isRequired,
   projectType: PropTypes.number.isRequired,
   selectedColor: PropTypes.string.isRequired,
-  showEditButton: PropTypes.bool,
   labelsPerDatapoint: PropTypes.number.isRequired,
-  progress: PropTypes.number.isRequired,
 };
 
 Project.defaultProps = {

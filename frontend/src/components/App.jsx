@@ -48,7 +48,6 @@ axios.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.log('ERROR:', error);
     const {
       config,
       response: { status },

@@ -19,7 +19,7 @@ Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
   const CURRENT_DATA = 5;
-  const { projectType, id, progress } = location.state;
+  const { projectType, id } = location.state;
 
   const [labels, setLabels] = useState([]);
   const [index, setIndex] = useState(0);
@@ -154,7 +154,6 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
-            projectID={id}
           />
         );
       }
