@@ -20,19 +20,6 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-          {/* Column 2 */}
-          <div className="col">
-            <h1>Stories</h1>
-            <ul className="list-unstyled">
-              <li>Here we could add some challenges left to do. For example:</li>
-              <br />
-              <li>Label 30 objects in a day:</li>
-              <li>9/10 [insert progress bar]</li>
-              <br />
-              <li>Label 200 images: </li>
-              <li>134/200 [insert progress bar]</li>
-            </ul>
-          </div>
           {/* Column 3 */}
           <div className="col">
             <h1>GitHub</h1>
@@ -46,8 +33,8 @@ const Footer = () => {
 
         <div id="copyright-row" className="row">
           <p className="col-small">
-            &copy; Copyright {new Date().getFullYear()} GutenTag | All rights reserved | Terms of
-            Service | Privacy
+            &copy; Copyright {new Date().getFullYear()} GutenTag | All rights reserved |{' '}
+            <a href="https://github.com/th3tard1sparadox/GutenTag/blob/main/LICENSE">License</a>
           </p>
         </div>
       </div>
