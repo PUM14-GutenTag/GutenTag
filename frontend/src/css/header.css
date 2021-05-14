@@ -3,14 +3,17 @@
   background-color: #ffffff;
 }
 
-.container.navbar-container, #navbar-content {
+.container.navbar-container,
+#navbar-content {
   max-width: 1320px;
-  padding-left: 3em;
-  padding-right: 3em;
+  padding-left: 0em;
+  padding-right: 7em;
 }
 
 .navbar-collapse {
   text-align: center;
+  padding-left: 0em;
+  padding-right: 0em;
 }
 
 .logo {
@@ -18,7 +21,9 @@
   height: 100px;
 }
 
-a.nav-link.text-label, #home-link, #settings-link {
+a.nav-link.text-label,
+#home-link,
+#settings-link {
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
@@ -34,4 +39,12 @@ a.nav-link.text-label, #home-link, #settings-link {
   padding-bottom: 0.125em;
   position: relative;
   color: #063954;
+}
+
+@media screen and (max-width: 767px) {
+  .container.navbar-container,
+  #navbar-content {
+    padding-left: 0em;
+    padding-right: 0em;
+  }
 }

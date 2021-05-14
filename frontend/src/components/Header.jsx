@@ -21,7 +21,6 @@ function Header() {
             <Nav.Link id="home-link" className="text-label" as={Link} to="/home">
               <HouseFill className="icon-offset" /> Home
             </Nav.Link>
-
             <Nav.Link id="settings-link" className="text-label" as={Link} to="/settings">
               <GearFill className="icon-offset" /> Settings
             </Nav.Link>
