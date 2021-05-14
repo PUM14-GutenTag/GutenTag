@@ -43,15 +43,14 @@ const AchievementCarousel = ({ containerClass }) => {
   return (
     <Carousel
       responsive={responsive}
-      infinate
       showDots={false}
       ssr // means to render carousel on server-side.
       keyBoardControl
       removeArrowOnDeviceType={['tablet', 'mobile']}
       itemClass="carousel-item-custom"
-      centerMode
       containerClass={containerClass}
       slidesToSlide={4}
+      draggable={false} // The library's drag function is super janky so turning it off.
     >
       {achievements.map((achievement, i) => {
         const opacity = achievement.earned == null ? 0.55 : 1;

@@ -1,12 +1,12 @@
 .carousel-item-custom {
-  margin: 1rem;
   transform-style: preserve-3d;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
 .carousel-item-container {
-  height: 100%;
+  height: 7.5rem;
+  margin: 0.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;

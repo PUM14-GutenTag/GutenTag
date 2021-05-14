@@ -130,9 +130,8 @@ svg.remove {
 }
 
 .carousel-container {
-  display: flex;
   height: 100%;
-  width: 90%;
+  width: 100%;
 }
 
 .main-col > h2 {
