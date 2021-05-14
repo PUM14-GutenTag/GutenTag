@@ -128,6 +128,12 @@ class User(db.Model):
             return (access_token, refresh_token)
         return None
 
+    def is_admin(self):
+        """
+        Returns True if user is admin, otherwise False.
+        """
+        return self.access_level >= AccessLevel.ADMIN
+
     def authorize(self, project_id):
         """
         Function adds an existing user to an existing project.

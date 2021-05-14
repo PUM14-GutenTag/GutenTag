@@ -3,7 +3,8 @@ from sqlalchemy.sql import extract
 from sqlalchemy import or_
 from api.models import (Achievement,
                         Statistic,
-                        Login)
+                        Login,
+                        User)
 from api import db
 
 
@@ -17,6 +18,7 @@ class BaseStatistic():
     This involves instantiating db models, and updating occurrences.
     """
     statistic_name = None
+    requires_admin = False
 
     @classmethod
     def get_occurrences(cls, user_id):
@@ -32,6 +34,10 @@ class BaseStatistic():
         """
         Create database models for a new user.
         """
+        user = User.query.get(user_id)
+        if cls.requires_admin and not user.is_admin():
+            return
+
         cls.instantiate_statistic_model(user_id)
         cls.instantiate_achievement_models(user_id)
 
@@ -327,6 +333,7 @@ class ProjectStatistic(IncrementStatistic):
     Keeps track of the number of projects the user has created.
     """
     statistic_name = "Projects created"
+    requires_admin = True
     ranks = {
         1: ("Creator - Bronze III", "Create your first project"),
         5: ("Creator - Bronze II", "Create 5 projects"),
@@ -341,6 +348,7 @@ class ImportStatistic(IncrementStatistic):
     Keeps track of the number of data imports the user has done.
     """
     statistic_name = "Imports completed"
+    requires_admin = True
     ranks = {
         1: ("Importer", "Import data to a project"),
     }
@@ -351,6 +359,7 @@ class ExportStatistic(IncrementStatistic):
     Keeps track of the number of data exports the user has done.
     """
     statistic_name = "Exports completed"
+    requires_admin = True
     ranks = {
         1: ("Exporter", "Export data from a project"),
     }
