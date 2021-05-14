@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 from api import rest
 from api.models import (
     AccessLevel,
+    DefaultLabel,
     Project,
     ProjectData,
     ProjectType,
@@ -240,6 +241,37 @@ class Deauthorize(Resource):
         else:
             msg = "User is not authorized to deauthorize other users"
             status = 404
+
+        return make_response(jsonify({"message": msg}), status)
+
+
+class NewDefaultLabel(Resource):
+    """
+    Endpoint for adding a new default label.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("label_name", type=str, required=True)
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+
+        if user.access_level >= AccessLevel.ADMIN:
+            try:
+                project = Project.query.filter_by(id=args.project_id).first()
+                return make_response(jsonify(try_add_response(
+                    DefaultLabel(project, args.label_name)
+                )), 200)
+            except Exception as e:
+                msg = f"Could not create default label: {e}"
+                status = 404
+        else:
+            msg = "User is not authorized to create default labels."
+            status = 401
 
         return make_response(jsonify({"message": msg}), status)
 

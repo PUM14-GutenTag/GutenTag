@@ -171,6 +171,24 @@ class User(db.Model):
         )
 
 
+class DefaultLabel(db.Model):
+    """
+    DefaultLabels contains multiple lables that are default for a certain
+    project.
+    """
+    __tablename__ = "default_label"
+
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project = db.relationship("Project", backref="default_labels")
+    name = db.Column(db.Text, nullable=False)
+
+    def __init__(self, project, name):
+        check_types([(project, Project), (name, str)])
+        self.project = project
+        self.name = name
+
+
 class Project(db.Model):
     """
     Project contain information about what users are related to this project
