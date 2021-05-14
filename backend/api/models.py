@@ -3,6 +3,7 @@ This file contains all database models and associated methods.
 """
 import datetime
 import io
+from math import ceil
 from enum import IntEnum
 from api import db
 from api.database_handler import check_types
@@ -619,9 +620,20 @@ class Statistic(db.Model):
         That is, how the user's occurrences compare to other users.
         """
         stats = self.query.filter_by(name=self.name).all()
-        stats.sort(key=lambda s: s.occurrences, reverse=True)
-        ranking = stats.index(self) + 1
-        return ranking
+        # Get all stats that have more occurrances
+        more_occurrences = [
+            stat.occurrences for stat in stats
+            if stat.occurrences > self.occurrences
+        ]
+        # Remove duplicates
+        unique_more_occurrences = list(dict.fromkeys(more_occurrences))
+
+        ranking = len(unique_more_occurrences) + 1
+        if ranking == 1:
+            return "Top 1"
+        else:
+            # Ceil ranking to nearest 5.
+            return f"Top {5 * ceil(ranking/5)}"
 
     def __repr__(self):
         return (
