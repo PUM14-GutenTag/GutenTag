@@ -58,6 +58,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
     inputRef.current.value = '';
     inputRef.current.focus();
     getImage(dataPointId);
+    // eslint-disable-next-line
   }, [dataPointId]);
 
   // Sets X and Y states when cropping

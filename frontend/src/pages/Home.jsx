@@ -18,6 +18,7 @@ const Home = () => {
   // Fetches a users/admins projects from backend.
   const fetchData = async () => {
     const result = await HTTPLauncher.sendGetUserProjects();
+    console.log(result);
     if (result.data !== undefined) {
       const dataArray = Object.values(result.data.projects);
       setProjects(dataArray);

@@ -102,12 +102,13 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to create a new project.
-  static sendCreateProject(projectName, projectType) {
+  static sendCreateProject(projectName, projectType, labelsPerDatapoint) {
     return axios.post(
       'create-project',
       {
         project_name: projectName,
         project_type: projectType,
+        labels_per_datapoint: labelsPerDatapoint,
       },
       { headers: authHeader() }
     );
@@ -255,6 +256,19 @@ class HTTPLauncher {
       headers: authHeader(),
       params: { project_id: projectID, data_id: dataID },
     });
+  }
+
+  static sendChangeLabelsPerDatapoint(projectID, labelsPerDatapoint) {
+    return axios.post(
+      'labels-per-data',
+      {
+        project_id: projectID,
+        labels_per_datapoint: labelsPerDatapoint,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
   }
 
   // Send HTTP-request to label a datapoint.

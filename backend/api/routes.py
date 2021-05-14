@@ -253,6 +253,7 @@ class NewProject(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_name", type=str, required=True)
         self.reqparse.add_argument("project_type", type=int, required=True)
+        self.reqparse.add_argument("labels_per_datapoint", type=int, required=True)
 
     @jwt_required()
     def post(self):
@@ -262,9 +263,11 @@ class NewProject(Resource):
         if user.access_level >= AccessLevel.ADMIN:
             try:
                 return make_response(jsonify(try_add_response(
-                    Project(args.project_name, args.project_type)
+                    Project(args.project_name, args.project_type,
+                     args.labels_per_datapoint)
                 )), 200)
             except Exception as e:
+                print("Exception", e)
                 msg = f"Could not create project: {e}"
                 status = 404
         else:
@@ -302,6 +305,33 @@ class RemoveProject(Resource):
 
         return make_response(jsonify({"message": msg}), status)
 
+class ChangeLabelsPerDatapoint(Resource):
+    """
+    #Endpoint for changing labels per datapoint before
+    #a project is finished.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+        self.reqparse.add_argument("labels_per_datapoint", type=int, required=True)
+
+        @jwt_required()
+        def post(self):
+            args = self.reqparse.parse_args()
+            user = User.get_by_email(get_jwt_identity())
+            project = Project.query.get(args.project_id)
+            status = 401
+            msg = "You are not authorized to change this parameter"
+            
+            if user.access_level >= AccessLevel.ADMIN:
+                project.labels_per_datapoint = args.labels_per_datapoint
+                status = 200
+                msg = "Labels per datapoint changed"
+
+                print("HERE:", project.labels_per_datapoint)
+
+            return make_response(jsonify({"message": msg}), status)
 
 class RemoveUser(Resource):
     """

@@ -135,6 +135,12 @@ svg.remove {
   width: 70%;
 }
 
+.subTitleLabel {
+  font-size: 2rem;
+  width: 100%;
+  white-space: nowrap;
+}
+
 .titleLabel {
   font-size: 2rem;
   width: 100%;

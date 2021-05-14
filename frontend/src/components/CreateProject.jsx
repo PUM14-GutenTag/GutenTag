@@ -9,6 +9,7 @@ import ProjectType from '../ProjectType';
 const CreateProject = () => {
   const [projectName, setProjectName] = useState('');
   const [projectType, setProjectType] = useState(1);
+  const [labelsPerDatapoint, setLabelsPerDatapoint] = useState(1);
   const [ID, setID] = useState(null);
   const [redirect, setRedirect] = useState(false);
   const [error, setError] = useState(false);
@@ -21,7 +22,11 @@ const CreateProject = () => {
   // Creates a project in the backend
   const submitHandler = async (event) => {
     event.preventDefault();
-    const response = await HTTPLauncher.sendCreateProject(projectName, projectType);
+    const response = await HTTPLauncher.sendCreateProject(
+      projectName,
+      projectType,
+      labelsPerDatapoint
+    );
     if (response.data.id === null) {
       setError(true);
     }
@@ -67,7 +72,23 @@ const CreateProject = () => {
             </Form.Control>
           </Form.Group>
         </Row>
-
+        <Row>
+          <Form.Group as={Col} controlId="formAmount">
+            <Form.Label className="titleLabel">Amount of labels per datapoint</Form.Label>
+            <Form.Control
+              className="text"
+              as="select"
+              name="amount"
+              onChange={(event) => setLabelsPerDatapoint(event.target.value)}
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </Form.Control>
+          </Form.Group>
+        </Row>
         <Row>
           <Button className="dark" variant="primary" type="submit">
             Submit

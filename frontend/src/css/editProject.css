@@ -37,3 +37,10 @@ svg.remove {
   height: 1.1em;
   margin-right: 0.2em;
 }
+
+.subTitleLabel {
+  padding-right: 1rem;
+}
+#formAmount {
+  padding-right: 1rem;
+}

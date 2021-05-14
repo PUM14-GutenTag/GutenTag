@@ -183,18 +183,24 @@ class Project(db.Model):
     project_type = db.Column(db.Integer, nullable=False)
     created = db.Column(db.DateTime, nullable=False,
                         default=datetime.datetime.now())
-
+    finished = db.Column(db.Boolean, default=False)
+    labels_per_datapoint = db.Column(db.Integer, nullable=False)
     data = db.relationship("ProjectData", back_populates="project",
                            cascade="all, delete", passive_deletes=True)
     users = db.relationship(
         "User", secondary=access_control, back_populates="projects")
 
-    def __init__(self, project_name, project_type):
-        check_types([(project_name, str), (project_type, int)])
+    def __init__(self, project_name, project_type, labels_per_datapoint):
+        check_types([(project_name, str), (project_type, int), (
+            labels_per_datapoint, int)])
         if not ProjectType.has_value(project_type):
             raise ValueError(f"Project type '{project_type}' is invalid.")
         self.name = project_name
         self.project_type = project_type
+        self.labels_per_datapoint = labels_per_datapoint
+
+    def set_finished(self, status):
+        self.finished = status
 
     def get_data(self, user_id):
         """
@@ -409,6 +415,9 @@ class Label(db.Model):
         "polymorphic_on": project_type
     }
 
+    def test(self):
+        print("*tsstss* Hemlig information här")
+
 
 class DocumentClassificationLabel(Label):
     """
@@ -424,6 +433,7 @@ class DocumentClassificationLabel(Label):
     }
 
     def __init__(self, data_id, user_id, label_str, is_prelabel=False):
+        super(DocumentClassificationLabel, self).test()
         args = [(data_id, int), (label_str, str)]
         if user_id is not None:
             args.append((user_id, int))
