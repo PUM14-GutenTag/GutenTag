@@ -45,7 +45,8 @@ const App = () => {
   const displayAchievements = async (response) => {
     if (achievementURLs.includes(response.config.url)) {
       const achieveResponse = await HTTPLauncher.sendGetUnnotifiedAchievements();
-      setNewAchievements(achieveResponse.data);
+      // Merge arrays rather than overwriting.
+      setNewAchievements((previousAch) => [...previousAch, ...achieveResponse.data]);
     }
   };
 
