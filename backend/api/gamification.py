@@ -1,5 +1,6 @@
 import datetime
 from sqlalchemy.sql import extract
+from sqlalchemy import or_
 from api.models import (Achievement,
                         Statistic,
                         Login)
@@ -227,7 +228,9 @@ class WeekendLoginStatistic(RankStatistic):
         """
         logins = Login.query.filter(
             Login.user_id == user_id,
-            extract('dow', Login.time) > 4
+            # dow: day of week. Sunday is 0, saturday is 6.
+            or_(extract('dow', Login.time) == 0,
+                extract('dow', Login.time) == 6)
         ).all()
         return len(logins)
 
@@ -398,6 +401,7 @@ def calc_workday_streak(datetime_list):
         streak_in_dates = streak_day in unique_dates
         if streak_in_dates:
             streak += 1
+        # weekday() returns 0 for monday and 6 for sunday.
         has_streak = streak_day.weekday() > 4 or streak_in_dates
 
     return streak
