@@ -255,7 +255,7 @@ class WorkdayLoginStatistic(BaseStatistic):
         30: ("Employee of the month", "Log in every workday for a month")
     }
 
-    @ classmethod
+    @classmethod
     def update(cls, user_id):
         """
         Update the number of occurrences.
@@ -274,7 +274,7 @@ class WorkdayLoginStatistic(BaseStatistic):
                 new_achieve.earned = datetime.datetime.now()
             db.session.flush()
 
-    @ classmethod
+    @classmethod
     def instantiate_achievement_models(cls, user_id):
         """
         Create a database model to track the user's progress on the statistic's
@@ -290,7 +290,7 @@ class WorkdayLoginStatistic(BaseStatistic):
             add_list.append(achieve)
         db.session.add_all(add_list)
 
-    @ classmethod
+    @classmethod
     def update_occurrences(cls, user_id):
         """
         Update the number of occurrences.
@@ -309,22 +309,22 @@ class LabelingStatistic(IncrementStatistic):
     """
     Keeps track of the number of labels that user has created.
     """
-    statistic_name = "Labels created"
+    statistic_name = "Data labeled"
     ranks = {
-        1: ("Labeler - Bronze III", "Create your first label"),
-        5: ("Labeler - Bronze II", "Create 5 labels"),
-        10: ("Labeler - Bronze I", "Create 10 labels"),
-        25: ("Labeler - Silver III", "Create 25 labels"),
-        50: ("Labeler - Silver II", "Create 50 labels"),
-        75: ("Labeler - Silver I", "Create 75 labels"),
-        150: ("Labeler - Gold III", "Create 150 labels"),
-        250: ("Labeler - Gold II", "Create 250 labels"),
-        500: ("Labeler - Gold I", "Create 500 labels"),
-        1000: ("Labeler - Platinum III", "Create 1 000 labels"),
-        2500: ("Labeler - Platinum II", "Create 2 500 labels"),
-        5000: ("Labeler - Platinum I", "Create 5 000 labels"),
-        10000: ("Labeler - Master", "Create 10 000 labels"),
-        100000: ("Labeler - Grandmaster", "Create 100 000 labels")
+        1: ("Labeler - Bronze III", "Label your first data point"),
+        5: ("Labeler - Bronze II", "Label 5 data"),
+        10: ("Labeler - Bronze I", "Label 10 data"),
+        25: ("Labeler - Silver III", "Label 25 data"),
+        50: ("Labeler - Silver II", "Label 50 data"),
+        75: ("Labeler - Silver I", "Label 75 data"),
+        150: ("Labeler - Gold III", "Label 150 data"),
+        250: ("Labeler - Gold II", "Label 250 data"),
+        500: ("Labeler - Gold I", "Label 500 data"),
+        1000: ("Labeler - Platinum III", "Label 1 000 data"),
+        2500: ("Labeler - Platinum II", "Label 2 500 data"),
+        5000: ("Labeler - Platinum I", "Label 5 000 data"),
+        10000: ("Labeler - Master", "Label 10 000 data"),
+        100000: ("Labeler - Grandmaster", "Label 100 000 data")
     }
 
 

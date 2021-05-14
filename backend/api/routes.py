@@ -584,7 +584,9 @@ class CreateDocumentClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                LabelingStatistic.update(user.id)
+                # Only update statistic once per data
+                if not data.has_labeled(user.id):
+                    LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label)
@@ -623,7 +625,9 @@ class CreateSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                LabelingStatistic.update(user.id)
+                # Only update statistic once per data
+                if not data.has_labeled(user.id):
+                    LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
                                   args.begin, args.end))), 200)
@@ -659,7 +663,9 @@ class CreateSequenceToSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                LabelingStatistic.update(user.id)
+                # Only update statistic once per data
+                if not data.has_labeled(user.id):
+                    LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
                         args.data_id, user.id, args.label)
@@ -700,7 +706,9 @@ class CreateImageClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                LabelingStatistic.update(user.id)
+                # Only update statistic once per data
+                if not data.has_labeled(user.id):
+                    LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,

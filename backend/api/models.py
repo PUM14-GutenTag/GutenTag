@@ -341,6 +341,12 @@ class ProjectData(db.Model):
         "polymorphic_on": type
     }
 
+    def has_labeled(self, user_id):
+        """
+        Return True if user has labeled the data before, otherwise False.
+        """
+        return sum(1 for label in self.labels if label.user_id == user_id) > 0
+
 
 class ProjectTextData(ProjectData):
     """
