@@ -124,6 +124,17 @@ class HTTPLauncher {
     );
   }
 
+  // Send HTTP-request to delete an existing default label.
+  static sendDeleteDefaultLabel(projectID, labelName) {
+    return axios.delete('delete-default-label', {
+      headers: authHeader(),
+      data: {
+        project_id: projectID,
+        label_name: labelName,
+      },
+    });
+  }
+
   // Send HTTP-request to delete an existing project.
   static sendDeleteProject(projectID) {
     return axios.delete('delete-project', {

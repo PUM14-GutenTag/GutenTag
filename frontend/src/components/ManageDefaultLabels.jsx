@@ -16,12 +16,16 @@ const ManageDefaultLabels = ({ projectID }) => {
     const result = await HTTPLauncher.sendGetDefaultLabel(projectID);
     const list = Object.keys(result.data).map((key) => result.data[key].name);
     setLabels(list);
-    console.log(labels);
   };
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    const result = await HTTPLauncher.sendCreateDefaultLabel(label, projectID);
+    await HTTPLauncher.sendCreateDefaultLabel(label, projectID);
+    fetchDefaultLabels();
+  };
+
+  const removeLabel = async (labelName) => {
+    await HTTPLauncher.sendDeleteDefaultLabel(projectID, labelName);
     fetchDefaultLabels();
   };
 
@@ -62,7 +66,7 @@ const ManageDefaultLabels = ({ projectID }) => {
             <tr key={result}>
               <td>{result}</td>
               <td className="right">
-                <Trash className="remove" />
+                <Trash className="remove" onClick={() => removeLabel(result)} />
               </td>
             </tr>
           ))}

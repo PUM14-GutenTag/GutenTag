@@ -306,6 +306,42 @@ class NewProject(Resource):
         return make_response(jsonify({"message": msg}), status)
 
 
+class RemoveDefaultLabel(Resource):
+    """
+    Endpoint for removing a default label.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+        self.reqparse.add_argument("label_name", type=str, required=True)
+
+    @jwt_required()
+    def delete(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+
+        if user.access_level >= AccessLevel.ADMIN:
+            try:
+                labels = project.default_labels
+                for label in labels:
+                    if label.name == args.label_name:
+                        return make_response(jsonify(try_delete_response(
+                            label)), 200)
+
+                msg = f"Label {args.label_name} does not exist"
+                status = 404
+            except Exception as e:
+                msg = f"Could not remove default label: {e}"
+                status = 404
+        else:
+            msg = "User is not authorized to remove default labels."
+            status = 401
+
+        return make_response(jsonify({"message": msg}), status)
+
+
 class RemoveProject(Resource):
     """
     Endpoint for removing a project.
@@ -1010,6 +1046,7 @@ rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
 rest.add_resource(NewDefaultLabel, "/create-default-label")
 rest.add_resource(NewProject, "/create-project")
+rest.add_resource(RemoveDefaultLabel, "/delete-default-label")
 rest.add_resource(RemoveProject, "/delete-project")
 rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
