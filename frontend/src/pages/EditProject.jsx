@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import Layout from '../components/Layout';
@@ -14,19 +14,40 @@ import HTTPLauncher from '../services/HTTPLauncher';
  * files.
  */
 const EditProject = ({ location }) => {
-  const { id, name, projectType } = location.state;
-  const [labelsPerDatapoint, setLabelsPerDatapoint] = useState(1);
+  const { id, name, projectType, labelsPerDatapoint } = location.state;
+  const [datapointLabels, setDatapointLabels] = useState(1);
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    console.log(labelsPerDatapoint);
-    const response = await HTTPLauncher.sendChangeLabelsPerDatapoint(id, labelsPerDatapoint);
-    console.log(response);
+    await HTTPLauncher.sendChangeLabelsPerDatapoint(id, datapointLabels);
+  };
+
+  const getProjectType = (type) => {
+    let result = '';
+    switch (type) {
+      case 1:
+        result = 'Document classification';
+        break;
+      case 2:
+        result = 'Sequence labeling';
+        break;
+      case 3:
+        result = 'Sequence to sequence labeling';
+        break;
+      case 4:
+        result = 'Image classification';
+        break;
+      default:
+        result = 'No project type';
+        break;
+    }
+    return result;
   };
 
   return (
     <Layout title="Edit project">
-      <h1>Project: {name}</h1>
+      <h1>Project Name: {name}</h1>
+      <h2>Project Type: {getProjectType(projectType)}</h2>
       <br />
       <Row>
         <Col id="center">
@@ -46,7 +67,8 @@ const EditProject = ({ location }) => {
               className="text"
               as="select"
               name="amount"
-              onChange={(event) => setLabelsPerDatapoint(event.target.value)}
+              onChange={(event) => setDatapointLabels(event.target.value)}
+              defaultValue={labelsPerDatapoint}
             >
               <option value="1">1</option>
               <option value="2">2</option>
@@ -71,6 +93,7 @@ EditProject.propTypes = {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       projectType: PropTypes.number.isRequired,
+      labelsPerDatapoint: PropTypes.number.isRequired,
     }).isRequired,
   }).isRequired,
 };

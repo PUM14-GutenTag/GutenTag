@@ -101,6 +101,7 @@ const CreateProject = () => {
                   id: ID,
                   name: projectName,
                   projectType,
+                  labelsPerDatapoint,
                 },
               }}
             />

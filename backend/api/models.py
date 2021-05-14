@@ -199,8 +199,22 @@ class Project(db.Model):
         self.project_type = project_type
         self.labels_per_datapoint = labels_per_datapoint
 
+    def check_finished(self):
+        for datapoint in self.data:
+            print("PROJECT CHECK FINISHED", datapoint.finished)
+            if not datapoint.finished:
+                pass
+
+        #self.set_finished(True)
+        #db.session.commit()
+
     def set_finished(self, status):
         self.finished = status
+        db.session.commit()
+
+    def set_labels_per_datapoint(self, amount):
+        self.labels_per_datapoint = amount
+        db.session.commit()
 
     def get_data(self, user_id):
         """
@@ -326,6 +340,7 @@ class ProjectData(db.Model):
     project = db.relationship("Project", back_populates="data")
     labels = db.relationship("Label", back_populates="data",
                              cascade="all, delete", passive_deletes=True)
+    finished = db.Column(db.Boolean, default=False)
     type = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, nullable=False,
                         default=datetime.datetime.now())
@@ -335,6 +350,27 @@ class ProjectData(db.Model):
         "polymorphic_identity": "base",
         "polymorphic_on": type
     }
+
+    def set_finished(self, status):
+        self.finished = status
+        db.session.commit()
+
+    def check_finished(self):
+        unique_users = 0
+        users = []
+
+        project = Project.query.get(self.project_id)
+        project.check_finished()
+
+        for label in self.labels:
+            if label.user_id not in users:
+                unique_users = unique_users + 1
+                users.append(label.user_id)
+        
+        if unique_users >= project.labels_per_datapoint:
+            self.set_finished(true)
+            db.session.commit()
+            project.check_finished()
 
 
 class ProjectTextData(ProjectData):
@@ -416,7 +452,7 @@ class Label(db.Model):
     }
 
     def test(self):
-        print("*tsstss* Hemlig information här")
+        print("Implement label counting in models.py Label")
 
 
 class DocumentClassificationLabel(Label):
@@ -433,7 +469,6 @@ class DocumentClassificationLabel(Label):
     }
 
     def __init__(self, data_id, user_id, label_str, is_prelabel=False):
-        super(DocumentClassificationLabel, self).test()
         args = [(data_id, int), (label_str, str)]
         if user_id is not None:
             args.append((user_id, int))
@@ -443,6 +478,8 @@ class DocumentClassificationLabel(Label):
         self.user_id = user_id
         self.label = label_str
         self.is_prelabel = is_prelabel
+
+        super(DocumentClassificationLabel, self).test()
 
     def format_json(self):
         return {

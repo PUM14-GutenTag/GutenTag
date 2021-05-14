@@ -6,7 +6,15 @@ import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { GearFill } from 'react-bootstrap-icons';
 
-const Project = ({ id, name, created, projectType, selectedColor, showEditButton }) => {
+const Project = ({
+  id,
+  name,
+  created,
+  projectType,
+  selectedColor,
+  showEditButton,
+  labelsPerDatapoint,
+}) => {
   const [showInfo, setShowInfo] = useState(false);
   const projectTypeNames = [
     'Document classification',
@@ -36,6 +44,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             <p>Type: {projectTypeNames[projectType - 1]}</p>
             <p>Progress: 1/4 </p>
             <p>Started: {created}</p>
+            <p>Labels per datapoint: {labelsPerDatapoint}</p>
           </div>
         </div>
       ) : null}
@@ -61,6 +70,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
               id,
               name,
               projectType,
+              labelsPerDatapoint,
             },
           }}
         >
@@ -78,6 +88,7 @@ Project.propTypes = {
   projectType: PropTypes.number.isRequired,
   selectedColor: PropTypes.string.isRequired,
   showEditButton: PropTypes.bool,
+  labelsPerDatapoint: PropTypes.number.isRequired,
 };
 
 Project.defaultProps = {

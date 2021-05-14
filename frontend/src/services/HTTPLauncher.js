@@ -258,6 +258,7 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to change amount of labels needed per datapoint
   static sendChangeLabelsPerDatapoint(projectID, labelsPerDatapoint) {
     return axios.post(
       'labels-per-data',

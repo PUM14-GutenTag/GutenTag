@@ -305,10 +305,11 @@ class RemoveProject(Resource):
 
         return make_response(jsonify({"message": msg}), status)
 
+
 class ChangeLabelsPerDatapoint(Resource):
     """
-    #Endpoint for changing labels per datapoint before
-    #a project is finished.
+    Endpoint for changing labels per datapoint before
+    a project is finished.
     """
 
     def __init__(self):
@@ -316,22 +317,23 @@ class ChangeLabelsPerDatapoint(Resource):
         self.reqparse.add_argument("project_id", type=int, required=True)
         self.reqparse.add_argument("labels_per_datapoint", type=int, required=True)
 
-        @jwt_required()
-        def post(self):
-            args = self.reqparse.parse_args()
-            user = User.get_by_email(get_jwt_identity())
-            project = Project.query.get(args.project_id)
-            status = 401
-            msg = "You are not authorized to change this parameter"
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+        status = 401
+        msg = "You are not authorized to change this parameter"
             
-            if user.access_level >= AccessLevel.ADMIN:
-                project.labels_per_datapoint = args.labels_per_datapoint
-                status = 200
-                msg = "Labels per datapoint changed"
+        if user.access_level >= AccessLevel.ADMIN:
+            project.set_labels_per_datapoint(args.labels_per_datapoint)
+            status = 200
+            msg = "Labels per datapoint changed"
 
-                print("HERE:", project.labels_per_datapoint)
+        project.check_finished()
 
-            return make_response(jsonify({"message": msg}), status)
+        return make_response(jsonify({"message": msg}), status)
 
 class RemoveUser(Resource):
     """
@@ -862,7 +864,8 @@ class FetchUserProjects(Resource):
                     "id": project.id,
                     "name": project.name,
                     "type": project.project_type,
-                    "created": project.created
+                    "created": project.created,
+                    "labels_per_datapoint": project.labels_per_datapoint
                 }
             msg = "Retrieved user projects"
             status = 200
@@ -965,6 +968,7 @@ rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
 rest.add_resource(NewProject, "/create-project")
 rest.add_resource(RemoveProject, "/delete-project")
+rest.add_resource(ChangeLabelsPerDatapoint, "/labels-per-data")
 rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
