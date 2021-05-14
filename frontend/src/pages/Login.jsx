@@ -13,7 +13,8 @@ import userAuth from '../services/userAuth';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [validated, setValidated] = useState(false);
+  const [validEmail, setValidEmail] = useState(true);
+  const [validPass, setValidPass] = useState(true);
 
   const history = useHistory();
 
@@ -32,17 +33,28 @@ function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setValidated(true);
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
+<<<<<<< HEAD
     if (responseLogin.data !== undefined) {
+=======
+    if (responseLogin.status === 200) {
+      const { access_token: accessToken, refresh_token: refreshToken } = responseLogin.data;
+      userAuth.setTokens(accessToken, refreshToken);
+>>>>>>> main
       history.push('/home');
+    } else if (responseLogin.response.status === 404) {
+      setValidEmail(false);
+      setValidPass(true);
+    } else if (responseLogin.response.status === 401) {
+      setValidPass(false);
+      setValidEmail(true);
     }
   };
 
   return (
     <div className="login-wrapper">
       <img src={logoUnder} alt="logo" className="login-logo" />
-      <Form noValidate validated={validated} onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <Form.Group as={Row} className="text-right" controlId="formBasicEmail">
           <Col>
             <Form.Label className="text-label-big"> Email </Form.Label>
@@ -57,9 +69,7 @@ function Login() {
               placeholder="Enter email"
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Form.Control.Feedback type="invalid">
-              Please input a valid email.
-            </Form.Control.Feedback>
+            {!validEmail && <div className="red-text">Incorrect email</div>}
           </Col>
         </Form.Group>
         <Form.Group as={Row} className="text-right" controlId="formBasicPassword">
@@ -75,7 +85,7 @@ function Login() {
               placeholder="Enter password"
               onChange={(e) => setPassword(e.target.value)}
             />
-            <Form.Control.Feedback type="invalid">Please input a password.</Form.Control.Feedback>
+            {!validPass && <div className="red-text">Incorrect password</div>}
           </Col>
         </Form.Group>
         <Button className="dark" id="button-center" type="submit" disabled={!validateForm()}>

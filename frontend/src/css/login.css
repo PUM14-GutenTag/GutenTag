@@ -29,6 +29,10 @@
   display: block;
 }
 
+.red-text {
+  color: #f52882;
+}
+
 @media (max-width: 768px) {
   .input-box {
     height: 34px;
