@@ -46,7 +46,7 @@ const CreateProject = () => {
         </Row>
         {error && (
           <Row>
-            <Form.Label>Project name already exists</Form.Label>
+            <Form.Label className="red-text">Project name already exists</Form.Label>
           </Row>
         )}
         <Row>
