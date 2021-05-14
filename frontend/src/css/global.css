@@ -98,3 +98,16 @@ th.right {
   user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+
+.achievement-title {
+  font-size: large;
+  font-weight: 800;
+}
+
+.achievement-subtitle {
+  font-weight: 600;
+}
+
+.achievement-footnote {
+  font-size: small;
+}

@@ -16,12 +16,3 @@
   padding: 0.5rem;
   text-align: center;
 }
-
-.carousel-item-header {
-  font-size: large;
-  font-weight: 800;
-}
-
-.carousel-item-body {
-  font-size: x-small;
-}

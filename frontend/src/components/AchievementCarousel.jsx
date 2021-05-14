@@ -57,12 +57,12 @@ const AchievementCarousel = ({ containerClass }) => {
         return (
           <div
             className="no-select carousel-item-container"
-            style={{ opacity, background: colors[i % 4] }}
+            style={{ opacity, background: colors[i % colors.length] }}
             key={achievement.name}
           >
-            <div className="carousel-item-header">{achievement.name}</div>
-            <div className="carousel-item-description">{achievement.description}</div>
-            <div className="carousel-item-body">{achievement.earned}</div>
+            <div className="achievement-title">{achievement.name}</div>
+            <div className="achievement-subtitle">{achievement.description}</div>
+            <div className="achievement-footnote">{achievement.earned}</div>
           </div>
         );
       })}

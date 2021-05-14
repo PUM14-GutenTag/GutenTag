@@ -15,7 +15,7 @@ import EditProject from '../pages/EditProject';
 // Components
 import ProtectedRoute from './ProtectedRoute';
 import { UserProvider } from '../contexts/UserContext';
-import AchievementToast from './AchievementToasts';
+import AchievementToast from './AchievementToast';
 
 // Styles
 import '../css/App.css';
