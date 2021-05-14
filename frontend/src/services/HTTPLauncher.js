@@ -101,6 +101,17 @@ class HTTPLauncher {
     );
   }
 
+  static sendCreateDefaultLabel(labelName, projectID) {
+    return axios.post(
+      'create-default-label',
+      {
+        label_name: labelName,
+        project_id: projectID,
+      },
+      { headers: authHeader() }
+    );
+  }
+
   // Send HTTP-request to create a new project.
   static sendCreateProject(projectName, projectType) {
     return axios.post(
@@ -231,6 +242,14 @@ class HTTPLauncher {
     return axios.post('add-image-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
       onUploadProgress,
+    });
+  }
+
+  // Send HTTP-request to fetch default labels.
+  static sendGetDefaultLabel(projectID) {
+    return axios.get('get-default-labels', {
+      headers: authHeader(),
+      params: { project_id: projectID },
     });
   }
 

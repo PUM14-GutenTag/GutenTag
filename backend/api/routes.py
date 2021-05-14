@@ -456,6 +456,49 @@ class AddNewImageData(Resource):
         return make_response(jsonify({"message": msg}), status)
 
 
+class GetDefaultLabels(Resource):
+    """
+    Endpoint to retrieve default labels.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+
+        if not project:
+            return make_response(jsonify({"message": "Invalid project id"}),
+                                 404)
+
+        if project in user.projects or user.access_level >= AccessLevel.ADMIN:
+            status = 200
+            try:
+                labels = []
+                label_info = {}
+
+                labels = project.default_labels
+                for label in labels:
+                    label_info[label.id] = {
+                        "name": label.name,
+                    }
+
+                print(project.default_labels)
+                return make_response(jsonify(label_info), status)
+            except Exception as e:
+                msg = f"Could not get data: {e}"
+                status = 404
+        else:
+            msg = "User is not authorized to get data."
+            status = 401
+
+        return make_response(jsonify({"message": msg}), status)
+
+
 class GetNewData(Resource):
     """
     Endpoint to retrieve data to be labeled.
@@ -965,11 +1008,13 @@ rest.add_resource(ChangePassword, "/change-password")
 rest.add_resource(RefreshToken, "/refresh-token")
 rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
+rest.add_resource(NewDefaultLabel, "/create-default-label")
 rest.add_resource(NewProject, "/create-project")
 rest.add_resource(RemoveProject, "/delete-project")
 rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
+rest.add_resource(GetDefaultLabels, "/get-default-labels")
 rest.add_resource(GetNewData, "/get-data")
 rest.add_resource(GetAmountOfData, "/get-data-amount")
 rest.add_resource(GetLabel, "/get-label")
