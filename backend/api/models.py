@@ -70,8 +70,10 @@ class User(db.Model):
 
     projects = db.relationship(
         "Project", secondary=access_control, back_populates="users")
-    statistics = db.relationship("Statistic")
-    achievements = db.relationship("Achievement")
+    statistics = db.relationship(
+        "Statistic", cascade="all, delete", passive_deletes=True)
+    achievements = db.relationship(
+        "Achievement", cascade="all, delete", passive_deletes=True)
 
     def __init__(self, first_name, last_name, email, password, isAdmin=False):
         check_types([(first_name, str), (last_name, str), (email, str),
@@ -602,7 +604,8 @@ class Login(db.Model):
     __tablename__ = "login"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id', ondelete="CASCADE"))
     time = db.Column(db.DateTime, nullable=False,
                      default=datetime.datetime.now())
 
@@ -616,7 +619,8 @@ class Statistic(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id', ondelete="CASCADE"))
     occurrences = db.Column(db.Integer, default=0, nullable=False)
 
     def format_json(self):
@@ -661,7 +665,8 @@ class Achievement(db.Model):
     __tablename__ = "achievement"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id', ondelete="CASCADE"))
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
     earned = db.Column(db.DateTime)
