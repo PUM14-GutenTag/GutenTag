@@ -183,6 +183,10 @@ class DefaultLabel(db.Model):
     project = db.relationship("Project", backref="default_labels")
     name = db.Column(db.Text, nullable=False)
 
+    __table_args__ = (db.UniqueConstraint("project_id",
+                                          "name",
+                                          name="_label_project_uc"),)
+
     def __init__(self, project, name):
         check_types([(project, Project), (name, str)])
         self.project = project
