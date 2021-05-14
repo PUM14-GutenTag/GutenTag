@@ -22,6 +22,7 @@ const Home = () => {
       const dataArray = Object.values(result.data.projects);
       setProjects(dataArray);
     }
+    console.log(result.data.projects);
   };
 
   // Filters users based on projectname.
@@ -57,6 +58,7 @@ const Home = () => {
                     selectedColor={colorList[i % colorList.length]}
                     showEditButton={userState.isAdmin}
                     labelsPerDatapoint={result.labels_per_datapoint}
+                    progress={result.progress}
                   />
                 </li>
               ))}

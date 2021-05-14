@@ -11,6 +11,7 @@ const Project = ({
   name,
   created,
   projectType,
+  progress,
   selectedColor,
   showEditButton,
   labelsPerDatapoint,
@@ -36,7 +37,7 @@ const Project = ({
     >
       <div className="title-container" aria-hidden="true">
         <h1>{name}</h1>
-        <ProgressBar now={50} striped id="progress-bar-project" />
+        <ProgressBar now={progress} striped id="progress-bar-project" />
       </div>
       {showInfo ? (
         <div className="projectInfo">
@@ -56,6 +57,7 @@ const Project = ({
           state: {
             projectType,
             id,
+            progress,
           },
         }}
       >
@@ -89,6 +91,7 @@ Project.propTypes = {
   selectedColor: PropTypes.string.isRequired,
   showEditButton: PropTypes.bool,
   labelsPerDatapoint: PropTypes.number.isRequired,
+  progress: PropTypes.number.isRequired,
 };
 
 Project.defaultProps = {

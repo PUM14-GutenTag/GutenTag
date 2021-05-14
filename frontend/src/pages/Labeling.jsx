@@ -19,12 +19,13 @@ Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
   const CURRENT_DATA = 5;
-  const { projectType, id } = location.state;
+  const { projectType, id, progress } = location.state;
 
   const [labels, setLabels] = useState([]);
   const [index, setIndex] = useState(0);
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
-  const [progress, setProgress] = useState(0);
+  const [progressInvidual, setProgressInvidual] = useState(0);
+  const [progressProject, setProgressProject] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
 
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
@@ -41,6 +42,12 @@ const Labeling = ({ location }) => {
       }
     }
   };
+
+  // fetch progress
+  useEffect(async () => {
+    const response = await HTTPLauncher.sendGetProjectProgress(id);
+    setProgressProject(response.data.progress);
+  });
 
   // Choose size of the text to use depending on the length of the text
   const textBoxSize = () => {
@@ -76,9 +83,9 @@ const Labeling = ({ location }) => {
       setDataAmount(response.data.dataAmount);
       const labeledByUser = response.data.labeledByUser;
       if (response.data.dataAmount === 0) {
-        setProgress(0);
+        setProgressInvidual(0);
       } else {
-        setProgress((labeledByUser / response.data.dataAmount) * 100);
+        setProgressInvidual((labeledByUser / response.data.dataAmount) * 100);
       }
     };
 
@@ -147,6 +154,7 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
+            projectID={id}
           />
         );
       }
@@ -181,10 +189,10 @@ const Labeling = ({ location }) => {
     return <></>;
   };
   const finishedLabel = () => {
-    if (progress === 100) {
+    if (progressInvidual === 100) {
       return <FinishedPopUp />;
     }
-    return <ProgressBar striped variant="success" now={progress} />;
+    return <ProgressBar striped variant="success" now={progressInvidual} />;
   };
 
   return (
@@ -193,7 +201,7 @@ const Labeling = ({ location }) => {
         <div className="progress-bars">
           {finishedLabel()}
           <br />
-          <ProgressBar striped variant="warning" now={25} />
+          <ProgressBar striped variant="warning" now={progressProject} />
         </div>
         <br />
         <div>

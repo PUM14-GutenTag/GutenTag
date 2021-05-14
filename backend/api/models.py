@@ -201,12 +201,11 @@ class Project(db.Model):
 
     def check_finished(self):
         for datapoint in self.data:
-            print("PROJECT CHECK FINISHED", datapoint.finished)
             if not datapoint.finished:
-                pass
+                return
 
-        #self.set_finished(True)
-        #db.session.commit()
+        self.set_finished(True)
+        db.session.commit()
 
     def set_finished(self, status):
         self.finished = status
@@ -215,6 +214,21 @@ class Project(db.Model):
     def set_labels_per_datapoint(self, amount):
         self.labels_per_datapoint = amount
         db.session.commit()
+
+    def get_progress(self):      
+        users = []
+        CONVERT_TO_PERCENTAGE = 100
+
+        for data in self.data:
+            for label in data.labels:
+                # Progress is made when a user labels a datapoint it has not already labeled
+                if (label.user_id, data.id) not in users and not label.is_prelabel:
+                    users.append((label.user_id, data.id))
+
+        if len(self.data) * self.labels_per_datapoint != 0:
+            return (len(users)/(len(self.data) * self.labels_per_datapoint)) * CONVERT_TO_PERCENTAGE
+        else:
+            return 0
 
     def get_data(self, user_id):
         """
@@ -356,19 +370,20 @@ class ProjectData(db.Model):
         db.session.commit()
 
     def check_finished(self):
-        unique_users = 0
         users = []
-
         project = Project.query.get(self.project_id)
-        project.check_finished()
 
         for label in self.labels:
-            if label.user_id not in users:
-                unique_users = unique_users + 1
+            print(label)
+            if label.user_id not in users and not label.is_prelabel:
+                print("--------")
+                print(label.user_id)
                 users.append(label.user_id)
+                print("Users: ", users)
         
-        if unique_users >= project.labels_per_datapoint:
-            self.set_finished(true)
+        if len(users) >= project.labels_per_datapoint:
+            print("--------------FINISHED------------------")
+            self.set_finished(True)
             db.session.commit()
             project.check_finished()
 

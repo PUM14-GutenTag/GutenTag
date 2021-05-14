@@ -100,8 +100,8 @@ const CreateProject = () => {
                 state: {
                   id: ID,
                   name: projectName,
-                  projectType,
-                  labelsPerDatapoint,
+                  projectType: parseInt(projectType),
+                  labelsPerDatapoint: parseInt(labelsPerDatapoint),
                 },
               }}
             />

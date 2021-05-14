@@ -591,10 +591,13 @@ class CreateDocumentClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label)
                 )), 200)
+
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -865,7 +868,9 @@ class FetchUserProjects(Resource):
                     "name": project.name,
                     "type": project.project_type,
                     "created": project.created,
-                    "labels_per_datapoint": project.labels_per_datapoint
+                    "labels_per_datapoint": project.labels_per_datapoint,
+                    "finished": project.finished,
+                    "progress": project.get_progress()
                 }
             msg = "Retrieved user projects"
             status = 200
@@ -876,6 +881,25 @@ class FetchUserProjects(Resource):
         return make_response(jsonify({"msg": msg,
                                       "projects": user_projects}), status)
 
+class GetProjectProgress(Resource):
+    """
+    Endpoint for retrieving progress in a project
+    as a percentage.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+    
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        project = Project.query.get(args.project_id)
+
+        if not project: 
+            return make_response(jsonify({"message": "Invalid project id"}), 404)
+
+        return make_response(jsonify({"message": "Progress retrieved", "progress": project.get_progress()}), 200)
 
 class GetExportData(Resource):
     """
@@ -982,6 +1006,7 @@ rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
 rest.add_resource(FetchUserInfo, '/get-user-info')
 rest.add_resource(FetchUsers, '/get-users')
+rest.add_resource(GetProjectProgress, '/get-project-progress')
 rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")

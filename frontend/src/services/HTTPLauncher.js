@@ -159,6 +159,14 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to get a projects progress
+  static sendGetProjectProgress(projectID) {
+    return axios.get('get-project-progress', {
+      headers: authHeader(),
+      params: { project_id: projectID },
+    });
+  }
+
   /* Send HTTP-request to add one or more text data points to an existing project.
 
     Below is the expected structure of JSONFile's content for the different project types:
