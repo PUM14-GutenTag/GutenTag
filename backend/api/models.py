@@ -470,6 +470,7 @@ class Label(db.Model):
         "polymorphic_on": project_type
     }
 
+
 class DocumentClassificationLabel(Label):
     """
     Label child for document classification projects.
