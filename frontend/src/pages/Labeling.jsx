@@ -54,13 +54,12 @@ const Labeling = ({ location }) => {
     return 'large-text';
   };
 
-  // Generates random light color
-  const generateRandomColor = () => {
-    const green = Math.floor(Math.random() * (256 - 175 + 1) + 175);
-    const blue = Math.floor(Math.random() * (256 - 175 + 1) + 175);
-    const red = Math.floor(Math.random() * (256 - 175 + 1) + 175);
-    return `rgb(${red}, ${green}, ${blue})`;
-  };
+  // Generates a random color HSL colors
+  const generateRandomColor = () => {  
+    return "hsl(" + 360 * Math.random() + ',' +
+               (75 + 25 * Math.random()) + '%,' + 
+               (60 + 10 * Math.random()) + '%)'
+  }
 
   // Function which can be called through callbacks to remove label
   const deleteLabel = async (labelId) => {
@@ -71,7 +70,6 @@ const Labeling = ({ location }) => {
   // Get a list of new datapoints from database, runs when entering a project
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
-    console.log(response);
     setListOfDataPoints(response.data.list);
     setIndex(response.data.index);
     getSetLabels(response.data.list);
@@ -135,7 +133,7 @@ const Labeling = ({ location }) => {
     }
   };
 
-  // select what project type showed be displayed bases on project type
+  // select what project type should be displayed bases on project type
   const selectProjectComponent = (typeOfProject) => {
     if (
       listOfDataPoints.length > 0 &&
@@ -181,8 +179,8 @@ const Labeling = ({ location }) => {
     return <></>;
   };
 
+  // Choose for which project types label suggestions should appear
   const suggestionLabels = (typeOfProject) => {
-    /* Choose for which project types label suggestions should appear */
     // Seq to Seq should not display suggestions
     if (typeOfProject !== 3) {
       return <hr className="hr-title" data-content="Suggestions" />;

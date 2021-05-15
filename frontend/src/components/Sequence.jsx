@@ -21,7 +21,7 @@ const Sequence = ({
   const addLabel = async (event) => {
     /* Adds a sequnece label and resets values in input and selection box */
     event.preventDefault();
-    if (inputRef.current.value !== '') {
+    if (inputRef.current.value !== '' && selection !== '') {
       await HTTPLauncher.sendCreateSequenceLabel(
         dataPointId,
         inputRef.current.value,
@@ -62,29 +62,35 @@ const Sequence = ({
     Function handeling selection event listener. Makes sure 
     only text data and complete unlabeled words can be selected.
     */
-
     const selectedText = window.getSelection();
     if (
       selectedText !== undefined &&
       selectedText.anchorNode !== null &&
       selectedText.toString() !== '' &&
       selectedText.toString() !== ' '
-    ) {
-      const currentlySelected = selectedText.toString();
-      const tempWordList = currentlySelected.split(' ');
-
-      // check that selection includes only complete words
+      ) {
+        const currentlySelected = selectedText.toString();
+        const tempWordList = currentlySelected.split(' ');
+      //remove potential spaces before and after selected word or words
+      if (tempWordList[0]===""){
+        tempWordList.shift();
+      }
+      if (tempWordList[tempWordList.length - 1]===""){
+        tempWordList.pop();
+      }  
+      // check that selection includes only complete words from text data
       if (
         wordList.includes(tempWordList[0]) &&
         wordList.includes(tempWordList[tempWordList.length - 1]) &&
         selectedText.anchorNode.parentNode.id === 'text-box-container'
       ) {
+        // check if selected text already labeled
         const result = findStartEndIndex(tempWordList[0], tempWordList[tempWordList.length - 1]);
         let unlabeledText = true;
         labels.forEach((label) => {
           if (
-            (result.start >= label.begin && result.start < label.end) ||
-            (result.end <= label.end && result.end > label.begin)
+            (result.start <= label.begin && result.end >= label.begin) ||
+            (result.start <= label.end && result.end >= label.end)
           ) {
             unlabeledText = false;
           }
@@ -94,6 +100,12 @@ const Sequence = ({
           setStartIndex(result.start);
           setEndIndex(result.end);
         }
+        else{
+          setSelection("");
+        }
+      }
+      else {
+        setSelection("");
       }
     }
   };
@@ -108,8 +120,7 @@ const Sequence = ({
     labels.forEach((label) => {
       // only complete words can be labeled therefore end index does not need to be checked
       if (label.begin <= startingIndex && label.end > startingIndex) {
-        // TODO: should add check of data id to determine specific color in the future
-        highLightColor = label.color; // NOTE: this is only temporary and should be REMOVED
+        highLightColor = label.color;
       }
     });
     return highLightColor;
@@ -123,7 +134,7 @@ const Sequence = ({
       /\w+/g,
       (p1, p2) => `<span id="text-box-container" style="color: ${highLightWord(p2)}"}>${p1}</span>`
     );
-    return <div dangerouslySetInnerHTML={{ __html: textInSpans }} />;
+    return <div id="text-box-container" dangerouslySetInnerHTML={{ __html: textInSpans }} />;
   };
 
   useEffect(() => {
