@@ -89,7 +89,7 @@ const Sequence = ({
       const currentlySelected = selectedText.toString();
       const tempWordList = currentlySelected.split(' ');
 
-      //remove potential spaces before and after selected word or words
+      // remove potential spaces before and after selected word or words
       if (tempWordList[0] === '') {
         tempWordList.shift();
       }
