@@ -183,7 +183,8 @@ def test_sequence_label():
     color = "#3A6FE8"
 
     # Test label valid data.
-    for lab in [(0, 3, "PER", color), (16, 27, "LOC", color), (31, 41, "LOC", color)]:
+    for lab in [(0, 3, "PER", color), (16, 27, "LOC", color),
+                (31, 41, "LOC", color)]:
         label = try_add(SequenceLabel(
             data.id, user.id, lab[2], lab[0], lab[1], lab[3]))
         assert label is not None
