@@ -57,11 +57,17 @@ const Labeling = ({ location }) => {
   };
 
   // Generates a random color HSL colors
-  const generateRandomColor = () => {  
-    return "hsl(" + 360 * Math.random() + ',' +
-               (75 + 25 * Math.random()) + '%,' + 
-               (50 + 15 * Math.random()) + '%)'
-  }
+  const generateRandomColor = () => {
+    return (
+      'hsl(' +
+      360 * Math.random() +
+      ',' +
+      (75 + 25 * Math.random()) +
+      '%,' +
+      (50 + 15 * Math.random()) +
+      '%)'
+    );
+  };
 
   // Function which can be called through callbacks to remove label
   const deleteLabel = async (labelId) => {
@@ -72,7 +78,6 @@ const Labeling = ({ location }) => {
   // Get a list of new datapoints from database, runs when entering a project
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
-    console.log("response: ", response);
     setListOfDataPoints(response.data.list);
     setIndex(response.data.index);
     getSetLabels(response.data.list);

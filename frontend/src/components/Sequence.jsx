@@ -60,7 +60,7 @@ const Sequence = ({
     return { start: tempStartIndex, end: tempEndIndex };
   };
 
-  // Check if selection contains labeled data 
+  // Check if selection contains labeled data
   const containsLabel = (selectionIndexes) => {
     let unlabeledText = true;
     labels.forEach((label) => {
@@ -71,8 +71,8 @@ const Sequence = ({
         unlabeledText = false;
       }
     });
-    return unlabeledText;   
-  }
+    return unlabeledText;
+  };
 
   /* 
   Function handeling selection event listener. Makes sure 
@@ -85,42 +85,43 @@ const Sequence = ({
       selectedText.anchorNode !== null &&
       selectedText.toString() !== '' &&
       selectedText.toString() !== ' '
-      ) {
-        const currentlySelected = selectedText.toString();
-        const tempWordList = currentlySelected.split(' ');
+    ) {
+      const currentlySelected = selectedText.toString();
+      const tempWordList = currentlySelected.split(' ');
 
       //remove potential spaces before and after selected word or words
-      if (tempWordList[0]===""){
+      if (tempWordList[0] === '') {
         tempWordList.shift();
       }
-      if (tempWordList[tempWordList.length - 1]===""){
+      if (tempWordList[tempWordList.length - 1] === '') {
         tempWordList.pop();
-      }  
+      }
       // check that selection includes only complete words from text data
       if (
         wordList.includes(tempWordList[0]) &&
         wordList.includes(tempWordList[tempWordList.length - 1]) &&
         selectedText.anchorNode.parentNode.id === 'text-box-container'
       ) {
-        const selectionIndexes = findStartEndIndex(tempWordList[0], tempWordList[tempWordList.length - 1]);
-        const result = containsLabel(selectionIndexes, selectedText)
+        const selectionIndexes = findStartEndIndex(
+          tempWordList[0],
+          tempWordList[tempWordList.length - 1]
+        );
+        const result = containsLabel(selectionIndexes, selectedText);
         if (result) {
           setSelection(selectedText.toString());
           setStartIndex(selectionIndexes.start);
           setEndIndex(selectionIndexes.end);
+        } else {
+          setSelection('');
         }
-        else{
-          setSelection("");
-        }
-      }
-      else {
-        setSelection("");
+      } else {
+        setSelection('');
       }
     }
   };
 
   // Highlightes word in if it has been labeled
-  const highLightWord = (startingIndex) => { 
+  const highLightWord = (startingIndex) => {
     let highLightColor = 'black';
 
     // check if word is labeled

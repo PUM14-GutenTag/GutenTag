@@ -38,7 +38,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels, generateRandomColor }) => {
       cropData[0],
       cropData[1],
       cropData[2],
-      cropData[3], 
+      cropData[3],
       generateRandomColor()
     );
     getSetLabels();
@@ -108,6 +108,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels, generateRandomColor }) => {
 ImageLabeling.propTypes = {
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
+  generateRandomColor: PropTypes.func.isRequired,
 };
 
 export default ImageLabeling;
