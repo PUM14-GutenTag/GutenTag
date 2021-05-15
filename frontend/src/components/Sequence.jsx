@@ -18,8 +18,8 @@ const Sequence = ({
   const [selection, setSelection] = useState('');
   const wordList = data.split(' ');
 
+  // Adds a sequnece label and resets values in input and selection box
   const addLabel = async (event) => {
-    /* Adds a sequnece label and resets values in input and selection box */
     event.preventDefault();
     if (inputRef.current.value !== '' && selection !== '') {
       await HTTPLauncher.sendCreateSequenceLabel(
@@ -36,7 +36,7 @@ const Sequence = ({
     setSelection('');
   };
 
-  // add all index of words before tempWord in wordList to get startIndex, add alla index of
+  // Add all index of words before tempWord in wordList to get startIndex, add alla index of
   const findStartEndIndex = (startWord, endWord) => {
     // index characters
     let tempStartIndex = 0;
@@ -57,11 +57,25 @@ const Sequence = ({
     return { start: tempStartIndex, end: tempEndIndex };
   };
 
+  // Check if selection contains labeled data 
+  const containsLabel = (selectionIndexes) => {
+    let unlabeledText = true;
+    labels.forEach((label) => {
+      if (
+        (selectionIndexes.start <= label.begin && selectionIndexes.end >= label.begin) ||
+        (selectionIndexes.start <= label.end && selectionIndexes.end >= label.end)
+      ) {
+        unlabeledText = false;
+      }
+    });
+    return unlabeledText;   
+  }
+
+  /* 
+  Function handeling selection event listener. Makes sure 
+  only text data and complete unlabeled words can be selected. 
+  */
   const handleSelection = () => {
-    /*
-    Function handeling selection event listener. Makes sure 
-    only text data and complete unlabeled words can be selected.
-    */
     const selectedText = window.getSelection();
     if (
       selectedText !== undefined &&
@@ -71,6 +85,7 @@ const Sequence = ({
       ) {
         const currentlySelected = selectedText.toString();
         const tempWordList = currentlySelected.split(' ');
+
       //remove potential spaces before and after selected word or words
       if (tempWordList[0]===""){
         tempWordList.shift();
@@ -84,21 +99,12 @@ const Sequence = ({
         wordList.includes(tempWordList[tempWordList.length - 1]) &&
         selectedText.anchorNode.parentNode.id === 'text-box-container'
       ) {
-        // check if selected text already labeled
-        const result = findStartEndIndex(tempWordList[0], tempWordList[tempWordList.length - 1]);
-        let unlabeledText = true;
-        labels.forEach((label) => {
-          if (
-            (result.start <= label.begin && result.end >= label.begin) ||
-            (result.start <= label.end && result.end >= label.end)
-          ) {
-            unlabeledText = false;
-          }
-        });
-        if (unlabeledText) {
+        const selectionIndexes = findStartEndIndex(tempWordList[0], tempWordList[tempWordList.length - 1]);
+        const result = containsLabel(selectionIndexes, selectedText)
+        if (result) {
           setSelection(selectedText.toString());
-          setStartIndex(result.start);
-          setEndIndex(result.end);
+          setStartIndex(selectionIndexes.start);
+          setEndIndex(selectionIndexes.end);
         }
         else{
           setSelection("");
@@ -110,10 +116,8 @@ const Sequence = ({
     }
   };
 
-  const highLightWord = (startingIndex) => {
-    /*
-    Highlightes word in if it has been labeled
-    */
+  // Highlightes word in if it has been labeled
+  const highLightWord = (startingIndex) => { 
     let highLightColor = 'black';
 
     // check if word is labeled
@@ -147,7 +151,6 @@ const Sequence = ({
 
   useEffect(() => {
     document.addEventListener('selectionchange', handleSelection);
-
     return () => {
       document.removeEventListener('selectionchange', handleSelection);
     };

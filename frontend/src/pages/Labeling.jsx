@@ -58,7 +58,7 @@ const Labeling = ({ location }) => {
   const generateRandomColor = () => {  
     return "hsl(" + 360 * Math.random() + ',' +
                (75 + 25 * Math.random()) + '%,' + 
-               (60 + 10 * Math.random()) + '%)'
+               (50 + 15 * Math.random()) + '%)'
   }
 
   // Function which can be called through callbacks to remove label
