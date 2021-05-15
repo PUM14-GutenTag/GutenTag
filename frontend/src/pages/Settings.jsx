@@ -25,6 +25,7 @@ const Settings = () => {
   // Sets the accesstoken to null and redirects to login page.
   const logout = () => {
     localStorage.setItem('gutentag-accesstoken', null);
+    localStorage.setItem('gutentag-refreshtoken', null);
     window.location.href = 'http://localhost:3000/';
   };
 
@@ -79,7 +80,7 @@ const Settings = () => {
       <Button className="dark" onClick={() => setPageShow(SettingPages.DEFAULT)}>
         Back
       </Button>
-      <CreateProject toggleCallback={toggleBack} />
+      <CreateProject />
     </div>,
     <div>
       <ManageUsers toggleCallback={toggleBack} />

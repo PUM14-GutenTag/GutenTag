@@ -425,6 +425,7 @@ class HTTPLauncher {
   static sendGetImageData(dataID) {
     return axios.get('get-image-data', {
       headers: authHeader(),
+      responseType: 'blob',
       params: { data_id: dataID },
     });
   }
