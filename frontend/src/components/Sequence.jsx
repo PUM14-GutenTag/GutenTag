@@ -177,9 +177,6 @@ const Sequence = ({
           Add new label
         </button>
       </div>
-      <p>
-        Selected Text: {selection}, Start index: {startIndex}, End index: {endIndex}
-      </p>
     </div>
   );
 };
