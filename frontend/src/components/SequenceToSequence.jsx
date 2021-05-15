@@ -6,7 +6,7 @@ import '../css/DocumentClassification.css';
 import '../css/SequenceToSequence.css';
 
 /* 
-Component that shows the specifics for document classification 
+Component that shows the specifics for sequence to sequence labeling 
 */
 const SequenceToSequence = ({
   data,

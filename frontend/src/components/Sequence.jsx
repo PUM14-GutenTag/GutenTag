@@ -4,6 +4,9 @@ import Form from 'react-bootstrap/Form';
 import '../css/Sequence.css';
 import HTTPLauncher from '../services/HTTPLauncher';
 
+/* 
+Component that shows the specifics for sequence labeling 
+*/
 const Sequence = ({
   data,
   dataPointId,
@@ -36,7 +39,7 @@ const Sequence = ({
     setSelection('');
   };
 
-  // Add all index of words before tempWord in wordList to get startIndex, add alla index of
+  // Find start index of start word in text data and end index of end word in text data
   const findStartEndIndex = (startWord, endWord) => {
     // index characters
     let tempStartIndex = 0;

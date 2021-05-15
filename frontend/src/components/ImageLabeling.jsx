@@ -9,7 +9,7 @@ import HTTPLauncher from '../services/HTTPLauncher';
 /*
 Component that shows a image, you are able to crop the img with a label
 */
-const ImageLabeling = ({ dataPointId, getSetLabels }) => {
+const ImageLabeling = ({ dataPointId, getSetLabels, generateRandomColor }) => {
   const inputRef = useRef();
   const cropperRef = useRef();
 
@@ -38,7 +38,8 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
       cropData[0],
       cropData[1],
       cropData[2],
-      cropData[3]
+      cropData[3], 
+      generateRandomColor()
     );
     getSetLabels();
     inputRef.current.value = '';

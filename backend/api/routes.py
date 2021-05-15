@@ -423,6 +423,7 @@ class AddNewImageData(Resource):
                 msg = "Data added."
                 status = 200
             except Exception as e:
+                print("except")
                 msg = f"Could not add data: {e}"
                 status = 404
 

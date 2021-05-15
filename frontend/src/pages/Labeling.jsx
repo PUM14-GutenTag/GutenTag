@@ -72,6 +72,7 @@ const Labeling = ({ location }) => {
   // Get a list of new datapoints from database, runs when entering a project
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
+    console.log("response: ", response);
     setListOfDataPoints(response.data.list);
     setIndex(response.data.index);
     getSetLabels(response.data.list);
@@ -153,7 +154,7 @@ const Labeling = ({ location }) => {
           />
         );
       }
-      if (typeOfProject === 2) {
+      if (typeOfProject === ProjectType.SEQUENCE_LABELING) {
         return (
           <Sequence
             data={listOfDataPoints[CURRENT_DATA].data}
@@ -170,10 +171,11 @@ const Labeling = ({ location }) => {
           <ImageLabeling
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            generateRandomColor={generateRandomColor}
           />
         );
       }
-      if (typeOfProject === ProjectType.SEQUENCE_LABELING) {
+      if (typeOfProject === ProjectType.SEQUENCE_TO_SEQUENCE) {
         return (
           <SequenceToSequence
             data={listOfDataPoints[CURRENT_DATA].data}
