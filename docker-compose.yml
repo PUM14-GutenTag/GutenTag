@@ -4,37 +4,17 @@ version: "3.8"
 services:
   db:
     image: postgres:13.2-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    env_file:
-      - ./.env.dev
 
   backend:
     build:
       context: ./backend
-    volumes:
-      - ./backend:/usr/src/backend
-      - ./test_resources:/usr/src/backend/Test/res
     depends_on:
       - db
     ports:
-      - "5000:5000"
-    restart: unless-stopped
-    env_file:
-      - ./.env.dev
+      - 5000:5000
 
   frontend:
     build:
       context: ./frontend
-    volumes:
-      - ./frontend/src:/usr/src/frontend/src
-      - ./test_resources:/usr/src/frontend/src/tests/res
     ports:
-      - "3000:3000"
-    restart: unless-stopped
-    env_file:
-      - ./.env.dev
-
-volumes:
-  postgres_data:
+      - 3000:3000

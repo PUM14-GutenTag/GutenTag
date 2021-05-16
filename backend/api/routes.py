@@ -8,7 +8,7 @@ from flask_jwt_extended import (
 )
 from enum import IntEnum
 from werkzeug.utils import secure_filename
-from api import rest
+from api import rest, IS_DEV_MODE
 from api.models import (
     AccessLevel,
     Project,
@@ -952,4 +952,6 @@ rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")
-rest.add_resource(Reset, "/reset")
+
+if IS_DEV_MODE:
+    rest.add_resource(Reset, "/reset")

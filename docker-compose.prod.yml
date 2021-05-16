@@ -1,0 +1,25 @@
+# Override file for production use.
+# Based on docker-compose.yml but overrides specific settings.
+version: "3.8"
+
+services:
+  db:
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    restart: always
+    env_file:
+      - ./.env.prod
+
+  backend:
+    command: gunicorn --bind 0.0.0.0:5000 run:app
+    restart: always
+    env_file:
+      - ./.env.prod
+
+  frontend:
+    restart: always
+    env_file:
+      - ./.env.prod
+
+volumes:
+  postgres_data_prod:

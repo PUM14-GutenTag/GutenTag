@@ -6,8 +6,8 @@ while ! nc -z $SQL_HOST $SQL_PORT; do
   sleep 0.1
 done
 
-echo "Database started."
+echo "Database started"
 
-python run.py
+python run.py create_db
 
 exec "$@"
