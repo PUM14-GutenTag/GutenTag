@@ -12,6 +12,8 @@ services:
 
   backend:
     command: python run.py run -h 0.0.0.0 -p 5000
+    ports:
+      - 5000:5000
     volumes:
       - ./backend:/usr/src/backend
       - ./test_resources:/usr/src/backend/Test/res
@@ -20,6 +22,8 @@ services:
       - ./.env.dev
 
   frontend:
+    ports:
+      - 3000:3000
     volumes:
       - ./frontend/src:/usr/src/frontend/src
       - ./test_resources:/usr/src/frontend/src/tests/res
