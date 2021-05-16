@@ -1,3 +1,4 @@
+# Main Compose file.
 version: "3.8"
 
 services:
@@ -5,10 +6,9 @@ services:
     image: postgres:13.2-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: gutentag
+    restart: unless-stopped
+    env_file:
+      - ./.env.dev
 
   backend:
     build:
@@ -20,27 +20,21 @@ services:
       - db
     ports:
       - "5000:5000"
-    environment:
-      PYTHONDONTWRITEBYTECODE: 1
-      PYTHONUNBUFFERED: 1
-      FLASK_ENV: development
-      DATABASE_URL: postgresql://admin:admin@db:5432/gutentag
+    restart: unless-stopped
+    env_file:
+      - ./.env.dev
 
   frontend:
     build:
       context: ./frontend
-    #stdin_open: true # docker run -i
-    #tty: true # docker run -t
     volumes:
       - ./frontend/src:/usr/src/frontend/src
       - ./test_resources:/usr/src/frontend/src/tests/res
-      # - /usr/src/frontend/node_modules
-    depends_on:
-      - backend
     ports:
       - "3000:3000"
-    environment:
-      CHOKIDAR_USEPOLLING: "true" # Enable hot reloading
+    restart: unless-stopped
+    env_file:
+      - ./.env.dev
 
 volumes:
   postgres_data:
