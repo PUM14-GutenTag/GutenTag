@@ -12,6 +12,7 @@ export const textBoxSize = (data) => {
     return '30px';
   } else if (lengthOfData < 300) {
     return '20px';
+  } else {
+    return '15px';
   }
-  return '15px';
 };
