@@ -295,7 +295,10 @@ class Project(db.Model):
             data = data_points[index + LIST_SIDE_LENGTH]
             data_point = {}
             data_point["id"] = data.id
-            data_point["data"] = data.text_data
+            if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
+                data_point["data"] = data.file_name
+            else:
+                data_point["data"] = data.text_data
             next_data = data_point
         except IndexError:
             next_data = {}
@@ -312,7 +315,10 @@ class Project(db.Model):
             data = data_points[index - LIST_SIDE_LENGTH]
             data_point = {}
             data_point["id"] = data.id
-            data_point["data"] = data.text_data
+            if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
+                data_point["data"] = data.file_name
+            else:
+                data_point["data"] = data.text_data
             earlier_data = data_point
         else:
             earlier_data = {}
