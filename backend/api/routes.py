@@ -912,9 +912,14 @@ class GetProjectProgress(Resource):
         project = Project.query.get(args.project_id)
 
         if not project:
-            return make_response(jsonify({"message": "Invalid project id"}), 404)
+            return make_response(
+                jsonify({"message": "Invalid project id"}), 404)
 
-        return make_response(jsonify({"message": "Progress retrieved", "progress": project.get_progress()}), 200)
+        return make_response(
+            jsonify({
+                "message": "Progress retrieved",
+                "progress": project.get_progress()
+            }), 200)
 
 
 class GetExportData(Resource):
@@ -929,7 +934,7 @@ class GetExportData(Resource):
                                    required=False,
                                    action="append")
 
-    @jwt_required()
+    @ jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())

@@ -227,12 +227,15 @@ class Project(db.Model):
 
         for data in self.data:
             for label in data.labels:
-                # Progress is made when a user labels a datapoint it has not already labeled
-                if (label.user_id, data.id) not in users and not label.is_prelabel:
+                # Progress is made when a user labels
+                # a datapoint it has not already labeled
+                if (label.user_id,
+                        data.id) not in users and not label.is_prelabel:
                     users.append((label.user_id, data.id))
 
         if len(self.data) * self.labels_per_datapoint != 0:
-            return (len(users)/(len(self.data) * self.labels_per_datapoint)) * CONVERT_TO_PERCENTAGE
+            return (len(users)/(len(self.data) * self.labels_per_datapoint)) \
+                * CONVERT_TO_PERCENTAGE
         else:
             return 0
 
