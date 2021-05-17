@@ -101,6 +101,7 @@ class HTTPLauncher {
     );
   }
 
+  // Send HTTP-request to create a new default label.
   static sendCreateDefaultLabel(labelName, projectID) {
     return axios.post(
       'create-default-label',

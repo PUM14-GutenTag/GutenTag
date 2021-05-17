@@ -8,22 +8,26 @@ import { Trash } from 'react-bootstrap-icons';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 
+// Component for making and removing default labels.
 const ManageDefaultLabels = ({ projectID }) => {
   const [label, setLabel] = useState('');
   const [labels, setLabels] = useState([]);
 
+  // Fetch all default labels.
   const fetchDefaultLabels = async () => {
     const result = await HTTPLauncher.sendGetDefaultLabel(projectID);
     const list = Object.keys(result.data).map((key) => result.data[key].name);
     setLabels(list);
   };
 
+  // Adds new default label.
   const submitHandler = async (event) => {
     event.preventDefault();
     await HTTPLauncher.sendCreateDefaultLabel(label, projectID);
     fetchDefaultLabels();
   };
 
+  // Removes a default label.
   const removeLabel = async (labelName) => {
     await HTTPLauncher.sendDeleteDefaultLabel(projectID, labelName);
     fetchDefaultLabels();
