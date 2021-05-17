@@ -102,10 +102,6 @@ button.red:not(:disabled):not(.disabled):active:focus {
   margin-bottom: 0em;
 }
 
-.red-text {
-  color: #f52882;
-}
-
 #button-margin {
   margin-left: 0px;
   margin-right: 2em;
