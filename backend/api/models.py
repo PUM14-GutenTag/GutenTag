@@ -3,12 +3,15 @@ This file contains all database models and associated methods.
 """
 import datetime
 import io
+from math import ceil
 from enum import IntEnum
 from api import db
 from api.database_handler import check_types
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
+
+
 LIST_SIDE_LENGTH = 5
 LIST_LENGTH = 2 * LIST_SIDE_LENGTH + 1
 
@@ -67,6 +70,10 @@ class User(db.Model):
 
     projects = db.relationship(
         "Project", secondary=access_control, back_populates="users")
+    statistics = db.relationship(
+        "Statistic", cascade="all, delete", passive_deletes=True)
+    achievements = db.relationship(
+        "Achievement", cascade="all, delete", passive_deletes=True)
 
     def __init__(self, first_name, last_name, email, password, isAdmin=False):
         check_types([(first_name, str), (last_name, str), (email, str),
@@ -122,6 +129,12 @@ class User(db.Model):
             refresh_token = create_refresh_token(identity=self.email)
             return (access_token, refresh_token)
         return None
+
+    def is_admin(self):
+        """
+        Returns True if user is admin, otherwise False.
+        """
+        return self.access_level >= AccessLevel.ADMIN
 
     def authorize(self, project_id):
         """
@@ -329,6 +342,12 @@ class ProjectData(db.Model):
         "polymorphic_identity": "base",
         "polymorphic_on": type
     }
+
+    def has_labeled(self, user_id):
+        """
+        Return True if user has labeled the data before, otherwise False.
+        """
+        return sum(1 for label in self.labels if label.user_id == user_id) > 0
 
 
 class ProjectTextData(ProjectData):
@@ -585,3 +604,110 @@ class ImageClassificationLabel(Label):
                 }
             }
         }
+
+
+class Login(db.Model):
+    """
+    Keeps track of the datetime of all user logins.
+    """
+    __tablename__ = "login"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id', ondelete="CASCADE"))
+    time = db.Column(db.DateTime, nullable=False,
+                     default=datetime.datetime.now())
+
+
+class Statistic(db.Model):
+    """
+    Keeps track of statisics of each user which can be displayed on their page
+    or used to track achievement progress.
+    """
+    __tablename__ = "statistic"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id', ondelete="CASCADE"))
+    occurrences = db.Column(db.Integer, default=0, nullable=False)
+
+    def format_json(self):
+        return {
+            "name": self.name,
+            "occurrences": self.occurrences,
+            "ranking": self.user_ranking()
+        }
+
+    def user_ranking(self):
+        """
+        Returns the user's statistic ranking compared to all other users.
+        That is, how the user's occurrences compare to other users.
+        """
+        stats = self.query.filter_by(name=self.name).all()
+        # Get all stats that have more occurrances
+        more_occurrences = [
+            stat.occurrences for stat in stats
+            if stat.occurrences > self.occurrences
+        ]
+        # Remove duplicates
+        unique_more_occurrences = list(dict.fromkeys(more_occurrences))
+
+        ranking = len(unique_more_occurrences) + 1
+        if ranking == 1:
+            return "Top 1"
+        else:
+            # Ceil ranking to nearest 5.
+            return f"Top {5 * ceil(ranking/5)}"
+
+    def __repr__(self):
+        return (
+            f"<Statistic(id={self.id}, name={self.name}, "
+            f"occurrences={self.occurrences}, user_id={self.user_id})>"
+        )
+
+
+class Achievement(db.Model):
+    """
+    Contains the achievements earned by all users.
+    """
+    __tablename__ = "achievement"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id', ondelete="CASCADE"))
+    name = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)
+    earned = db.Column(db.DateTime)
+    has_notified = db.Column(db.Boolean, nullable=False, default=False)
+
+    def format_json(self):
+        if self.earned is None:
+            earned = None
+        else:
+            earned = self.earned.strftime("%d %B %Y")
+        return {
+            "name": self.name,
+            "description": self.description,
+            "earned": earned
+        }
+
+    @staticmethod
+    def get_unnotified(user_id):
+        achieve_list = Achievement.query.filter(
+            Achievement.user_id == user_id,
+            Achievement.earned.isnot(None),
+            Achievement.has_notified.is_(False)
+        ).all()
+        for achieve in achieve_list:
+            achieve.has_notified = True
+        db.session.commit()
+
+        return [achieve.format_json() for achieve in achieve_list]
+
+    def __repr__(self):
+        return (
+            f"<Achievement(id={self.id}, name={self.name}, "
+            f"description={self.description}, earned={self.earned}, "
+            f"has_notified={self.has_notified}, user_id={self.user_id})>"
+        )

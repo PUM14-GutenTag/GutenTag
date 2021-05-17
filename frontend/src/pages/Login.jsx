@@ -34,9 +34,7 @@ function Login() {
     event.preventDefault();
 
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
-    if (responseLogin.status === 200) {
-      const { access_token: accessToken, refresh_token: refreshToken } = responseLogin.data;
-      userAuth.setTokens(accessToken, refreshToken);
+    if (responseLogin.data !== undefined) {
       history.push('/home');
     } else if (responseLogin.response.status === 404) {
       setValidEmail(false);

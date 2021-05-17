@@ -116,7 +116,25 @@ const Labeling = ({ location }) => {
     }
   };
 
-  // select what project type should be displayed bases on project type
+
+  const handleUserKeyPress = (e) => {
+    const { key } = e;
+    if (key === 'ArrowRight') {
+      nextData();
+    } else if (key === 'ArrowLeft') {
+      getLastData();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleUserKeyPress);
+
+    return () => {
+      window.removeEventListener('keydown', handleUserKeyPress);
+    };
+  }, [listOfDataPoints]);
+
+  // select what project type showed be displayed bases on project type
   const selectProjectComponent = (typeOfProject) => {
     if (
       listOfDataPoints.length > 0 &&

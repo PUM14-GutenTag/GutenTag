@@ -4,9 +4,13 @@ const hasAccessToken = () => {
   return token !== 'null' && token !== null;
 };
 
-// Store access and refresh tokens in localStorage.
-const setTokens = (accessToken, refreshToken) => {
+// Store access in localStorage.
+const setAccessToken = (accessToken) => {
   localStorage.setItem('gutentag-accesstoken', accessToken);
+};
+
+// Store refresh token in localStorage.
+const setRefreshToken = (refreshToken) => {
   localStorage.setItem('gutentag-refreshtoken', refreshToken);
 };
 
@@ -18,7 +22,8 @@ const clearTokens = () => {
 
 const userAuth = {
   hasAccessToken,
-  setTokens,
+  setAccessToken,
+  setRefreshToken,
   clearTokens,
 };
 

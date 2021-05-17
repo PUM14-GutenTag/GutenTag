@@ -102,10 +102,6 @@ button.red:not(:disabled):not(.disabled):active:focus {
   margin-bottom: 0em;
 }
 
-.red-text {
-  color: #f52882;
-}
-
 #button-margin {
   margin-left: 0px;
   margin-right: 2em;
@@ -120,6 +116,22 @@ svg.remove {
   width: 1.1em;
   height: 1.1em;
   margin-right: 0.2em;
+}
+
+.main-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-container {
+  height: 100%;
+  width: 100%;
+}
+
+.main-col > h2 {
+  margin-top: 1.75rem;
 }
 
 /* Create Project & User Form */

@@ -690,3 +690,110 @@ describe('sendGetExportData', () => {
     expect(response.status).toBe(200);
   });
 });
+
+describe('sendGetUnnotifiedAchievements', () => {
+  test('Project multiple achievement', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    // Notify achievements unrelated to the test (logins, first upload, etc.).
+    await HTTPLauncher.sendGetUnnotifiedAchievements();
+
+    const promises = [];
+    for (let i = 0; i < 5; i += 1) {
+      promises.push(testUtil.createProject(1, `Project ${i}`));
+    }
+    await Promise.all(promises);
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    // Expecting Creator Bronze III and Bronze II achievements for 1 and 5 labels.
+    expect(response.status).toBe(200);
+    expect(response.data.length).toBe(2);
+  });
+
+  test('Importer achievement', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1, 'Document');
+    // Notify achievements unrelated to the test (logins, etc.).
+    await HTTPLauncher.sendGetUnnotifiedAchievements();
+
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
+    );
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    // Expecting 'Importer' achievement.
+    expect(response.status).toBe(200);
+    expect(response.data.length).toBe(1);
+  });
+
+  test('Exporter achievement', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1, 'Document');
+
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
+    );
+    // Notify achievements unrelated to the test (logins, etc.).
+    await HTTPLauncher.sendGetUnnotifiedAchievements();
+
+    await HTTPLauncher.sendGetExportData(projectID);
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    // Expecting 'Exporter' achievement.
+    expect(response.status).toBe(200);
+    expect(response.data.length).toBe(1);
+  });
+
+  test('Labeling single achievement', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1, 'Document');
+
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
+    );
+    // Notify achievements unrelated to the test (logins, first upload, etc.).
+    await HTTPLauncher.sendGetUnnotifiedAchievements();
+
+    await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'label 0');
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    // Expecting Labeling Bronze III achievement.
+    expect(response.status).toBe(200);
+    expect(response.data.length).toBe(1);
+  });
+
+  test('Labeling multiple achievement', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1, 'Document');
+
+    await HTTPLauncher.sendAddNewTextData(
+      projectID,
+      testUtil.getTextFile(textDir, 'input_document_classification.json')
+    );
+    // Notify achievements unrelated to the test (logins, first upload, etc.).
+    await HTTPLauncher.sendGetUnnotifiedAchievements();
+
+    const promises = [];
+    for (let i = 0; i < 5; i += 1) {
+      promises.push(HTTPLauncher.sendCreateDocumentClassificationLabel(1, `label ${i}`));
+    }
+    await Promise.all(promises);
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    // Expecting Labeling Bronze III and Bronze II achievements for 1 and 5 labels.
+    expect(response.status).toBe(200);
+    expect(response.data.length).toBe(2);
+  });
+
+  test('Login first time achievement', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+
+    const response = await HTTPLauncher.sendGetUnnotifiedAchievements();
+    // Expecting 'First time' achievement.
+    expect(response.status).toBe(200);
+    expect(response.data.length).toBe(1);
+  });
+});
