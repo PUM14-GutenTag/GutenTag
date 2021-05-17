@@ -31,6 +31,12 @@ const Labeling = ({ location }) => {
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
   const type = projectType;
   const projectId = id;
+  // fetch progress
+  const fetchProgress = async () => {
+    const response = await HTTPLauncher.sendGetProjectProgress(id);
+    setProgressProject(response.data.progress);
+  };
+
   // fetch all labels for a given datapoint
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
@@ -40,14 +46,9 @@ const Labeling = ({ location }) => {
       } else {
         setLabels([]);
       }
+      fetchProgress();
     }
   };
-
-  // fetch progress
-  useEffect(async () => {
-    const response = await HTTPLauncher.sendGetProjectProgress(id);
-    setProgressProject(response.data.progress);
-  });
 
   // Choose size of the text to use depending on the length of the text
   const textBoxSize = () => {
@@ -188,8 +189,11 @@ const Labeling = ({ location }) => {
     return <></>;
   };
   const finishedLabel = () => {
-    if (progressInvidual === 100) {
-      return <FinishedPopUp />;
+    if (progressInvidual === 100 && progressProject !== 100) {
+      return <FinishedPopUp value={false} />;
+    }
+    if (progressProject === 100) {
+      return <FinishedPopUp value />;
     }
     return <ProgressBar striped variant="success" now={progressInvidual} />;
   };

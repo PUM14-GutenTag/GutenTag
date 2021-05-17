@@ -253,7 +253,8 @@ class NewProject(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_name", type=str, required=True)
         self.reqparse.add_argument("project_type", type=int, required=True)
-        self.reqparse.add_argument("labels_per_datapoint", type=int, required=True)
+        self.reqparse.add_argument(
+            "labels_per_datapoint", type=int, required=True)
 
     @jwt_required()
     def post(self):
@@ -264,7 +265,7 @@ class NewProject(Resource):
             try:
                 return make_response(jsonify(try_add_response(
                     Project(args.project_name, args.project_type,
-                     args.labels_per_datapoint)
+                            args.labels_per_datapoint)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create project: {e}"
@@ -314,8 +315,8 @@ class ChangeLabelsPerDatapoint(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-        self.reqparse.add_argument("labels_per_datapoint", type=int, required=True)
-
+        self.reqparse.add_argument(
+            "labels_per_datapoint", type=int, required=True)
 
     @jwt_required()
     def post(self):
@@ -324,7 +325,7 @@ class ChangeLabelsPerDatapoint(Resource):
         project = Project.query.get(args.project_id)
         status = 401
         msg = "You are not authorized to change this parameter"
-            
+
         if user.access_level >= AccessLevel.ADMIN:
             project.set_labels_per_datapoint(args.labels_per_datapoint)
             status = 200
@@ -333,6 +334,7 @@ class ChangeLabelsPerDatapoint(Resource):
         project.check_finished()
 
         return make_response(jsonify({"message": msg}), status)
+
 
 class RemoveUser(Resource):
     """
@@ -631,9 +633,12 @@ class CreateSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
                                   args.begin, args.end))), 200)
+
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -666,10 +671,13 @@ class CreateSequenceToSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
                         args.data_id, user.id, args.label)
                 )), 200)
+
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -706,11 +714,14 @@ class CreateImageClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,
                         (args.x1, args.y1), (args.x2, args.y2))
                 )), 200)
+
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -743,7 +754,11 @@ class DeleteLabel(Resource):
         if (label.user_id == user.id
                 or (user.access_level >= AccessLevel.ADMIN)):
             try:
-                return make_response(jsonify(try_delete_response(label)), 200)
+                response = make_response(
+                    jsonify(try_delete_response(label)), 200)
+                data = ProjectData.query.get(label.data_id)
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not remove label: {e}"
                 status = 404
@@ -880,6 +895,7 @@ class FetchUserProjects(Resource):
         return make_response(jsonify({"msg": msg,
                                       "projects": user_projects}), status)
 
+
 class GetProjectProgress(Resource):
     """
     Endpoint for retrieving progress in a project
@@ -889,16 +905,17 @@ class GetProjectProgress(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_id", type=int, required=True)
-    
+
     @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         project = Project.query.get(args.project_id)
 
-        if not project: 
+        if not project:
             return make_response(jsonify({"message": "Invalid project id"}), 404)
 
         return make_response(jsonify({"message": "Progress retrieved", "progress": project.get_progress()}), 200)
+
 
 class GetExportData(Resource):
     """

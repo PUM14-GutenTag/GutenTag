@@ -250,14 +250,15 @@ class Project(db.Model):
 
         # find earliest none labeled data point
         for data in project_data:
-            if not found_labeled:
-                break
-            found_labeled = False
-            for label in data.labels:
-                if(user_id == label.user_id):
-                    found_labeled = True
-                    index += 1
+            if not data.finished:
+                if not found_labeled:
                     break
+                found_labeled = False
+                for label in data.labels:
+                    if(user_id == label.user_id):
+                        found_labeled = True
+                        index += 1
+                        break
 
         # Check if all data points are labeled by user
         if index == len(project_data):
@@ -378,6 +379,8 @@ class ProjectData(db.Model):
     def check_finished(self):
         users = []
         project = Project.query.get(self.project_id)
+        print("----------------------------------------")
+        print("TEST THIS:", project, self.project)
 
         for label in self.labels:
             if label.user_id not in users and not label.is_prelabel:
