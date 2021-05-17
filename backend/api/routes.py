@@ -56,6 +56,11 @@ class GetDataType(IntEnum):
     GET_EARLIER_VALUE = -1
 
 
+class Index(Resource):
+    def get(self):
+        return jsonify({"message": "index"})
+
+
 class CreateUser(Resource):
     """
     Endpoint for creating a user.
@@ -927,6 +932,7 @@ class Reset(Resource):
         try_add(admin)
 
 
+rest.add_resource(Index, "/")
 rest.add_resource(CreateUser, "/create-user")
 rest.add_resource(Login, "/login")
 rest.add_resource(ChangePassword, "/change-password")
