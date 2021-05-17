@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import HTTPLauncher from '../services/HTTPLauncher';
@@ -7,7 +7,14 @@ import '../css/DocumentClassification.css';
 /*
 Component that shows the specifics for document classification
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize, label, setLabel }) => {
+const DocumentClassification = ({
+  data,
+  dataPointId,
+  getSetLabels,
+  textBoxSize,
+  label,
+  setLabel,
+}) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */

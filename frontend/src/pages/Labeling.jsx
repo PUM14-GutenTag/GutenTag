@@ -13,7 +13,7 @@ import '../css/Labeling.css';
 import Layout from '../components/Layout';
 import Label from '../components/Label';
 import ProjectType from '../ProjectType';
-import DefaultLabels from '../components/DefaultLabels'
+import DefaultLabels from '../components/DefaultLabels';
 
 /*
 Labeling-page handles labeling functionality
