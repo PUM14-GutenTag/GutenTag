@@ -102,7 +102,8 @@ def import_text_data(project_id, json_data):
             elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
                 label_list += [
                     SequenceToSequenceLabel(data.id, None, lab,
-                                            generate_random_color(), is_prelabel=True)
+                                            generate_random_color(),
+                                            is_prelabel=True)
                     for lab in labels
                 ]
             else:
