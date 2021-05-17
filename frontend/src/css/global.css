@@ -88,3 +88,7 @@ td.right,
 th.right {
   text-align: end;
 }
+
+.red-text {
+  color: #f52882;
+}
