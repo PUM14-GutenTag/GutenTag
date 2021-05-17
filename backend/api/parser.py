@@ -19,7 +19,9 @@ from api.models import (Project,
 
 
 def generate_random_color():
-    return 'hsl({hue}, {saturation}%, {lightness}%)'.format(hue=360 * random.random(), saturation=75 + 25 * random.random(), lightness=50 + 15 * random.random())
+    return 'hsl({hue}, {saturation}%, {lightness}%)'.format(
+        hue=360 * random.random(), saturation=75 + 25 * random.random(),
+        lightness=50 + 15 * random.random())
 
 
 def import_text_data(project_id, json_data):
@@ -87,19 +89,20 @@ def import_text_data(project_id, json_data):
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
                 label_list += [
                     DocumentClassificationLabel(
-                        data.id, None, lab, generate_random_color(), is_prelabel=True)
+                        data.id, None, lab, generate_random_color(),
+                        is_prelabel=True)
                     for lab in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_LABELING:
                 label_list += [
-                    SequenceLabel(data.id, None, lab, begin, end, generate_random_color(),
-                                  is_prelabel=True)
+                    SequenceLabel(data.id, None, lab, begin, end,
+                                  generate_random_color(), is_prelabel=True)
                     for begin, end, lab in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
                 label_list += [
-                    SequenceToSequenceLabel(data.id, None, lab, generate_random_color(),
-                                            is_prelabel=True)
+                    SequenceToSequenceLabel(data.id, None, lab,
+                                            generate_random_color(), is_prelabel=True)
                     for lab in labels
                 ]
             else:
