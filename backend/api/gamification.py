@@ -264,15 +264,19 @@ class WorkdayLoginStatistic(BaseStatistic):
         occurrences = cls.get_occurrences(user_id)
 
         # Check if new achievement attained.
-        workday_ranks = [calc_workdays_in_days(k) for k in cls.ranks.keys()]
-        if occurrences in workday_ranks:
-            new_achieve = Achievement.query.filter_by(
-                user_id=user_id,
-                name=cls.ranks[occurrences][0],
-            ).one()
-            if (new_achieve):
-                new_achieve.earned = datetime.datetime.now()
-            db.session.flush()
+        workday_ranks = [(k, calc_workdays_in_days(k))
+                         for k in cls.ranks.keys()]
+        print("workday_ranks", workday_ranks)
+        for days, workdays in workday_ranks:
+            if occurrences == workdays:
+                new_achieve = Achievement.query.filter_by(
+                    user_id=user_id,
+                    name=cls.ranks[days][0],
+                ).one()
+                if (new_achieve):
+                    new_achieve.earned = datetime.datetime.now()
+                db.session.flush()
+                break
 
     @classmethod
     def instantiate_achievement_models(cls, user_id):
