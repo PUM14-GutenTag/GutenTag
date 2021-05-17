@@ -221,7 +221,7 @@ class Project(db.Model):
             data.check_finished()
         db.session.commit()
 
-    def get_progress(self):      
+    def get_progress(self):
         users = []
         CONVERT_TO_PERCENTAGE = 100
 
@@ -378,21 +378,18 @@ class ProjectData(db.Model):
 
     def check_finished(self):
         users = []
-        project = Project.query.get(self.project_id)
-        print("----------------------------------------")
-        print("TEST THIS:", project, self.project)
 
         for label in self.labels:
             if label.user_id not in users and not label.is_prelabel:
                 users.append(label.user_id)
-        
-        if len(users) >= project.labels_per_datapoint:
+
+        if len(users) >= self.project.labels_per_datapoint:
             self.set_finished(True)
         else:
             self.set_finished(False)
-        
+
         db.session.commit()
-        project.check_finished()
+        self.project.check_finished()
 
 
 class ProjectTextData(ProjectData):

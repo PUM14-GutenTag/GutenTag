@@ -57,7 +57,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
     inputRef.current.value = '';
     inputRef.current.focus();
     getImage(dataPointId);
-  }, [dataPointId, imgSource]);
+  }, [dataPointId]);
 
   // Sets X and Y states when cropping
   const onCrop = (e) => {
