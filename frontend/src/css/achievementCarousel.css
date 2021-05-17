@@ -1,6 +1,18 @@
 .carousel-item-custom {
-  margin: 1em;
   transform-style: preserve-3d;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+
+.carousel-item-container {
+  height: 7.5rem;
+  margin: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 2px 2px 2px rgb(0 0 0 / 25%);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  text-align: center;
 }
