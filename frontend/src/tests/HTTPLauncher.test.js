@@ -448,7 +448,11 @@ describe('sendCreateDocumentClassificationLabel request', () => {
       }
     });
     expect(counter).toBe(3);
-    const labelResponse = await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label');
+    const labelResponse = await HTTPLauncher.sendCreateDocumentClassificationLabel(
+      1,
+      'new label',
+      '#3A6FE8'
+    );
     expect(labelResponse.status).toBe(200);
 
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
@@ -478,7 +482,13 @@ describe('sendCreateSequenceLabel request', () => {
     });
     expect(counter).toBe(3);
 
-    const labelResponse = await HTTPLauncher.sendCreateSequenceLabel(1, 'new label', 0, 3);
+    const labelResponse = await HTTPLauncher.sendCreateSequenceLabel(
+      1,
+      'new label',
+      0,
+      3,
+      '#3A6FE8'
+    );
     expect(labelResponse.status).toBe(200);
 
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
@@ -508,7 +518,11 @@ describe('sendCreateSequenceToSequenceLabel request', () => {
     });
     expect(counter).toBe(3);
 
-    const labelResponse = await HTTPLauncher.sendCreateSequenceToSequenceLabel(1, 'new label');
+    const labelResponse = await HTTPLauncher.sendCreateSequenceToSequenceLabel(
+      1,
+      'new label',
+      '#3A6FE8'
+    );
     expect(labelResponse.status).toBe(200);
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
     expect(Object.values(getLabelResponse.data.labels)[0].label).toBe('new label');
@@ -535,7 +549,8 @@ describe('sendCreateImageClassificationLabel request', () => {
       100,
       120,
       200,
-      220
+      220,
+      '#3A6FE8'
     );
     expect(labelResponse.status).toBe(200);
     const getLabelResponse = await HTTPLauncher.sendGetLabel(projectID, 1);
@@ -565,7 +580,11 @@ describe('sendRemoveLabel', () => {
     });
     expect(counter).toBe(3);
 
-    const labelResponse = await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label');
+    const labelResponse = await HTTPLauncher.sendCreateDocumentClassificationLabel(
+      1,
+      'new label',
+      '#3A6FE8'
+    );
     expect(labelResponse.status).toBe(200);
 
     const getLabelResponse1 = await HTTPLauncher.sendGetLabel(projectID, 1);
@@ -590,7 +609,7 @@ describe('sendGetExportData', () => {
       testUtil.getTextFile(textDir, 'input_document_classification.json')
     );
     await HTTPLauncher.sendGetData(projectID, 0);
-    await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label');
+    await HTTPLauncher.sendCreateDocumentClassificationLabel(1, 'new label', '#3A6FE8');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
@@ -612,7 +631,7 @@ describe('sendGetExportData', () => {
       testUtil.getTextFile(textDir, 'input_sequence.json')
     );
     await HTTPLauncher.sendGetData(projectID, 0);
-    await HTTPLauncher.sendCreateSequenceLabel(1, 'new label', 0, 3);
+    await HTTPLauncher.sendCreateSequenceLabel(1, 'new label', 0, 3, '#3A6FE8');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
@@ -634,7 +653,7 @@ describe('sendGetExportData', () => {
       testUtil.getTextFile(textDir, 'input_sequence_to_sequence.json')
     );
     await HTTPLauncher.sendGetData(projectID, 0);
-    await HTTPLauncher.sendCreateSequenceToSequenceLabel(1, 'new label');
+    await HTTPLauncher.sendCreateSequenceToSequenceLabel(1, 'new label', '#3A6FE8');
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);
@@ -657,7 +676,15 @@ describe('sendGetExportData', () => {
       images
     );
     await HTTPLauncher.sendGetData(projectID, 0);
-    await HTTPLauncher.sendCreateImageClassificationLabel(1, 'new label', 100, 120, 200, 220);
+    await HTTPLauncher.sendCreateImageClassificationLabel(
+      1,
+      'new label',
+      100,
+      120,
+      200,
+      220,
+      '#3A6FE8'
+    );
 
     const response = await HTTPLauncher.sendGetExportData(projectID);
     expect(response.status).toBe(200);

@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import HTTPLauncher from '../services/HTTPLauncher';
+import { generateRandomColor } from '../util';
 
 /*
 Component that shows a image, you are able to crop the img with a label
@@ -38,7 +39,8 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
       cropData[0],
       cropData[1],
       cropData[2],
-      cropData[3]
+      cropData[3],
+      generateRandomColor()
     );
     getSetLabels();
     inputRef.current.value = '';
@@ -58,6 +60,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
     inputRef.current.value = '';
     inputRef.current.focus();
     getImage(dataPointId);
+    // eslint-disable-next-line
   }, [dataPointId]);
 
   // Sets X and Y states when cropping

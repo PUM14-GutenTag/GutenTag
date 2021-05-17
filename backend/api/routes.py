@@ -132,7 +132,6 @@ class LoginUser(Resource):
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
                 status = 200
-
         return make_response(jsonify({
             "message": msg,
             "access_token": access_token,
@@ -571,6 +570,7 @@ class CreateDocumentClassificationLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -589,7 +589,7 @@ class CreateDocumentClassificationLabel(Resource):
                     LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
-                        args.data_id, user.id, args.label)
+                        args.data_id, user.id, args.label, args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
@@ -611,6 +611,7 @@ class CreateSequenceLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
         self.reqparse.add_argument("begin", type=int, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
         self.reqparse.add_argument("end", type=int, required=True)
 
     @jwt_required()
@@ -630,7 +631,7 @@ class CreateSequenceLabel(Resource):
                     LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
-                                  args.begin, args.end))), 200)
+                                  args.begin, args.end, args.color))), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -650,6 +651,7 @@ class CreateSequenceToSequenceLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -668,7 +670,7 @@ class CreateSequenceToSequenceLabel(Resource):
                     LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
-                        args.data_id, user.id, args.label)
+                        args.data_id, user.id, args.label, args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
@@ -693,6 +695,7 @@ class CreateImageClassificationLabel(Resource):
         self.reqparse.add_argument("y1", type=int, required=True)
         self.reqparse.add_argument("x2", type=int, required=True)
         self.reqparse.add_argument("y2", type=int, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -712,7 +715,7 @@ class CreateImageClassificationLabel(Resource):
                 return make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,
-                        (args.x1, args.y1), (args.x2, args.y2))
+                        (args.x1, args.y1), (args.x2, args.y2), args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
