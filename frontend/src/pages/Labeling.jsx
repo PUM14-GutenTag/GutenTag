@@ -13,8 +13,9 @@ import '../css/Labeling.css';
 import Layout from '../components/Layout';
 import Label from '../components/Label';
 import ProjectType from '../ProjectType';
+import DefaultLabels from '../components/DefaultLabels'
 
-/* 
+/*
 Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
@@ -176,7 +177,13 @@ const Labeling = ({ location }) => {
     /* Choose for which project types label suggestions should appear */
     // Seq to Seq should not display suggestions
     if (typeOfProject !== ProjectType.SEQUENCE_TO_SEQUENCE) {
-      return <hr className="hr-title" data-content="Suggestions" />;
+      return (
+        <div>
+          <hr className="hr-title" data-content="Suggestions" />
+          <DefaultLabels projectID={projectId} />
+        </div>
+      );
+
     }
     return <></>;
   };
