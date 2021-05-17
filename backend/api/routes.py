@@ -349,7 +349,6 @@ class AddNewTextData(Resource):
             msg = "User is not authorized to add data."
             status = 401
         else:
-            print("third")
             json_file = request.files["json_file"]
             if not allowed_extension(json_file.filename, TEXT_EXTENSIONS):
                 return make_response(

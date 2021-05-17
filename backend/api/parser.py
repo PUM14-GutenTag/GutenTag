@@ -330,13 +330,13 @@ def export_data(project_id, filters=None):
     label_dict = defaultdict(list)
     for lab in label_list:
         if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
-            label = [lab.label, lab.color]
+            label = lab.label
         elif project.project_type == ProjectType.SEQUENCE_LABELING:
-            label = [lab.begin, lab.end, lab.label, lab.color]
+            label = [lab.begin, lab.end, lab.label]
         elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
-            label = [lab.label, lab.color]
+            label = lab.label
         elif project.project_type == ProjectType.IMAGE_CLASSIFICATION:
-            label = [[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label, lab.color]
+            label = [[lab.x1, lab.y1], [lab.x2, lab.y2], lab.label]
         else:
             raise ValueError(f"Invalid project type: {project.project_type}")
         label_dict[lab.data_id].append(label)
