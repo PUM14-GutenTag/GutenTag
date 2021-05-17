@@ -171,7 +171,7 @@ describe('sendCreateProject', () => {
     await testUtil.resetDB();
     await testUtil.createUser();
 
-    const response = await HTTPLauncher.sendCreateProject('Project Exodus', 1);
+    const response = await HTTPLauncher.sendCreateProject('Project Exodus', 1, 5);
     expect(response.status).toBe(200);
     expect(response.data.id).toBeDefined();
   });
