@@ -6,7 +6,7 @@ import { useUser } from '../contexts/UserContext';
 
 import '../css/home.css';
 
-const colorList = ['#cdffff', '#e2d0f5', '#ffeacc'];
+const colorList = ['#cdffff', '#e2d0f5', '#ffeacc', '#fdd4e6'];
 
 // Home page. All projects available on the system are shown to admin.
 // A user is only shown projects they are authorized to.
@@ -47,14 +47,14 @@ const Home = () => {
           <ul>
             {projects
               .filter((p) => filterFunc(p))
-              .map((result, i) => (
+              .map((result) => (
                 <li key={result.name}>
                   <Project
                     id={result.id}
                     created={result.created}
                     name={result.name}
                     projectType={result.type}
-                    selectedColor={colorList[i % colorList.length]}
+                    selectedColor={colorList[result.type - 1]}
                     showEditButton={userState.isAdmin}
                     labelsPerDatapoint={result.labels_per_datapoint}
                     progress={result.progress}
