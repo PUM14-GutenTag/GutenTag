@@ -11,4 +11,7 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_SERVER_NAME: ${SERVER_NAME}

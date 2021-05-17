@@ -22,6 +22,11 @@ services:
       - ./.env.dev
 
   frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_SERVER_NAME: ${SERVER_NAME}
+        REACT_APP_IS_DEV_MODE: 1
     command: npm run start
     ports:
       - 3000:3000

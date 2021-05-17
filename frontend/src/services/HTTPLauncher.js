@@ -2,7 +2,9 @@ import authHeader from './authHeader';
 
 const axios = require('axios');
 
-axios.defaults.baseURL = 'http://localhost/api/';
+axios.defaults.baseURL = process.env.REACT_APP_IS_DEV_MODE
+  ? 'http://localhost:5000/'
+  : 'http://localhost/api/';
 class HTTPLauncher {
   // Sets the base URL for all requests.
   static setBaseURL(URL) {

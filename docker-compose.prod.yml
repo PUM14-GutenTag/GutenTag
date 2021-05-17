@@ -19,6 +19,11 @@ services:
       - ./.env.prod
 
   frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_SERVER_NAME: ${SERVER_NAME}
+        REACT_APP_IS_DEV_MODE: 0
     command: npm run build
     expose:
       - 3000
