@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import '../css/project.css';
@@ -26,6 +26,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
           >
             <div className="title-container" aria-hidden="true">
               <h1>{name}</h1>
+
               <ProgressBar now={50} striped id="progress-bar-project" />
             </div>
           </Accordion.Toggle>
@@ -44,6 +45,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             eventKey="0"
           >
             <Button
+              className="outline-dark"
               variant="outline-primary"
               as={Link}
               to={{
