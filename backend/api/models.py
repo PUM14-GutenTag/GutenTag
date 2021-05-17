@@ -234,7 +234,8 @@ class Project(db.Model):
                     users.append((label.user_id, data.id))
 
         if len(self.data) * self.labels_per_datapoint != 0:
-            return (len(users)/(len(self.data) * self.labels_per_datapoint)) \
+            return (len(users) / (len(
+                self.data) * self.labels_per_datapoint)) \
                 * CONVERT_TO_PERCENTAGE
         else:
             return 0
