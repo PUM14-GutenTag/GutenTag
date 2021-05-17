@@ -27,6 +27,7 @@ const Labeling = ({ location }) => {
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
   const [progress, setProgress] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
+  const [label, setLabel] = useState('');
 
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
   const type = projectType;
@@ -91,8 +92,6 @@ const Labeling = ({ location }) => {
     if (listOfDataPoints.length > 0) {
       getSetLabels(listOfDataPoints);
     }
-
-    // eslint-disable-next-line
   }, []);
 
   // Get earlier datapoint, and delete data point out of scope from list
@@ -148,6 +147,8 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             textBoxSize={textBoxSize()}
+            label={label}
+            setLabel={setLabel}
           />
         );
       }
@@ -156,6 +157,8 @@ const Labeling = ({ location }) => {
           <ImageLabeling
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            label={label}
+            setLabel={setLabel}
           />
         );
       }
@@ -180,10 +183,9 @@ const Labeling = ({ location }) => {
       return (
         <div>
           <hr className="hr-title" data-content="Suggestions" />
-          <DefaultLabels projectID={projectId} />
+          <DefaultLabels projectID={projectId} setLabel={setLabel} />
         </div>
       );
-
     }
     return <></>;
   };

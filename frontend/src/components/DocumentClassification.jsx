@@ -1,13 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/DocumentClassification.css';
 
-/* 
-Component that shows the specifics for document classification 
+/*
+Component that shows the specifics for document classification
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize }) => {
+const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize, label, setLabel }) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
@@ -23,6 +23,16 @@ const DocumentClassification = ({ data, dataPointId, getSetLabels, textBoxSize }
     inputRef.current.value = '';
     inputRef.current.focus();
   }, [dataPointId]);
+
+  useEffect(() => {
+    if (label !== '') {
+      (async () => {
+        await HTTPLauncher.sendCreateDocumentClassificationLabel(dataPointId, label);
+        getSetLabels();
+      })();
+      setLabel('');
+    }
+  }, [label]);
 
   return (
     <div className="classification-container">
@@ -55,6 +65,8 @@ DocumentClassification.propTypes = {
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
   textBoxSize: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default DocumentClassification;

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 
-const DefaultLabels = ({ projectID }) => {
+const DefaultLabels = ({ projectID, setLabel }) => {
   const [labels, setLabels] = useState([]);
 
   const fetchDefaultLabels = async () => {
@@ -14,7 +14,8 @@ const DefaultLabels = ({ projectID }) => {
   };
 
   const sendLabel = (label) => {
-    console.log(label);
+    // console.log(label);
+    setLabel(label);
   };
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const DefaultLabels = ({ projectID }) => {
 
 DefaultLabels.propTypes = {
   projectID: PropTypes.number.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default DefaultLabels;
