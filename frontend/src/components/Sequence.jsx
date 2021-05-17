@@ -3,23 +3,17 @@ import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import '../css/Sequence.css';
 import HTTPLauncher from '../services/HTTPLauncher';
+import { generateRandomColor, textBoxSize } from '../util';
 
 /* 
 Component that shows the specifics for sequence labeling 
 */
-const Sequence = ({
-  data,
-  dataPointId,
-  getSetLabels,
-  textBoxSize,
-  labels,
-  generateRandomColor,
-}) => {
+const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
   const [selection, setSelection] = useState('');
-  const wordList = data.split(' ');
+  const wordList = data.trim().split(' ');
 
   // Adds a sequnece label and resets values in input and selection box
   const addLabel = async (event) => {
@@ -62,16 +56,18 @@ const Sequence = ({
 
   // Check if selection contains labeled data
   const containsLabel = (selectionIndexes) => {
-    let unlabeledText = true;
+    let labeledText = false;
     labels.forEach((label) => {
       if (
-        (selectionIndexes.start <= label.begin && selectionIndexes.end >= label.begin) ||
-        (selectionIndexes.start <= label.end && selectionIndexes.end >= label.end)
+        (selectionIndexes.start >= label.begin && selectionIndexes.start <= label.end) ||
+        (selectionIndexes.end >= label.begin && selectionIndexes.end <= label.end) ||
+        (selectionIndexes.start <= label.end && selectionIndexes.end >= label.end) ||
+        (selectionIndexes.start <= label.begin && selectionIndexes.end >= label.begin)
       ) {
-        unlabeledText = false;
+        labeledText = true;
       }
     });
-    return unlabeledText;
+    return labeledText;
   };
 
   /* 
@@ -87,15 +83,8 @@ const Sequence = ({
       selectedText.toString() !== ' '
     ) {
       const currentlySelected = selectedText.toString();
-      const tempWordList = currentlySelected.split(' ');
+      const tempWordList = currentlySelected.trim().split(' ');
 
-      // remove potential spaces before and after selected word or words
-      if (tempWordList[0] === '') {
-        tempWordList.shift();
-      }
-      if (tempWordList[tempWordList.length - 1] === '') {
-        tempWordList.pop();
-      }
       // check that selection includes only complete words from text data
       if (
         wordList.includes(tempWordList[0]) &&
@@ -107,7 +96,7 @@ const Sequence = ({
           tempWordList[tempWordList.length - 1]
         );
         const result = containsLabel(selectionIndexes, selectedText);
-        if (result) {
+        if (!result) {
           setSelection(selectedText.toString());
           setStartIndex(selectionIndexes.start);
           setEndIndex(selectionIndexes.end);
@@ -164,7 +153,7 @@ const Sequence = ({
   return (
     <div className="sequence-container">
       <hr className="hr-title" data-content="Text data" />
-      <div id="text-box-container" className={textBoxSize}>
+      <div id="text-box-container" style={{ fontSize: textBoxSize(data) }}>
         {wrapWordsInSpan(data)}
       </div>
       <hr className="hr-title" data-content="Add new sequence label" />
@@ -189,8 +178,6 @@ Sequence.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
-  textBoxSize: PropTypes.string.isRequired,
-  generateRandomColor: PropTypes.func.isRequired,
   labels: PropTypes.arrayOf(
     PropTypes.shape({
       begin: PropTypes.number.isRequired,

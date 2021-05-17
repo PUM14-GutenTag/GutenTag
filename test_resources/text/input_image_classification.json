@@ -1,13 +1,13 @@
 [
   {
     "file_name": "ILSVRC2012_val_00000001.JPEG",
-    "labels": [[[50, 100], [90, 120], "snake", "#3A6FE8"]]
+    "labels": [[[50, 100], [90, 120], "snake"]]
   },
   {
     "file_name": "ILSVRC2012_val_00000002.JPEG",
     "labels": [
       [[75, 125], [100, 150], "person"],
-      [[100, 150], [160, 200], "person", "#3A6FE8"]
+      [[100, 150], [160, 200], "person"]
     ]
   },
   {

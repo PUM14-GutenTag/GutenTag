@@ -1,11 +1,11 @@
 [
   {
     "text": "Gosling provides an amazing performance that dwarfs everything else in the film.",
-    "labels": [["positive", "#3A6FE8"]]
+    "labels": [["positive"]]
   },
   {
     "text": "Not for everyone, but for those with whom it will connect, it's a nice departure from standard moviegoing fare.",
-    "labels": [["positive", "#3A6FE8"], ["negative", "#3A6FE8"]]
+    "labels": [["positive"], ["negative"]]
   },
   {
     "text": "A disturbing and frighteningly evocative assembly of imagery and hypnotic music composed by Philip Glass.",

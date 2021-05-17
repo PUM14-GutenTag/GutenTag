@@ -3,17 +3,12 @@ import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/DocumentClassification.css';
+import { generateRandomColor, textBoxSize } from '../util';
 
 /* 
 Component that shows the specifics for document classification 
 */
-const DocumentClassification = ({
-  data,
-  dataPointId,
-  getSetLabels,
-  textBoxSize,
-  generateRandomColor,
-}) => {
+const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
@@ -37,7 +32,7 @@ const DocumentClassification = ({
   return (
     <div className="classification-container">
       <div className="text-box-container">
-        <p className={textBoxSize}>{data}</p>
+        <p style={{ fontSize: textBoxSize(data) }}>{data}</p>
       </div>
       <hr className="hr-title" data-content="Add new label" />
       <div className="form-container">
@@ -63,9 +58,7 @@ const DocumentClassification = ({
 DocumentClassification.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
-  generateRandomColor: PropTypes.func.isRequired,
   getSetLabels: PropTypes.func.isRequired,
-  textBoxSize: PropTypes.string.isRequired,
 };
 
 export default DocumentClassification;

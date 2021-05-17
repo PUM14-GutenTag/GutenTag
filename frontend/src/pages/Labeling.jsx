@@ -44,23 +44,6 @@ const Labeling = ({ location }) => {
     }
   };
 
-  // Choose size of the text to use depending on the length of the text
-  const textBoxSize = () => {
-    const data = listOfDataPoints[CURRENT_DATA].data;
-    if (data.length < 18) {
-      return 'small-text';
-    }
-    if (data.length < 600) {
-      return 'medium-text';
-    }
-    return 'large-text';
-  };
-
-  // Generates a random color HSL colors
-  const generateRandomColor = () => {
-    return `hsl(${360 * Math.random()}, ${75 + 25 * Math.random()}%,${50 + 15 * Math.random()}%)`;
-  };
-
   // Function which can be called through callbacks to remove label
   const deleteLabel = async (labelId) => {
     await HTTPLauncher.sendRemoveLabel(labelId);
@@ -146,8 +129,6 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
-            textBoxSize={textBoxSize()}
-            generateRandomColor={generateRandomColor}
           />
         );
       }
@@ -157,9 +138,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             getSetLabels={getSetLabels}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
-            textBoxSize={textBoxSize()}
             labels={labels}
-            generateRandomColor={generateRandomColor}
           />
         );
       }
@@ -168,7 +147,6 @@ const Labeling = ({ location }) => {
           <ImageLabeling
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
-            generateRandomColor={generateRandomColor}
           />
         );
       }
@@ -178,8 +156,6 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
-            textBoxSize={textBoxSize()}
-            generateRandomColor={generateRandomColor}
           />
         );
       }

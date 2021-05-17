@@ -341,15 +341,11 @@ class AddNewTextData(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())
-        print("before")
 
         if "json_file" not in request.files:
             msg = "No JSON file uploaded."
             status = 406
-            print("first")
         elif user.access_level < AccessLevel.ADMIN:
-            print("second")
-            print("access", user.access_level)
             msg = "User is not authorized to add data."
             status = 401
         else:
@@ -367,7 +363,6 @@ class AddNewTextData(Resource):
                 msg = "Data added."
                 status = 200
             except Exception as e:
-                print("hej vi är fel")
                 msg = f"Could not add data: {e}"
 
         return make_response(jsonify({"message": msg}), status)
@@ -423,7 +418,6 @@ class AddNewImageData(Resource):
                 msg = "Data added."
                 status = 200
             except Exception as e:
-                print("except")
                 msg = f"Could not add data: {e}"
                 status = 404
 
