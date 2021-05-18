@@ -24,8 +24,8 @@ const InputSpinner = ({ amount, setAmount }) => {
 
   return (
     <div className="no-select input-spinner">
-      <ChevronUp onClick={handleUp} className="fa-5x arrow-btn" /> <h1>{counter}</h1>
-      <ChevronDown onClick={handleDown} className="fa-5x arrow-btn" />
+      <ChevronUp onClick={handleUp} className="fa-3x arrow-btn" /> <h1>{counter}</h1>
+      <ChevronDown onClick={handleDown} className="fa-3x arrow-btn" />
     </div>
   );
 };
