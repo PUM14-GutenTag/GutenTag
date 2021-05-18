@@ -8,7 +8,7 @@ import { generateRandomColor, textBoxSize } from '../util';
 /*
 Component that shows the specifics for document classification
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
+const DocumentClassification = ({ data, dataPointId, getSetLabels, defaultLabel, setLabel }) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
@@ -28,6 +28,20 @@ const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
     inputRef.current.value = '';
     inputRef.current.focus();
   }, [dataPointId]);
+
+  useEffect(() => {
+    if (defaultLabel !== '') {
+      (async () => {
+        await HTTPLauncher.sendCreateDocumentClassificationLabel(
+          dataPointId,
+          defaultLabel,
+          generateRandomColor()
+        );
+        getSetLabels();
+      })();
+      setLabel('');
+    }
+  }, [defaultLabel]);
 
   return (
     <div className="classification-container">
@@ -60,6 +74,8 @@ DocumentClassification.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default DocumentClassification;

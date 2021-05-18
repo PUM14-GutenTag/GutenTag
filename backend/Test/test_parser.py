@@ -49,7 +49,7 @@ def test_document_classification_import_export():
     reset_db()
 
     project = try_add(Project(
-        "Document project", ProjectType.DOCUMENT_CLASSIFICATION))
+        "Document project", ProjectType.DOCUMENT_CLASSIFICATION, 5))
 
     # Read and import from the input file into the database.
     text_file = os.path.join(
@@ -71,7 +71,7 @@ def test_sequence_import_export():
     reset_db()
 
     project = try_add(Project(
-        "Sequence project", ProjectType.SEQUENCE_LABELING))
+        "Sequence project", ProjectType.SEQUENCE_LABELING, 5))
 
     # Read and import from the input file into the database.
     text_file = os.path.join(PATH, "res/text/input_sequence.json")
@@ -92,7 +92,7 @@ def test_sequence_to_sequence_import_export():
     reset_db()
 
     project = try_add(Project(
-        "Sequence to sequence project", ProjectType.SEQUENCE_TO_SEQUENCE))
+        "Sequence to sequence project", ProjectType.SEQUENCE_TO_SEQUENCE, 5))
 
     # Read and import from the input file into the database.
     text_file = os.path.join(PATH, "res/text/input_sequence_to_sequence.json")
@@ -113,7 +113,7 @@ def test_image_classification_import_export():
     reset_db()
 
     project = try_add(Project(
-        "Image project", ProjectType.IMAGE_CLASSIFICATION))
+        "Image project", ProjectType.IMAGE_CLASSIFICATION, 5))
 
     # Read and import from the input files into the database.
     text_file = os.path.join(

@@ -8,7 +8,7 @@ import { generateRandomColor, textBoxSize } from '../util';
 /*
 Component that shows the specifics for sequence labeling
 */
-const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
+const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLabel }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
@@ -64,6 +64,25 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
     setStartIndex('');
     setEndIndex('');
   }, [dataPointId]);
+
+  useEffect(() => {
+    if (defaultLabel !== '' && selection !== '') {
+      (async () => {
+        await HTTPLauncher.sendCreateSequenceLabel(
+          dataPointId,
+          defaultLabel,
+          startIndex,
+          endIndex,
+          generateRandomColor()
+        );
+        getSetLabels();
+      })();
+      setLabel('');
+      setSelection('');
+      inputRef.current.value = '';
+      inputRef.current.focus();
+    }
+  }, [defaultLabel]);
 
   // Functions for handeling selection evvent listener
   useEffect(() => {
@@ -204,6 +223,8 @@ Sequence.propTypes = {
       user_id: PropTypes.number.isRequired,
     }).isRequired
   ).isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default Sequence;

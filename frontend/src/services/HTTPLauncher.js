@@ -101,16 +101,40 @@ class HTTPLauncher {
     );
   }
 
+  // Send HTTP-request to create a new default label.
+  static sendCreateDefaultLabel(labelName, projectID) {
+    return axios.post(
+      'create-default-label',
+      {
+        label_name: labelName,
+        project_id: projectID,
+      },
+      { headers: authHeader() }
+    );
+  }
+
   // Send HTTP-request to create a new project.
-  static sendCreateProject(projectName, projectType) {
+  static sendCreateProject(projectName, projectType, labelsPerDatapoint) {
     return axios.post(
       'create-project',
       {
         project_name: projectName,
         project_type: projectType,
+        labels_per_datapoint: labelsPerDatapoint,
       },
       { headers: authHeader() }
     );
+  }
+
+  // Send HTTP-request to delete an existing default label.
+  static sendDeleteDefaultLabel(projectID, labelName) {
+    return axios.delete('delete-default-label', {
+      headers: authHeader(),
+      data: {
+        project_id: projectID,
+        label_name: labelName,
+      },
+    });
   }
 
   // Send HTTP-request to delete an existing project.
@@ -155,6 +179,14 @@ class HTTPLauncher {
   static sendGetUserProjects() {
     return axios.get('get-user-projects', {
       headers: authHeader(),
+    });
+  }
+
+  // Send HTTP-request to get a projects progress
+  static sendGetProjectProgress(projectID) {
+    return axios.get('get-project-progress', {
+      headers: authHeader(),
+      params: { project_id: projectID },
     });
   }
 
@@ -234,6 +266,14 @@ class HTTPLauncher {
     });
   }
 
+  // Send HTTP-request to fetch default labels.
+  static sendGetDefaultLabel(projectID) {
+    return axios.get('get-default-labels', {
+      headers: authHeader(),
+      params: { project_id: projectID },
+    });
+  }
+
   // Send HTTP-request to fetch datapoints to be labelled.
   static sendGetData(projectID, type, index = 0) {
     return axios.get('get-data', {
@@ -255,6 +295,20 @@ class HTTPLauncher {
       headers: authHeader(),
       params: { project_id: projectID, data_id: dataID },
     });
+  }
+
+  // Send HTTP-request to change amount of labels needed per datapoint
+  static sendChangeLabelsPerDatapoint(projectID, labelsPerDatapoint) {
+    return axios.post(
+      'labels-per-data',
+      {
+        project_id: projectID,
+        labels_per_datapoint: labelsPerDatapoint,
+      },
+      {
+        headers: authHeader(),
+      }
+    );
   }
 
   // Send HTTP-request to label a datapoint.

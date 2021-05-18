@@ -184,6 +184,28 @@ class User(db.Model):
         )
 
 
+class DefaultLabel(db.Model):
+    """
+    DefaultLabels contains multiple lables that are default for a certain
+    project.
+    """
+    __tablename__ = "default_label"
+
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project = db.relationship("Project", backref="default_labels")
+    name = db.Column(db.Text, nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("project_id",
+                                          "name",
+                                          name="_label_project_uc"),)
+
+    def __init__(self, project, name):
+        check_types([(project, Project), (name, str)])
+        self.project = project
+        self.name = name
+
+
 class Project(db.Model):
     """
     Project contain information about what users are related to this project
@@ -196,18 +218,81 @@ class Project(db.Model):
     project_type = db.Column(db.Integer, nullable=False)
     created = db.Column(db.DateTime, nullable=False,
                         default=datetime.datetime.now())
-
+    finished = db.Column(db.Boolean, default=False)
+    labels_per_datapoint = db.Column(db.Integer, nullable=False)
     data = db.relationship("ProjectData", back_populates="project",
                            cascade="all, delete", passive_deletes=True)
     users = db.relationship(
         "User", secondary=access_control, back_populates="projects")
 
-    def __init__(self, project_name, project_type):
-        check_types([(project_name, str), (project_type, int)])
+    def __init__(self, project_name, project_type, labels_per_datapoint):
+        check_types([(project_name, str), (project_type, int), (
+            labels_per_datapoint, int)])
         if not ProjectType.has_value(project_type):
             raise ValueError(f"Project type '{project_type}' is invalid.")
         self.name = project_name
         self.project_type = project_type
+        self.labels_per_datapoint = labels_per_datapoint
+
+    def check_finished(self):
+        """
+        Check if all datapoints in a project have been fully labeled
+        """
+        for datapoint in self.data:
+            if not datapoint.finished:
+                self.set_finished(False)
+                db.session.commit()
+                return
+
+        self.set_finished(True)
+        db.session.commit()
+
+    def set_finished(self, status):
+        """
+        Setter for finished variable
+        """
+        self.finished = status
+        db.session.commit()
+
+    def set_labels_per_datapoint(self, amount):
+        """
+        Setter for labels_per_datapoint
+        """
+        self.labels_per_datapoint = amount
+        self.check_finished
+
+        for data in self.data:
+            data.check_finished()
+        db.session.commit()
+
+    def get_progress(self):
+        """
+        Calculate and return progress according to formula
+        a/(b*c) where
+
+        a = Amount of unique users that have labeled each datapoint
+        b = Amount of datapoints in the project
+        c = Variable labels_per_datapoint
+
+        This is multiplied by 100 to return a percentage
+        """
+        users = []
+        CONVERT_TO_PERCENTAGE = 100
+
+        for data in self.data:
+            for label in data.labels:
+                # Progress is made when a user labels
+                # a datapoint it has not already labeled
+                if (label.user_id,
+                        data.id) not in users and not label.is_prelabel:
+                    users.append((label.user_id, data.id))
+
+        if len(self.data) * self.labels_per_datapoint != 0:
+            return (len(users) / (len(
+                self.data) * self.labels_per_datapoint)) \
+                * CONVERT_TO_PERCENTAGE
+        else:
+            return 0
 
     def get_data(self, user_id):
         """
@@ -223,14 +308,15 @@ class Project(db.Model):
 
         # find earliest none labeled data point
         for data in project_data:
-            if not found_labeled:
-                break
-            found_labeled = False
-            for label in data.labels:
-                if(user_id == label.user_id):
-                    found_labeled = True
-                    index += 1
+            if not data.finished:
+                if not found_labeled:
                     break
+                found_labeled = False
+                for label in data.labels:
+                    if(user_id == label.user_id):
+                        found_labeled = True
+                        index += 1
+                        break
 
         # Check if all data points are labeled by user
         if index == len(project_data):
@@ -295,7 +381,10 @@ class Project(db.Model):
             data = data_points[index + LIST_SIDE_LENGTH]
             data_point = {}
             data_point["id"] = data.id
-            data_point["data"] = data.text_data
+            if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
+                data_point["data"] = data.file_name
+            else:
+                data_point["data"] = data.text_data
             next_data = data_point
         except IndexError:
             next_data = {}
@@ -312,7 +401,10 @@ class Project(db.Model):
             data = data_points[index - LIST_SIDE_LENGTH]
             data_point = {}
             data_point["id"] = data.id
-            data_point["data"] = data.text_data
+            if self.project_type == ProjectType.IMAGE_CLASSIFICATION:
+                data_point["data"] = data.file_name
+            else:
+                data_point["data"] = data.text_data
             earlier_data = data_point
         else:
             earlier_data = {}
@@ -333,6 +425,7 @@ class ProjectData(db.Model):
     project = db.relationship("Project", back_populates="data")
     labels = db.relationship("Label", back_populates="data",
                              cascade="all, delete", passive_deletes=True)
+    finished = db.Column(db.Boolean, default=False)
     type = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, nullable=False,
                         default=datetime.datetime.now())
@@ -342,6 +435,31 @@ class ProjectData(db.Model):
         "polymorphic_identity": "base",
         "polymorphic_on": type
     }
+
+    def set_finished(self, status):
+        """
+        Setter for finished variable
+        """
+        self.finished = status
+        db.session.commit()
+
+    def check_finished(self):
+        """
+        Check if the datapoint is fully labeled
+        """
+        users = []
+
+        for label in self.labels:
+            if label.user_id not in users and not label.is_prelabel:
+                users.append(label.user_id)
+
+        if len(users) >= self.project.labels_per_datapoint:
+            self.set_finished(True)
+        else:
+            self.set_finished(False)
+
+        db.session.commit()
+        self.project.check_finished()
 
     def has_labeled(self, user_id):
         """

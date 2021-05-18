@@ -56,6 +56,8 @@ const Home = () => {
                     projectType={result.type}
                     selectedColor={colorList[result.type - 1]}
                     showEditButton={userState.isAdmin}
+                    labelsPerDatapoint={result.labels_per_datapoint}
+                    progress={result.progress}
                   />
                 </li>
               ))}
