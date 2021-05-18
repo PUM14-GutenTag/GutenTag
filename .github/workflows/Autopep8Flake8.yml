@@ -2,7 +2,7 @@ name: Python CI autopep8 Flake8
 
 on:
   push:
-    branches: [main]
+    branches: [main, production]
   pull_request:
     branches: [main]
 
