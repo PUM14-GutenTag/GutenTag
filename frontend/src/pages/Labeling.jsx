@@ -219,7 +219,7 @@ const Labeling = ({ location }) => {
     if (progressProject === 100) {
       return <FinishedPopUp projectDone />;
     }
-    return <ProgressBar striped variant="success" now={progressInvidual} />;
+    return <ProgressBar variant="prim" now={progressInvidual} />;
   };
 
   return (
@@ -237,7 +237,7 @@ const Labeling = ({ location }) => {
         <div className="progress-bars">
           {finishedLabel()}
           <br />
-          <ProgressBar striped variant="warning" now={progressProject} />
+          <ProgressBar variant="sec" now={progressProject} />
         </div>
         <br />
         <div>

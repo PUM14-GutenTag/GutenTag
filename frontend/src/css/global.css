@@ -131,3 +131,13 @@ th.right {
   justify-content: center;
   padding-left: 0px;
 }
+
+div.bg-prim {
+  background-color: #00C8C8;
+  color: white;
+}
+
+div.bg-sec {
+  background-color: #7028B7;
+  color: white;
+}
