@@ -266,9 +266,8 @@ class WorkdayLoginStatistic(BaseStatistic):
         # Check if new achievement attained.
         workday_ranks = [(k, calc_workdays_in_days(k))
                          for k in cls.ranks.keys()]
-        print("workday_ranks", workday_ranks)
         for days, workdays in workday_ranks:
-            if occurrences == workdays:
+            if occurrences == days:
                 new_achieve = Achievement.query.filter_by(
                     user_id=user_id,
                     name=cls.ranks[days][0],
