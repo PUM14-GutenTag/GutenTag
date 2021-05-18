@@ -170,16 +170,19 @@ def test_document_classification_label():
     project = try_add(Project(
         "Project", ProjectType.DOCUMENT_CLASSIFICATION))
     label_str = "Positive"
+    color = "#3A6FE8"
     data = try_add(ProjectTextData(project.id, "This is so exciting!"))
 
     # Test label valid data.
-    label = try_add(DocumentClassificationLabel(data.id, user.id, label_str))
+    label = try_add(DocumentClassificationLabel(
+        data.id, user.id, label_str, color))
     assert label is not None
     assert label in data.labels
 
     # Test label existing data as a non-existing user.
     with raises(IntegrityError):
-        label = try_add(DocumentClassificationLabel(data.id, 100, label_str))
+        label = try_add(DocumentClassificationLabel(
+            data.id, 100, label_str, color))
         assert label is None
 
 
@@ -192,11 +195,13 @@ def test_sequence_label():
         "Project", ProjectType.SEQUENCE_LABELING))
     data = try_add(ProjectTextData(
         project.id, "Alex is going to Los Angeles in California"))
+    color = "#3A6FE8"
 
     # Test label valid data.
-    for lab in [(0, 3, "PER"), (16, 27, "LOC"), (31, 41, "LOC")]:
+    for lab in [(0, 3, "PER", color), (16, 27, "LOC", color),
+                (31, 41, "LOC", color)]:
         label = try_add(SequenceLabel(
-            data.id, user.id, lab[2], lab[0], lab[1]))
+            data.id, user.id, lab[2], lab[0], lab[1], lab[3]))
         assert label is not None
         assert label in data.labels
 
@@ -211,11 +216,12 @@ def test_sequence_to_sequence_label():
     data = try_add(
         ProjectTextData(project.id,
                         "John saw the man on the mountain with a telescope."))
+    color = "#3A6FE8"
 
     # Test label valid data.
     for lab in ["John såg mannen på berget med hjälp av ett teleskop.",
                 "John såg mannen med ett teleskop på berget."]:
-        label = try_add(SequenceToSequenceLabel(data.id, user.id, lab))
+        label = try_add(SequenceToSequenceLabel(data.id, user.id, lab, color))
         assert label is not None
         assert label in data.labels
 
@@ -227,16 +233,18 @@ def test_image_classification_label():
                         "usertest@gmail.com", "password"))
     project = try_add(Project(
         "Project", ProjectType.IMAGE_CLASSIFICATION))
+    color = "#3A6FE8"
 
     image_file = os.path.join(PATH, "res/images/ILSVRC2012_val_00000001.JPEG")
     with open(image_file, "rb") as file:
-        data = try_add(ProjectImageData(project.id, file.name, file.read()))
+        data = try_add(ProjectImageData(
+            project.id, file.name, file.read()))
 
     # Test label valid data.
     coord1 = (10, 40)
     coord2 = (50, 100)
     label = try_add(ImageClassificationLabel(
-        data.id, user.id, "snake", coord1, coord2))
+        data.id, user.id, "snake", coord1, coord2, color))
     assert label is not None
     assert label in data.labels
 
@@ -250,8 +258,10 @@ def test_delete_label():
         "Project", ProjectType.DOCUMENT_CLASSIFICATION))
     in_data = "Test"
     label_str = "Positive"
+    color = "#3A6FE8"
     data = try_add(ProjectTextData(project.id, in_data))
-    label = try_add(DocumentClassificationLabel(data.id, user.id, label_str))
+    label = try_add(DocumentClassificationLabel(
+        data.id, user.id, label_str, color))
     assert label is not None
     assert label in data.labels
 
@@ -269,7 +279,9 @@ def test_delete_project():
     data_id = data.id
     user = try_add(User("name", "surname", "email@email.com", "password"))
     label_str = "Negative"
-    label = try_add(DocumentClassificationLabel(data.id, user.id, label_str))
+    color = "#3A6FE8"
+    label = try_add(DocumentClassificationLabel(
+        data.id, user.id, label_str, color))
     label_id = label.id
     assert ProjectData.query.get(data.id) is not None
     assert Label.query.get(label.id) is not None

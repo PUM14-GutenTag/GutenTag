@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import PropTypes from 'prop-types';
-import { Check, Trash } from 'react-bootstrap-icons';
+import { Check, X } from 'react-bootstrap-icons';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 
@@ -60,6 +60,7 @@ const ManageProjectUsers = ({ projectID }) => {
     if (showUsers) {
       fetchUserData();
     }
+    // eslint-disable-next-line
   }, [showUsers]);
 
   // Sends request to backend to deauthorize user.
@@ -91,7 +92,7 @@ const ManageProjectUsers = ({ projectID }) => {
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th className="right">Authorize</th>
+            <th className="right">Authorized</th>
           </tr>
         </thead>
         <tbody>
@@ -104,11 +105,11 @@ const ManageProjectUsers = ({ projectID }) => {
 
                 {filterProjectUsers(result) ? (
                   <td className="right">
-                    <Trash className="remove" onClick={() => deauthorizeUser(result[1])} />
+                    <Check className="add" onClick={() => deauthorizeUser(result[1])} />
                   </td>
                 ) : (
                   <td className="right">
-                    <Check className="add" onClick={() => authorizeUser(result[1])} />
+                    <X className="remove" onClick={() => authorizeUser(result[1])} />
                   </td>
                 )}
               </tr>

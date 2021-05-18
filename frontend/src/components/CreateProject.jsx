@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 
@@ -8,15 +8,9 @@ import ProjectType from '../ProjectType';
 /* Component for creating a project */
 const CreateProject = () => {
   const [projectName, setProjectName] = useState('');
-  const [projectType, setProjectType] = useState(1);
-  const [ID, setID] = useState(null);
-  const [redirect, setRedirect] = useState(false);
+  const [projectType, setProjectType] = useState(ProjectType.DOCUMENT_CLASSIFICATION);
+  const [ID, setID] = useState();
   const [error, setError] = useState(false);
-
-  // When we get an ID we redirect to edit that project
-  useEffect(() => {
-    if (ID !== null) setRedirect(true);
-  }, [ID]);
 
   // Creates a project in the backend
   const submitHandler = async (event) => {
@@ -38,6 +32,7 @@ const CreateProject = () => {
               className="text"
               type="text"
               name="name"
+              value={projectName}
               onChange={(event) => setProjectName(event.target.value)}
               placeholder="Enter project name..."
               required
@@ -46,7 +41,7 @@ const CreateProject = () => {
         </Row>
         {error && (
           <Row>
-            <Form.Label>Project name already exists</Form.Label>
+            <Form.Label className="red-text">Project name already exists</Form.Label>
           </Row>
         )}
         <Row>
@@ -56,7 +51,8 @@ const CreateProject = () => {
               className="text"
               as="select"
               name="type"
-              onChange={(event) => setProjectType(event.target.value)}
+              value={projectType}
+              onChange={(event) => setProjectType(parseInt(event.target.value, 10))}
             >
               <option value={ProjectType.DOCUMENT_CLASSIFICATION}>Document classification</option>
               <option value={ProjectType.SEQUENCE_LABELING}>Sequence labeling</option>
@@ -72,7 +68,7 @@ const CreateProject = () => {
           <Button className="dark" variant="primary" type="submit">
             Submit
           </Button>
-          {redirect && (
+          {ID && (
             <Redirect
               to={{
                 pathname: '/edit-project',

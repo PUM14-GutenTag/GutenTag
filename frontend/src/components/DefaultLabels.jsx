@@ -15,6 +15,11 @@ const DefaultLabels = ({ projectID, setLabel }) => {
     setLabels(list);
   };
 
+  // Unsure why this have to be in a separate func, but it doesn't work if it's not.
+  const pushLabel = (label) => {
+    setLabel(label);
+  };
+
   useEffect(() => {
     fetchDefaultLabels();
   }, []);
@@ -22,7 +27,7 @@ const DefaultLabels = ({ projectID, setLabel }) => {
   return (
     <div>
       {labels.map((label) => (
-        <Button className="dark" onClick={() => setLabel(label)} style={{ margin: '0.2em' }}>
+        <Button className="dark" onClick={() => pushLabel(label)} style={{ margin: '0.2em' }}>
           {label}
         </Button>
       ))}

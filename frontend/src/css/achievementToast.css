@@ -1,0 +1,16 @@
+.achievement-toast-body {
+  height: 7.5rem;
+  width: 18rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.achievement-toast-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: inherit;
+}

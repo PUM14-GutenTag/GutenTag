@@ -20,19 +20,31 @@ from api.models import (
     SequenceLabel,
     SequenceToSequenceLabel,
     ImageClassificationLabel,
-    User
+    User,
+    Achievement,
+    Statistic,
+    Login
 )
 from api.database_handler import (
     reset_db,
-    try_add,
     try_add_response,
-    try_delete_response
+    try_delete_response,
+    add_flush,
+    commit
 )
 from api.parser import (
     import_text_data,
     import_image_data,
     export_data
 )
+from api.gamification import (add_stats_to_new_user,
+                              LabelingStatistic,
+                              ProjectStatistic,
+                              LoginStatistic,
+                              WorkdayLoginStatistic,
+                              WeekendLoginStatistic,
+                              ImportStatistic,
+                              ExportStatistic)
 
 
 """
@@ -79,14 +91,17 @@ class CreateUser(Resource):
         if user.access_level >= AccessLevel.ADMIN:
             new_user = User(args.first_name, args.last_name, args.email,
                             args.password, args.admin)
-            return make_response(jsonify(try_add_response(new_user)), 200)
+            add_flush(new_user)
+            add_stats_to_new_user(new_user.id)
+            commit()
+            return make_response(jsonify("User added."), 200)
 
         return make_response(jsonify({"id": None, "message":
                                       "You are not authorized to  \
                                       create other users."}), 401)
 
 
-class Login(Resource):
+class LoginUser(Resource):
     """
     Endpoint for logging in an user.
     """
@@ -110,10 +125,14 @@ class Login(Resource):
                 access_token, refresh_token = None, None
                 status = 401
             else:
+                add_flush(Login(user_id=user.id))
+                LoginStatistic.update(user.id)
+                WorkdayLoginStatistic.update(user.id)
+                WeekendLoginStatistic.update(user.id)
+                commit()
                 msg = f"Logged in as {user.first_name} {user.last_name}"
                 access_token, refresh_token = response
                 status = 200
-
         return make_response(jsonify({
             "message": msg,
             "access_token": access_token,
@@ -293,6 +312,7 @@ class NewProject(Resource):
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
+                ProjectStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     Project(args.project_name, args.project_type)
                 )), 200)
@@ -428,6 +448,8 @@ class AddNewTextData(Resource):
 
             try:
                 import_text_data(args.project_id, json.load(json_file))
+                ImportStatistic.update(user.id)
+                commit()
                 msg = "Data added."
                 status = 200
             except Exception as e:
@@ -483,6 +505,8 @@ class AddNewImageData(Resource):
             try:
                 import_image_data(args.project_id, json.load(json_file),
                                   image_dict)
+                ImportStatistic.update(user.id)
+                commit()
                 msg = "Data added."
                 status = 200
             except Exception as e:
@@ -657,6 +681,7 @@ class CreateDocumentClassificationLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -670,9 +695,12 @@ class CreateDocumentClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                # Only update statistic once per data
+                if not data.has_labeled(user.id):
+                    LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
-                        args.data_id, user.id, args.label)
+                        args.data_id, user.id, args.label, args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
@@ -694,6 +722,7 @@ class CreateSequenceLabel(Resource):
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
         self.reqparse.add_argument("begin", type=int, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
         self.reqparse.add_argument("end", type=int, required=True)
 
     @jwt_required()
@@ -708,9 +737,12 @@ class CreateSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                # Only update statistic once per data
+                if not data.has_labeled(user.id):
+                    LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
-                                  args.begin, args.end))), 200)
+                                  args.begin, args.end, args.color))), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -730,6 +762,7 @@ class CreateSequenceToSequenceLabel(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("data_id", type=int, required=True)
         self.reqparse.add_argument("label", type=str, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -743,9 +776,12 @@ class CreateSequenceToSequenceLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                # Only update statistic once per data
+                if not data.has_labeled(user.id):
+                    LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
-                        args.data_id, user.id, args.label)
+                        args.data_id, user.id, args.label, args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
@@ -770,6 +806,7 @@ class CreateImageClassificationLabel(Resource):
         self.reqparse.add_argument("y1", type=int, required=True)
         self.reqparse.add_argument("x2", type=int, required=True)
         self.reqparse.add_argument("y2", type=int, required=True)
+        self.reqparse.add_argument("color", type=str, required=True)
 
     @jwt_required()
     def post(self):
@@ -783,10 +820,13 @@ class CreateImageClassificationLabel(Resource):
 
         if user.is_authorized(data.project.id):
             try:
+                # Only update statistic once per data
+                if not data.has_labeled(user.id):
+                    LabelingStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,
-                        (args.x1, args.y1), (args.x2, args.y2))
+                        (args.x1, args.y1), (args.x2, args.y2), args.color)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create label: {e}"
@@ -979,14 +1019,17 @@ class GetExportData(Resource):
 
         if user.access_level >= AccessLevel.ADMIN:
             try:
+                data = export_data(project.id)
+                ExportStatistic.update(user.id)
+                commit()
                 if (project.project_type == ProjectType.IMAGE_CLASSIFICATION):
                     return make_response(send_file(
-                        export_data(project.id),
+                        data,
                         attachment_filename=f"{project.name}.zip",
                         as_attachment=True
                     ), 200)
                 else:
-                    return make_response(export_data(project.id), 200)
+                    return make_response(data, 200)
             except Exception as e:
                 msg = f"Could not export data: {e}"
                 status = 404
@@ -1026,6 +1069,42 @@ class GetImageData(Resource):
         return make_response(jsonify({"message": msg}), status)
 
 
+class GetUnnotifiedAchievements(Resource):
+    """
+    Endpoint that returns a list of achievements which have not been displayed
+    for the user.
+    """
+    @jwt_required()
+    def get(self):
+        user = User.get_by_email(get_jwt_identity())
+        achieve_list = Achievement.get_unnotified(user.id)
+        return jsonify(achieve_list)
+
+
+class GetAchievements(Resource):
+    """
+    Endpoint that returns a list of all the user's achievements whether they've
+    been earned or not.
+    """
+    @jwt_required()
+    def get(self):
+        user = User.get_by_email(get_jwt_identity())
+        achieve_list = Achievement.query.filter_by(user_id=user.id)
+        return jsonify([achieve.format_json() for achieve in achieve_list])
+
+
+class GetStatistics(Resource):
+    """
+    Endpoint that returns a list of all the user's achievements whether they've
+    been earned or not.
+    """
+    @jwt_required()
+    def get(self):
+        user = User.get_by_email(get_jwt_identity())
+        stat_list = Statistic.query.filter_by(user_id=user.id)
+        return jsonify([stat.format_json() for stat in stat_list])
+
+
 class Reset(Resource):
     """
     Reset defines an endpoint used to reset the database for use during
@@ -1035,11 +1114,13 @@ class Reset(Resource):
     def get(self):
         reset_db()
         admin = User("Admin", "Admin", "admin@admin", "password", True)
-        try_add(admin)
+        add_flush(admin)
+        add_stats_to_new_user(admin.id)
+        commit()
 
 
 rest.add_resource(CreateUser, "/create-user")
-rest.add_resource(Login, "/login")
+rest.add_resource(LoginUser, "/login")
 rest.add_resource(ChangePassword, "/change-password")
 rest.add_resource(RefreshToken, "/refresh-token")
 rest.add_resource(Authorize, "/authorize-user")
@@ -1066,4 +1147,7 @@ rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")
+rest.add_resource(GetUnnotifiedAchievements, "/get-unnotified-achievements")
+rest.add_resource(GetAchievements, "/get-achievements")
+rest.add_resource(GetStatistics, "/get-statistics")
 rest.add_resource(Reset, "/reset")

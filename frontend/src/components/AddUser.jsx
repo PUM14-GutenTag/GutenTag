@@ -10,11 +10,22 @@ const AddUser = ({ toggleBack }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [validEmail, setValidEmail] = useState(true);
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateUser(firstname, lastname, password, email, isAdmin);
-    toggleBack();
+    const response = await HTTPLauncher.sendCreateUser(
+      firstname,
+      lastname,
+      password,
+      email,
+      isAdmin
+    );
+    if (response.data.id === null) {
+      setValidEmail(false);
+    } else {
+      toggleBack();
+    }
   };
 
   const handleChange = (event) => {
@@ -61,6 +72,7 @@ const AddUser = ({ toggleBack }) => {
               placeholder="Enter an email..."
               required
             />
+            {!validEmail && <div className="red-text">This email already exists!</div>}
           </Form.Group>
         </Row>
         <Row>
