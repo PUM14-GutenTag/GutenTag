@@ -82,7 +82,7 @@ const Labeling = ({ location }) => {
   const getLastData = async () => {
     const tempLocalIndex = CURRENT_DATA - 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
-    if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
+    if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0) && index > 0) {
       const tempIndex = index - 1;
       setIndex(tempIndex);
       tempListOfDataPoints.pop();
@@ -101,7 +101,7 @@ const Labeling = ({ location }) => {
   const nextData = async () => {
     const tempLocalIndex = CURRENT_DATA + 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
-    if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
+    if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0) && index < dataAmount - 1) {
       const tempIndex = index + 1;
       setIndex(tempIndex);
       tempListOfDataPoints.shift();
@@ -115,7 +115,6 @@ const Labeling = ({ location }) => {
       getSetLabels(tempListOfDataPoints);
     }
   };
-
 
   const handleUserKeyPress = (e) => {
     const { key } = e;
