@@ -19,6 +19,7 @@ services:
       - ./test_resources:/usr/src/backend/Test/res
     restart: unless-stopped
     env_file:
+      - ./.env.dev
 
 volumes:
   postgres_data:

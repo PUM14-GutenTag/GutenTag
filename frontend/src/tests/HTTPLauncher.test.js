@@ -14,7 +14,8 @@ beforeAll(() => {
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
   // Tests won't work using localhost. Must use backend.
   HTTPLauncher.setBaseURL(
-    process.env.REACT_APP_MODE === 'prod' ? 'http://backend/api/' : 'http://backend:5000/'
+    'http://backend:5000/'
+    // process.env.REACT_APP_MODE === 'prod' ? 'http://backend/api/' : 'http://backend:5000/'
   );
 });
 
