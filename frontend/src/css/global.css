@@ -88,13 +88,6 @@ td.right,
 th.right {
   text-align: end;
 }
-.input-spinner {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
 
 .no-select {
   -webkit-touch-callout: none; /* iOS Safari */

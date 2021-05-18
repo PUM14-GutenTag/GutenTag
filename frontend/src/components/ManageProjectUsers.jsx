@@ -10,6 +10,7 @@ import '../css/editProject.css';
 // Component for making users authorized and deauthorized to projects.
 // Only accessable as admin.
 const ManageProjectUsers = ({ projectID }) => {
+  const [showUsers] = useState(true);
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('');
   const [projectUsers, setProjectUsers] = useState([]);
@@ -56,8 +57,11 @@ const ManageProjectUsers = ({ projectID }) => {
   };
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+    if (showUsers) {
+      fetchUserData();
+    }
+    // eslint-disable-next-line
+  }, [showUsers]);
 
   // Sends request to backend to deauthorize user.
   const deauthorizeUser = async (u) => {

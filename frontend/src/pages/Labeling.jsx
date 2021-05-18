@@ -25,8 +25,7 @@ const Labeling = ({ location }) => {
   const [labels, setLabels] = useState([]);
   const [index, setIndex] = useState(0);
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
-  const [progressInvidual, setProgressInvidual] = useState(0);
-  const [progressProject, setProgressProject] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
   const [defaultLabel, setLabel] = useState('');
   const CURRENT_DATA = 5;
@@ -34,12 +33,6 @@ const Labeling = ({ location }) => {
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
   const type = projectType;
   const projectId = id;
-  // fetch progress
-  const fetchProgress = async () => {
-    const response = await HTTPLauncher.sendGetProjectProgress(id);
-    setProgressProject(response.data.progress);
-  };
-
   // fetch all labels for a given datapoint
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
@@ -50,7 +43,6 @@ const Labeling = ({ location }) => {
       } else {
         setLabels([]);
       }
-      fetchProgress();
     }
   };
 
@@ -75,9 +67,9 @@ const Labeling = ({ location }) => {
       setDataAmount(response.data.dataAmount);
       const labeledByUser = response.data.labeledByUser;
       if (response.data.dataAmount === 0) {
-        setProgressInvidual(0);
+        setProgress(0);
       } else {
-        setProgressInvidual((labeledByUser / response.data.dataAmount) * 100);
+        setProgress((labeledByUser / response.data.dataAmount) * 100);
       }
     };
     getAmountOfData();
@@ -213,13 +205,10 @@ const Labeling = ({ location }) => {
     return <></>;
   };
   const finishedLabel = () => {
-    if (progressInvidual === 100 && progressProject !== 100) {
-      return <FinishedPopUp projectDone={false} />;
+    if (progress === 100) {
+      return <FinishedPopUp />;
     }
-    if (progressProject === 100) {
-      return <FinishedPopUp projectDone />;
-    }
-    return <ProgressBar striped variant="success" now={progressInvidual} />;
+    return <ProgressBar striped variant="success" now={progress} />;
   };
 
   return (
@@ -228,7 +217,7 @@ const Labeling = ({ location }) => {
         <div className="progress-bars">
           {finishedLabel()}
           <br />
-          <ProgressBar striped variant="warning" now={progressProject} />
+          <ProgressBar striped variant="warning" now={25} />
         </div>
         <br />
         <div>

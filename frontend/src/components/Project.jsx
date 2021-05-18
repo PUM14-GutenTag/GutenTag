@@ -6,16 +6,7 @@ import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { GearFill } from 'react-bootstrap-icons';
 
-const Project = ({
-  id,
-  name,
-  created,
-  progress,
-  projectType,
-  selectedColor,
-  showEditButton,
-  labelsPerDatapoint,
-}) => {
+const Project = ({ id, name, created, projectType, selectedColor, showEditButton }) => {
   const [showInfo, setShowInfo] = useState(false);
   const projectTypeNames = [
     'Document classification',
@@ -37,7 +28,7 @@ const Project = ({
     >
       <div className="title-container" aria-hidden="true">
         <h1>{name}</h1>
-        <ProgressBar now={progress} striped id="progress-bar-project" />
+        <ProgressBar now={50} striped id="progress-bar-project" />
       </div>
       {showInfo ? (
         <div className="projectInfo">
@@ -45,7 +36,6 @@ const Project = ({
             <p>Type: {projectTypeNames[projectType - 1]}</p>
             <p>Progress: 1/4 </p>
             <p>Started: {created}</p>
-            <p>Labels per datapoint: {labelsPerDatapoint}</p>
           </div>
         </div>
       ) : null}
@@ -71,7 +61,6 @@ const Project = ({
               id,
               name,
               projectType,
-              labelsPerDatapoint,
             },
           }}
         >
@@ -83,14 +72,12 @@ const Project = ({
 };
 
 Project.propTypes = {
-  showEditButton: PropTypes.bool,
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   created: PropTypes.string.isRequired,
-  progress: PropTypes.number.isRequired,
   projectType: PropTypes.number.isRequired,
   selectedColor: PropTypes.string.isRequired,
-  labelsPerDatapoint: PropTypes.number.isRequired,
+  showEditButton: PropTypes.bool,
 };
 
 Project.defaultProps = {

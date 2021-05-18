@@ -86,28 +86,26 @@ def test_create_project():
     reset_db()
 
     # Test correctly creating a project.
-    project = try_add(
-        Project("Project", ProjectType.DOCUMENT_CLASSIFICATION, 5))
+    project = try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
     assert project is not None
 
     # Test duplicate project name.
     with raises(IntegrityError):
-        project = try_add(
-            Project("Project", ProjectType.IMAGE_CLASSIFICATION, 5))
+        project = try_add(Project("Project", ProjectType.IMAGE_CLASSIFICATION))
         assert project is None
 
     # Test incorrect project name.
     with raises(TypeError):
         project = try_add(
-            Project({"Project"}, ProjectType.IMAGE_CLASSIFICATION, 5))
+            Project({"Project"}, ProjectType.IMAGE_CLASSIFICATION))
         assert project is None
 
 
 def test_get_all_projects():
     reset_db()
     try_add(User("first", "last", "user@gmail.com", "password", True))
-    try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION, 5))
-    try_add(Project("Project2", ProjectType.DOCUMENT_CLASSIFICATION, 5))
+    try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
+    try_add(Project("Project2", ProjectType.DOCUMENT_CLASSIFICATION))
 
     all_projects = Project.query.all()
     assert all_projects is not None
@@ -116,7 +114,7 @@ def test_get_all_projects():
 def test_authorize_user():
     reset_db()
 
-    project = try_add(Project("A project", ProjectType.SEQUENCE_LABELING, 5))
+    project = try_add(Project("A project", ProjectType.SEQUENCE_LABELING))
 
     # Test authorizing existing user.
     user = try_add(User("firstname", "lastname", "mail@gmail.com", "password",
@@ -142,8 +140,7 @@ def test_deauthorize_user():
     reset_db()
 
     user = try_add(User("first", "last", "user@gmail.com", "password"))
-    project = try_add(
-        Project("Project", ProjectType.DOCUMENT_CLASSIFICATION, 5))
+    project = try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
     user.authorize(project.id)
 
     # Test deauthorizing existing user.
@@ -160,7 +157,7 @@ def test_deauthorize_user():
     user = try_add(User("firstname", "lastname", "user57@gmail.com",
                         "password"))
     project = try_add(Project("Projecttest",
-                              ProjectType.DOCUMENT_CLASSIFICATION, 5))
+                              ProjectType.DOCUMENT_CLASSIFICATION))
     with raises(ValueError):
         user.deauthorize(project.id)
 
@@ -171,7 +168,7 @@ def test_document_classification_label():
     user = try_add(User("firsttest", "lasttest",
                         "usertest@gmail.com", "password"))
     project = try_add(Project(
-        "Project", ProjectType.DOCUMENT_CLASSIFICATION, 5))
+        "Project", ProjectType.DOCUMENT_CLASSIFICATION))
     label_str = "Positive"
     color = "#3A6FE8"
     data = try_add(ProjectTextData(project.id, "This is so exciting!"))
@@ -195,7 +192,7 @@ def test_sequence_label():
     user = try_add(User("firsttest", "lasttest",
                         "usertest@gmail.com", "password"))
     project = try_add(Project(
-        "Project", ProjectType.SEQUENCE_LABELING, 5))
+        "Project", ProjectType.SEQUENCE_LABELING))
     data = try_add(ProjectTextData(
         project.id, "Alex is going to Los Angeles in California"))
     color = "#3A6FE8"
@@ -215,7 +212,7 @@ def test_sequence_to_sequence_label():
     user = try_add(User("firsttest", "lasttest",
                         "usertest@gmail.com", "password"))
     project = try_add(Project(
-        "Project", ProjectType.SEQUENCE_TO_SEQUENCE, 5))
+        "Project", ProjectType.SEQUENCE_TO_SEQUENCE))
     data = try_add(
         ProjectTextData(project.id,
                         "John saw the man on the mountain with a telescope."))
@@ -235,7 +232,7 @@ def test_image_classification_label():
     user = try_add(User("firsttest", "lasttest",
                         "usertest@gmail.com", "password"))
     project = try_add(Project(
-        "Project", ProjectType.IMAGE_CLASSIFICATION, 5))
+        "Project", ProjectType.IMAGE_CLASSIFICATION))
     color = "#3A6FE8"
 
     image_file = os.path.join(PATH, "res/images/ILSVRC2012_val_00000001.JPEG")
@@ -258,7 +255,7 @@ def test_delete_label():
     user = try_add(User("firsttest", "lasttest",
                         "usertest@gmail.com", "password"))
     project = try_add(Project(
-        "Project", ProjectType.DOCUMENT_CLASSIFICATION, 5))
+        "Project", ProjectType.DOCUMENT_CLASSIFICATION))
     in_data = "Test"
     label_str = "Positive"
     color = "#3A6FE8"
@@ -276,8 +273,7 @@ def test_delete_label():
 def test_delete_project():
     reset_db()
 
-    project = try_add(
-        Project("Project", ProjectType.DOCUMENT_CLASSIFICATION, 5))
+    project = try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
     project_id = project.id
     data = try_add(ProjectTextData(project.id, "text"))
     data_id = data.id

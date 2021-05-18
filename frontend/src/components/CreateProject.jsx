@@ -4,11 +4,10 @@ import { Redirect } from 'react-router-dom';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 import ProjectType from '../ProjectType';
-import InputSpinner from './InputSpinner';
+
 /* Component for creating a project */
 const CreateProject = () => {
   const [projectName, setProjectName] = useState('');
-  const [labelsPerDatapoint, setLabelsPerDatapoint] = useState(1);
   const [projectType, setProjectType] = useState(ProjectType.DOCUMENT_CLASSIFICATION);
   const [ID, setID] = useState();
   const [error, setError] = useState(false);
@@ -16,19 +15,11 @@ const CreateProject = () => {
   // Creates a project in the backend
   const submitHandler = async (event) => {
     event.preventDefault();
-    const response = await HTTPLauncher.sendCreateProject(
-      projectName,
-      projectType,
-      labelsPerDatapoint
-    );
+    const response = await HTTPLauncher.sendCreateProject(projectName, projectType);
     if (response.data.id === null) {
       setError(true);
     }
     setID(response.data.id);
-  };
-
-  const sendChange = async (amount) => {
-    setLabelsPerDatapoint(amount);
   };
 
   return (
@@ -72,12 +63,7 @@ const CreateProject = () => {
             </Form.Control>
           </Form.Group>
         </Row>
-        <Row>
-          <div>
-            <Form.Label className="titleLabel">Labels per datapoint</Form.Label>
-            <InputSpinner amount={labelsPerDatapoint} setAmount={sendChange} />
-          </div>
-        </Row>
+
         <Row>
           <Button className="dark" variant="primary" type="submit">
             Submit
@@ -89,8 +75,7 @@ const CreateProject = () => {
                 state: {
                   id: ID,
                   name: projectName,
-                  projectType: parseInt(projectType, 10),
-                  labelsPerDatapoint: parseInt(labelsPerDatapoint, 10),
+                  projectType,
                 },
               }}
             />
