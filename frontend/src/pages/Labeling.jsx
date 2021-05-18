@@ -116,7 +116,6 @@ const Labeling = ({ location }) => {
     }
   };
 
-
   const handleUserKeyPress = (e) => {
     const { key } = e;
     if (key === 'ArrowRight') {
@@ -147,6 +146,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
           />
         );
       }
@@ -165,6 +165,7 @@ const Labeling = ({ location }) => {
           <ImageLabeling
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
           />
         );
       }
@@ -174,6 +175,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
           />
         );
       }

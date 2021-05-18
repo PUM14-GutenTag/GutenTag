@@ -8,20 +8,28 @@ import { generateRandomColor, textBoxSize } from '../util';
 /* 
 Component that shows the specifics for document classification 
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
+const DocumentClassification = ({ data, dataPointId, getSetLabels, labels }) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
   const addLabel = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateDocumentClassificationLabel(
-      dataPointId,
-      inputRef.current.value,
-      generateRandomColor()
-    );
-    getSetLabels();
-    inputRef.current.value = '';
-    inputRef.current.focus();
+    let uniqueLabel = true;
+    labels.forEach((label) => {
+      if (label.label === inputRef.current.value) {
+        uniqueLabel = false;
+      }
+    });
+    if (uniqueLabel) {
+      await HTTPLauncher.sendCreateDocumentClassificationLabel(
+        dataPointId,
+        inputRef.current.value,
+        generateRandomColor()
+      );
+      getSetLabels();
+      inputRef.current.value = '';
+      inputRef.current.focus();
+    }
   };
 
   useEffect(() => {
@@ -59,6 +67,15 @@ DocumentClassification.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
+  labels: PropTypes.arrayOf(
+    PropTypes.shape({
+      color: PropTypes.string.isRequired,
+      data_id: PropTypes.number.isRequired,
+      label: PropTypes.string.isRequired,
+      label_id: PropTypes.number.isRequired,
+      user_id: PropTypes.number.isRequired,
+    }).isRequired
+  ).isRequired,
 };
 
 export default DocumentClassification;
