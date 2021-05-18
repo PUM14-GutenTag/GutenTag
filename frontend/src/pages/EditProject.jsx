@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
 import Layout from '../components/Layout';
 import ImportForm from '../components/ImportForm';
