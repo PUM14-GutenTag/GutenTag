@@ -9,6 +9,7 @@ from pytest import raises
 from sqlalchemy.exc import IntegrityError
 from api.database_handler import reset_db, try_add, try_delete
 from api.models import (User,
+                        DefaultLabel,
                         Project,
                         ProjectData,
                         ProjectTextData,
@@ -65,6 +66,20 @@ def test_change_password():
 
     assert user.check_password("password") is False
     assert user.check_password("bassword") is True
+
+
+def test_create_default_labels():
+    reset_db()
+
+    # Test correctly creating a project.
+    project = try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
+    assert project is not None
+
+    default_label = try_add(DefaultLabel(project, "negative"))
+    assert default_label is not None
+    assert default_label.project == project
+    assert project.default_labels[0] == default_label
+    assert project.default_labels[0].name == "negative"
 
 
 def test_create_project():

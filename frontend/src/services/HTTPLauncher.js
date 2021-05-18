@@ -101,6 +101,18 @@ class HTTPLauncher {
     );
   }
 
+  // Send HTTP-request to create a new default label.
+  static sendCreateDefaultLabel(labelName, projectID) {
+    return axios.post(
+      'create-default-label',
+      {
+        label_name: labelName,
+        project_id: projectID,
+      },
+      { headers: authHeader() }
+    );
+  }
+
   // Send HTTP-request to create a new project.
   static sendCreateProject(projectName, projectType, labelsPerDatapoint) {
     return axios.post(
@@ -112,6 +124,17 @@ class HTTPLauncher {
       },
       { headers: authHeader() }
     );
+  }
+
+  // Send HTTP-request to delete an existing default label.
+  static sendDeleteDefaultLabel(projectID, labelName) {
+    return axios.delete('delete-default-label', {
+      headers: authHeader(),
+      data: {
+        project_id: projectID,
+        label_name: labelName,
+      },
+    });
   }
 
   // Send HTTP-request to delete an existing project.
@@ -240,6 +263,14 @@ class HTTPLauncher {
     return axios.post('add-image-data', formData, {
       headers: { 'Content-type': 'multipart/form-data', ...authHeader() },
       onUploadProgress,
+    });
+  }
+
+  // Send HTTP-request to fetch default labels.
+  static sendGetDefaultLabel(projectID) {
+    return axios.get('get-default-labels', {
+      headers: authHeader(),
+      params: { project_id: projectID },
     });
   }
 

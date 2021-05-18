@@ -10,7 +10,7 @@ import { generateRandomColor } from '../util';
 /*
 Component that shows a image, you are able to crop the img with a label
 */
-const ImageLabeling = ({ dataPointId, getSetLabels }) => {
+const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel }) => {
   const inputRef = useRef();
   const cropperRef = useRef();
 
@@ -62,6 +62,25 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
     // eslint-disable-next-line
   }, [dataPointId]);
 
+  useEffect(() => {
+    if (defaultLabel !== '') {
+      (async () => {
+        const cropData = getCropData();
+        await HTTPLauncher.sendCreateImageClassificationLabel(
+          dataPointId,
+          defaultLabel,
+          cropData[0],
+          cropData[1],
+          cropData[2],
+          cropData[3],
+          generateRandomColor()
+        );
+        getSetLabels();
+      })();
+      setLabel('');
+    }
+  }, [defaultLabel]);
+
   // Sets X and Y states when cropping
   const onCrop = (e) => {
     setX(e.detail.x);
@@ -109,6 +128,8 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
 ImageLabeling.propTypes = {
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default ImageLabeling;

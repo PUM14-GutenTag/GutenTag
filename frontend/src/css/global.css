@@ -122,3 +122,12 @@ th.right {
 .red-text {
   color: #f52882;
 }
+
+.btn-margin {
+  margin: 0.2em;
+}
+
+#col-cen-pad {
+  justify-content: center;
+  padding-left: 0px;
+}

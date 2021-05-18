@@ -166,6 +166,18 @@ describe('sendDeauthorizeUser request', () => {
   });
 });
 
+describe('sendCreateDefaultLabel', () => {
+  test('Correct request', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1);
+
+    const response = await HTTPLauncher.sendCreateDefaultLabel('label', projectID);
+    expect(response.status).toBe(200);
+    expect(response.data.id).toBeDefined();
+  });
+});
+
 describe('sendCreateProject', () => {
   test('Correct request', async () => {
     await testUtil.resetDB();
@@ -218,6 +230,19 @@ describe('sendGetUserProjects', () => {
     expect(response.status).toBe(200);
     expect(response.data.projects['1'].type).toBe(1);
     expect(response.data.projects['2'].type).toBe(2);
+  });
+});
+
+describe('sendDeleteDefaultLabel request', () => {
+  test('Correct request', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1);
+    await HTTPLauncher.sendCreateDefaultLabel('label', projectID);
+
+    const response = await HTTPLauncher.sendDeleteDefaultLabel(projectID, 'label');
+    expect(response.status).toBe(200);
+    expect(response.data.id).toBeDefined();
   });
 });
 
@@ -321,6 +346,19 @@ describe('sendAddNewImageData request', () => {
     );
     expect(response.status).toBe(200);
     expect(response.data.message).toBe('Data added.');
+  });
+});
+
+describe('sendGetDefaultLabel request', () => {
+  test('Default labels', async () => {
+    await testUtil.resetDB();
+    await testUtil.createUser();
+    const projectID = await testUtil.createProject(1);
+    await HTTPLauncher.sendCreateDefaultLabel('label', projectID);
+
+    const response = await HTTPLauncher.sendGetDefaultLabel(projectID);
+    expect(response.status).toBe(200);
+    expect(response.data[1].name).toBe('label');
   });
 });
 
