@@ -1,7 +1,7 @@
 name: JS CI Test
 on:
   push:
-    branches: [main, production]
+    branches: [main]
   pull_request:
     branches: [main]
 

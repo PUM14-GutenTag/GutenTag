@@ -13,6 +13,7 @@ def create_db():
     """
     db.create_all()
     db.session.flush()
+    print("USERS", User.query.all())
     if (len(User.query.all()) == 0):
         admin = User("Admin", "Admin", "admin@admin.com", "password", True)
         db.session.add(admin)

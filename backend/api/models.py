@@ -5,7 +5,6 @@ import datetime
 import io
 from math import ceil
 from enum import IntEnum
-from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token

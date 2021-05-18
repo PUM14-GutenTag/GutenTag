@@ -6,7 +6,6 @@ from api.models import (Achievement,
                         Login,
                         User)
 from api import db
-from sqlalchemy import event
 
 
 ###################################################
