@@ -258,12 +258,13 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to label a datapoint.
-  static sendCreateDocumentClassificationLabel(dataID, label) {
+  static sendCreateDocumentClassificationLabel(dataID, label, color) {
     return axios.post(
       'label-document',
       {
         data_id: dataID,
         label,
+        color,
       },
       {
         headers: authHeader(),
@@ -272,7 +273,7 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to label a datapoint.
-  static sendCreateSequenceLabel(dataID, label, begin, end) {
+  static sendCreateSequenceLabel(dataID, label, begin, end, color) {
     return axios.post(
       'label-sequence',
       {
@@ -280,6 +281,7 @@ class HTTPLauncher {
         label,
         begin,
         end,
+        color,
       },
       {
         headers: authHeader(),
@@ -288,12 +290,13 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to label a datapoint.
-  static sendCreateSequenceToSequenceLabel(dataID, label) {
+  static sendCreateSequenceToSequenceLabel(dataID, label, color) {
     return axios.post(
       'label-sequence-to-sequence',
       {
         data_id: dataID,
         label,
+        color,
       },
       {
         headers: authHeader(),
@@ -302,7 +305,7 @@ class HTTPLauncher {
   }
 
   // Send HTTP-request to label a datapoint.
-  static sendCreateImageClassificationLabel(dataID, label, x1, y1, x2, y2) {
+  static sendCreateImageClassificationLabel(dataID, label, x1, y1, x2, y2, color) {
     return axios.post(
       'label-image',
       {
@@ -312,6 +315,7 @@ class HTTPLauncher {
         y1,
         x2,
         y2,
+        color,
       },
       {
         headers: authHeader(),
@@ -423,6 +427,27 @@ class HTTPLauncher {
       headers: authHeader(),
       responseType: 'blob',
       params: { data_id: dataID },
+    });
+  }
+
+  // Send HTTP-request to get achievements which have not been displayed to the user.
+  static sendGetUnnotifiedAchievements() {
+    return axios.get('get-unnotified-achievements', {
+      headers: authHeader(),
+    });
+  }
+
+  // Send HTTP-request to get all achievements.
+  static sendGetAchievements() {
+    return axios.get('get-achievements', {
+      headers: authHeader(),
+    });
+  }
+
+  // Send HTTP-request to get all statistics.
+  static sendGetStatistics() {
+    return axios.get('get-statistics', {
+      headers: authHeader(),
     });
   }
 

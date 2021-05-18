@@ -118,6 +118,22 @@ svg.remove {
   margin-right: 0.2em;
 }
 
+.main-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-container {
+  height: 100%;
+  width: 100%;
+}
+
+.main-col > h2 {
+  margin-top: 1.75rem;
+}
+
 /* Create Project & User Form */
 
 .create-container {

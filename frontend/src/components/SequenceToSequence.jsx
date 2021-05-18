@@ -4,17 +4,22 @@ import Form from 'react-bootstrap/Form';
 import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/DocumentClassification.css';
 import '../css/SequenceToSequence.css';
+import { generateRandomColor, textBoxSize } from '../util';
 
 /* 
-Component that shows the specifics for document classification 
+Component that shows the specifics for sequence to sequence labeling 
 */
-const SequenceToSequence = ({ data, dataPointId, getSetLabels, textBoxSize }) => {
+const SequenceToSequence = ({ data, dataPointId, getSetLabels }) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
   const addLabel = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateSequenceToSequenceLabel(dataPointId, inputRef.current.value);
+    await HTTPLauncher.sendCreateSequenceToSequenceLabel(
+      dataPointId,
+      inputRef.current.value,
+      generateRandomColor()
+    );
     getSetLabels();
     inputRef.current.value = '';
     inputRef.current.focus();
@@ -28,7 +33,7 @@ const SequenceToSequence = ({ data, dataPointId, getSetLabels, textBoxSize }) =>
   return (
     <div className="classification-container">
       <div className="text-box-container">
-        <p className={textBoxSize}>{data}</p>
+        <p style={{ fontSize: textBoxSize(data) }}>{data}</p>
       </div>
       <hr className="hr-title" data-content="Add new sequence" />
       <div className="form-container">
@@ -55,7 +60,6 @@ SequenceToSequence.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
-  textBoxSize: PropTypes.string.isRequired,
 };
 
 export default SequenceToSequence;

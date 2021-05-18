@@ -60,6 +60,7 @@ const ManageProjectUsers = ({ projectID }) => {
     if (showUsers) {
       fetchUserData();
     }
+    // eslint-disable-next-line
   }, [showUsers]);
 
   // Sends request to backend to deauthorize user.

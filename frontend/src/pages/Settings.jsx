@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { Button, Row, Col } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 import CreateProject from '../components/CreateProject';
 import ChangePass from '../components/ChangePass';
 import ManageUsers from '../components/ManageUsers';
 import AchievementCarousel from '../components/AchievementCarousel';
+import StatList from '../components/StatList';
 import Layout from '../components/Layout';
 
 import { useUser } from '../contexts/UserContext';
+import userAuth from '../services/userAuth';
 
 import SettingPages from '../SettingPages';
 
@@ -21,12 +26,12 @@ import '../css/settings.css';
 const Settings = () => {
   const [showPage, setPageShow] = useState(SettingPages.DEFAULT);
   const { state: userState } = useUser();
+  const history = useHistory();
 
   // Sets the accesstoken to null and redirects to login page.
   const logout = () => {
-    localStorage.setItem('gutentag-accesstoken', null);
-    localStorage.setItem('gutentag-refreshtoken', null);
-    window.location.href = 'http://localhost:3000/';
+    userAuth.clearTokens();
+    history.push('/');
   };
 
   const toggleBack = () => {
@@ -35,21 +40,8 @@ const Settings = () => {
 
   const pages = [
     <div>
-      <Col
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <h1>Name: {userState.name}</h1>
-        <br />
-        <h1>Personal records</h1>
-        <div style={{ height: '100%', width: '90%' }}>
-          <AchievementCarousel />
-        </div>
-        <br />
+      <Col className="main-col">
+        <h1>{userState.name}</h1>
         {userState.isAdmin && (
           <Row id="manage-btn-row">
             <Button className="generic" onClick={() => setPageShow(SettingPages.ADD_NEW_PROJECT)}>
@@ -68,6 +60,10 @@ const Settings = () => {
             Change password
           </Button>
         </Row>
+        <h2>Achievements</h2>
+        <AchievementCarousel containerClass="carousel-container" />
+        <h2>Statistics</h2>
+        <StatList />
       </Col>
     </div>,
     <div>
