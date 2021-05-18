@@ -1,6 +1,6 @@
 // Generates a random color HSL colors
 export const generateRandomColor = () => {
-  return `hsl(${360 * Math.random()}, ${75 + 25 * Math.random()}%, ${50 + 15 * Math.random()}%)`;
+  return `hsl(${360 * Math.random()}, ${50 + 50 * Math.random()}%, ${30 + 20 * Math.random()}%)`;
 };
 
 // Choose size of the text to use depending on the length of the text data

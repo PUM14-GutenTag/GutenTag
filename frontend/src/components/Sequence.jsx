@@ -34,7 +34,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
 
   // Highlightes word in if it has been labeled
   const highLightWord = (startingIndex) => {
-    let highLightColor = 'black';
+    let highLightColor = '#063954';
 
     // check if word is labeled
     labels.forEach((label) => {
@@ -153,7 +153,6 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
 
   return (
     <div className="sequence-container">
-      <hr className="hr-title" data-content="Text data" />
       <div id="text-box-container" style={{ fontSize: textBoxSize(data) }}>
         {wrapWordsInSpan(data)}
       </div>

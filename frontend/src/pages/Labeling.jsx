@@ -218,7 +218,7 @@ const Labeling = ({ location }) => {
         <div>
           <div className="main-content">
             <ChevronLeft
-              className="right-left-arrow  make-large fa-10x arrow-btn"
+              className="right-left-arrow  make-large fa-7x arrow-btn"
               onClick={getLastData}
             />
 
@@ -246,7 +246,7 @@ const Labeling = ({ location }) => {
             </div>
 
             <ChevronRight
-              className="right-left-arrow  make-large fa-10x arrow-btn"
+              className="right-left-arrow  make-large fa-7x arrow-btn"
               onClick={nextData}
             />
           </div>

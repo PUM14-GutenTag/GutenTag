@@ -34,5 +34,5 @@
 
 .arrow-btn:hover {
   cursor: pointer;
-  color: rgb(38, 9, 201);
+  opacity: 0.75;
 }
