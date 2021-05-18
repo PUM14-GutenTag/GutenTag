@@ -220,7 +220,7 @@ def test_image_classification_label():
     user = try_add(User("firsttest", "lasttest",
                         "usertest@gmail.com", "password"))
     project = try_add(Project(
-        "Project", ProjectType.IMAGE_CLASSIFICATION))
+        "Project", ProjectType.IMAGE_CLASSIFICATION, 5))
     color = "#3A6FE8"
 
     image_file = os.path.join(PATH, "res/images/ILSVRC2012_val_00000001.JPEG")
