@@ -9,6 +9,9 @@ jobs:
   test:
     name: Run test suite
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_MODE: dev
+      REACT_APP_SERVER_NAME: localhost
 
     steps:
       - name: Checkout code
@@ -22,3 +25,6 @@ jobs:
 
       - name: Run tests
         run: docker-compose run -e CI=true frontend npm test -- --testPathIgnorePatterns performance.test.js
+        env:
+          REACT_APP_MODE: dev
+          REACT_APP_SERVER_NAME: localhost
