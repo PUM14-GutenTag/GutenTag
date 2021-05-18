@@ -9,8 +9,8 @@
   position: relative;
   display: flex;
   padding-bottom: 0;
-  border-radius: 15px;
-  height: 3em;
+  border-radius: 0.3em;
+  height: 2.5em;
   width: 50%;
   margin-top: 1rem;
 }
@@ -20,11 +20,11 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgb(219, 219, 219);
+  background-color: #e9ecef;
   font-size: 20px;
   text-align: center;
   align-items: center;
-  border-radius: 15px;
+  border-radius: 0.3em;
   justify-content: center;
   overflow-y: auto;
   align-content: center;

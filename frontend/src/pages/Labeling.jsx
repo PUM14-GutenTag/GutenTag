@@ -219,7 +219,14 @@ const Labeling = ({ location }) => {
     if (progressProject === 100) {
       return <FinishedPopUp projectDone />;
     }
-    return <ProgressBar variant="prim" now={progressInvidual} />;
+    return (
+      <div>
+        <div style={{ color: 'black', opacity: '0.5', paddingLeft: '0.2em' }}>
+          Individual progression
+        </div>
+        <ProgressBar variant="sec" now={progressInvidual} label={`${progressInvidual.toFixed(2)}%`} />
+      </div>
+    );
   };
 
   return (
@@ -237,7 +244,14 @@ const Labeling = ({ location }) => {
         <div className="progress-bars">
           {finishedLabel()}
           <br />
-          <ProgressBar variant="sec" now={progressProject} />
+          <div style={{ color: 'black', opacity: '0.5', paddingLeft: '0.2em' }}>
+            Project progression
+          </div>
+          <ProgressBar
+            variant="prim"
+            now={progressProject}
+            label={`${progressProject.toFixed(2)}%`}
+          />
         </div>
         <br />
         <div>
