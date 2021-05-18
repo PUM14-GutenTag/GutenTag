@@ -30,18 +30,13 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel, labe
   };
 
   // Adds label to the datapoint and updates the labels that are being shown for the user
-  const addLabel = async () => {
-    let labelStr;
-    if (defaultLabel) {
-      labelStr = defaultLabel;
-    } else {
-      labelStr = inputRef.current.value;
-    }
+  const addLabel = async (event) => {
+    event.preventDefault();
     const cropData = getCropData();
     let uniqueLabel = true;
     labels.forEach((label) => {
       if (
-        label.label === labelStr &&
+        label.label === inputRef.current.value &&
         label.coordinates.x1 === Math.floor(cropData[0]) &&
         label.coordinates.y1 === Math.floor(cropData[1]) &&
         label.coordinates.x2 === Math.floor(cropData[2]) &&
@@ -53,7 +48,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel, labe
     if (uniqueLabel) {
       await HTTPLauncher.sendCreateImageClassificationLabel(
         dataPointId,
-        labelStr,
+        inputRef.current.value,
         cropData[0],
         cropData[1],
         cropData[2],
@@ -83,7 +78,33 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel, labe
 
   useEffect(() => {
     if (defaultLabel !== '') {
-      addLabel();
+      (async () => {
+        const cropData = getCropData();
+        let uniqueLabel = true;
+        labels.forEach((label) => {
+          if (
+            label.label === defaultLabel &&
+            label.coordinates.x1 === Math.floor(cropData[0]) &&
+            label.coordinates.y1 === Math.floor(cropData[1]) &&
+            label.coordinates.x2 === Math.floor(cropData[2]) &&
+            label.coordinates.y2 === Math.floor(cropData[3])
+          ) {
+            uniqueLabel = false;
+          }
+        });
+        if (uniqueLabel) {
+          await HTTPLauncher.sendCreateImageClassificationLabel(
+            dataPointId,
+            defaultLabel,
+            cropData[0],
+            cropData[1],
+            cropData[2],
+            cropData[3],
+            generateRandomColor()
+          );
+          getSetLabels();
+        }
+      })();
       setLabel('');
     }
   }, [defaultLabel]);

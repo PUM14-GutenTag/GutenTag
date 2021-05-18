@@ -17,15 +17,9 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLa
   // Adds a sequnece label and resets values in input and selection box
   const addLabel = async () => {
     if (inputRef.current.value !== '' && selection !== '') {
-      let labelStr;
-      if (defaultLabel) {
-        labelStr = defaultLabel;
-      } else {
-        labelStr = inputRef.current.value;
-      }
       await HTTPLauncher.sendCreateSequenceLabel(
         dataPointId,
-        labelStr,
+        inputRef.current.value,
         startIndex,
         endIndex,
         generateRandomColor()
@@ -72,8 +66,20 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLa
 
   useEffect(() => {
     if (defaultLabel !== '' && selection !== '') {
-      addLabel();
+      (async () => {
+        await HTTPLauncher.sendCreateSequenceLabel(
+          dataPointId,
+          defaultLabel,
+          startIndex,
+          endIndex,
+          generateRandomColor()
+        );
+        getSetLabels();
+      })();
       setLabel('');
+      setSelection('');
+      inputRef.current.value = '';
+      inputRef.current.focus();
     }
   }, [defaultLabel]);
 

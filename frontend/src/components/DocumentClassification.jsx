@@ -19,23 +19,18 @@ const DocumentClassification = ({
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
-  const addLabel = async () => {
-    let labelStr;
-    if (defaultLabel) {
-      labelStr = defaultLabel;
-    } else {
-      labelStr = inputRef.current.value;
-    }
+  const addLabel = async (event) => {
+    event.preventDefault();
     let uniqueLabel = true;
     labels.forEach((label) => {
-      if (label.label === labelStr) {
+      if (label.label === inputRef.current.value) {
         uniqueLabel = false;
       }
     });
     if (uniqueLabel) {
       await HTTPLauncher.sendCreateDocumentClassificationLabel(
         dataPointId,
-        labelStr,
+        inputRef.current.value,
         generateRandomColor()
       );
       getSetLabels();
@@ -51,7 +46,22 @@ const DocumentClassification = ({
 
   useEffect(() => {
     if (defaultLabel !== '') {
-      addLabel();
+      (async () => {
+        let uniqueLabel = true;
+        labels.forEach((label) => {
+          if (label.label === defaultLabel) {
+            uniqueLabel = false;
+          }
+        });
+        if (uniqueLabel) {
+          await HTTPLauncher.sendCreateDocumentClassificationLabel(
+            dataPointId,
+            defaultLabel,
+            generateRandomColor()
+          );
+          getSetLabels();
+        }
+      })();
       setLabel('');
     }
   }, [defaultLabel]);
