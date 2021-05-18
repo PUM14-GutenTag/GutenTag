@@ -7,7 +7,16 @@ import { Accordion, Card } from 'react-bootstrap';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { GearFill, CaretDownFill, CaretLeftFill } from 'react-bootstrap-icons';
 
-const Project = ({ id, name, created, projectType, selectedColor, showEditButton }) => {
+const Project = ({
+  id,
+  name,
+  created,
+  progress,
+  projectType,
+  selectedColor,
+  showEditButton,
+  labelsPerDatapoint,
+}) => {
   const projectTypeNames = [
     'Document classification',
     'Sequence labeling',
@@ -33,7 +42,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
               ) : (
                 <CaretDownFill className="arrow-down" color="#063954" />
               )}
-              <ProgressBar now={50} striped id="progress-bar-project" />
+              <ProgressBar now={progress} striped id="progress-bar-project" />
             </div>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0">
@@ -41,6 +50,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
               <p className="paragraf-text">Type: {projectTypeNames[projectType - 1]}</p>
               <p className="paragraf-text">Progress: 1/4 </p>
               <p className="paragraf-text">Started: {created}</p>
+              <p>Labels per datapoint: {labelsPerDatapoint}</p>
             </Card.Body>
           </Accordion.Collapse>
         </Card>
@@ -74,6 +84,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
                     id,
                     name,
                     projectType,
+                    labelsPerDatapoint,
                   },
                 }}
               >
@@ -88,12 +99,14 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
 };
 
 Project.propTypes = {
+  showEditButton: PropTypes.bool,
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   created: PropTypes.string.isRequired,
+  progress: PropTypes.number.isRequired,
   projectType: PropTypes.number.isRequired,
   selectedColor: PropTypes.string.isRequired,
-  showEditButton: PropTypes.bool,
+  labelsPerDatapoint: PropTypes.number.isRequired,
 };
 
 Project.defaultProps = {
