@@ -14,6 +14,7 @@ import '../css/Labeling.css';
 import Layout from '../components/Layout';
 import Label from '../components/Label';
 import ProjectType from '../ProjectType';
+import DefaultLabels from '../components/DefaultLabels';
 
 /*
 Labeling-page handles labeling functionality
@@ -26,6 +27,7 @@ const Labeling = ({ location }) => {
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
   const [progress, setProgress] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
+  const [defaultLabel, setLabel] = useState('');
   const CURRENT_DATA = 5;
 
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
@@ -75,7 +77,9 @@ const Labeling = ({ location }) => {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line
+    if (listOfDataPoints.length > 0) {
+      getSetLabels(listOfDataPoints);
+    }
   }, []);
 
   // Get earlier datapoint, and delete data point out of scope from list
@@ -147,6 +151,8 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             labels={labels}
+            defaultLabel={defaultLabel}
+            setLabel={setLabel}
           />
         );
       }
@@ -157,6 +163,8 @@ const Labeling = ({ location }) => {
             getSetLabels={getSetLabels}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             labels={labels}
+            defaultLabel={defaultLabel}
+            setLabel={setLabel}
           />
         );
       }
@@ -166,6 +174,8 @@ const Labeling = ({ location }) => {
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
             labels={labels}
+            defaultLabel={defaultLabel}
+            setLabel={setLabel}
           />
         );
       }
@@ -188,7 +198,12 @@ const Labeling = ({ location }) => {
   const suggestionLabels = (typeOfProject) => {
     // Seq to Seq should not display suggestions
     if (typeOfProject !== ProjectType.SEQUENCE_TO_SEQUENCE) {
-      return <hr className="hr-title" data-content="Suggestions" />;
+      return (
+        <div>
+          <hr className="hr-title" data-content="Suggestions" />
+          <DefaultLabels projectID={projectId} setLabel={setLabel} />
+        </div>
+      );
     }
     return <></>;
   };

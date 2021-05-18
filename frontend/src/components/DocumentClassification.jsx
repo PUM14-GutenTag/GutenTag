@@ -5,25 +5,37 @@ import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/DocumentClassification.css';
 import { generateRandomColor, textBoxSize } from '../util';
 
-/* 
-Component that shows the specifics for document classification 
+/*
+Component that shows the specifics for document classification
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels, labels }) => {
+const DocumentClassification = ({
+  data,
+  dataPointId,
+  getSetLabels,
+  defaultLabel,
+  setLabel,
+  labels,
+}) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
-  const addLabel = async (event) => {
-    event.preventDefault();
+  const addLabel = async () => {
+    let labelStr;
+    if (defaultLabel) {
+      labelStr = defaultLabel;
+    } else {
+      labelStr = inputRef.current.value;
+    }
     let uniqueLabel = true;
     labels.forEach((label) => {
-      if (label.label === inputRef.current.value) {
+      if (label.label === labelStr) {
         uniqueLabel = false;
       }
     });
     if (uniqueLabel) {
       await HTTPLauncher.sendCreateDocumentClassificationLabel(
         dataPointId,
-        inputRef.current.value,
+        labelStr,
         generateRandomColor()
       );
       getSetLabels();
@@ -36,6 +48,13 @@ const DocumentClassification = ({ data, dataPointId, getSetLabels, labels }) => 
     inputRef.current.value = '';
     inputRef.current.focus();
   }, [dataPointId]);
+
+  useEffect(() => {
+    if (defaultLabel !== '') {
+      addLabel();
+      setLabel('');
+    }
+  }, [defaultLabel]);
 
   return (
     <div className="classification-container">
@@ -76,6 +95,8 @@ DocumentClassification.propTypes = {
       user_id: PropTypes.number.isRequired,
     }).isRequired
   ).isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default DocumentClassification;

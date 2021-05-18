@@ -10,7 +10,7 @@ import { generateRandomColor } from '../util';
 /*
 Component that shows a image, you are able to crop the img with a label
 */
-const ImageLabeling = ({ dataPointId, getSetLabels, labels }) => {
+const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel, labels }) => {
   const inputRef = useRef();
   const cropperRef = useRef();
 
@@ -30,13 +30,18 @@ const ImageLabeling = ({ dataPointId, getSetLabels, labels }) => {
   };
 
   // Adds label to the datapoint and updates the labels that are being shown for the user
-  const addLabel = async (event) => {
-    event.preventDefault();
+  const addLabel = async () => {
+    let labelStr;
+    if (defaultLabel) {
+      labelStr = defaultLabel;
+    } else {
+      labelStr = inputRef.current.value;
+    }
     const cropData = getCropData();
     let uniqueLabel = true;
     labels.forEach((label) => {
       if (
-        label.label === inputRef.current.value &&
+        label.label === labelStr &&
         label.coordinates.x1 === Math.floor(cropData[0]) &&
         label.coordinates.y1 === Math.floor(cropData[1]) &&
         label.coordinates.x2 === Math.floor(cropData[2]) &&
@@ -48,7 +53,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels, labels }) => {
     if (uniqueLabel) {
       await HTTPLauncher.sendCreateImageClassificationLabel(
         dataPointId,
-        inputRef.current.value,
+        labelStr,
         cropData[0],
         cropData[1],
         cropData[2],
@@ -76,6 +81,13 @@ const ImageLabeling = ({ dataPointId, getSetLabels, labels }) => {
     getImage(dataPointId);
     // eslint-disable-next-line
   }, [dataPointId]);
+
+  useEffect(() => {
+    if (defaultLabel !== '') {
+      addLabel();
+      setLabel('');
+    }
+  }, [defaultLabel]);
 
   // Sets X and Y states when cropping
   const onCrop = (e) => {
@@ -139,6 +151,8 @@ ImageLabeling.propTypes = {
       user_id: PropTypes.number.isRequired,
     }).isRequired
   ).isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default ImageLabeling;

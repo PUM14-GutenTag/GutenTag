@@ -5,22 +5,27 @@ import '../css/Sequence.css';
 import HTTPLauncher from '../services/HTTPLauncher';
 import { generateRandomColor, textBoxSize } from '../util';
 
-/* 
-Component that shows the specifics for sequence labeling 
+/*
+Component that shows the specifics for sequence labeling
 */
-const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
+const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLabel }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
   const [selection, setSelection] = useState('');
 
   // Adds a sequnece label and resets values in input and selection box
-  const addLabel = async (event) => {
-    event.preventDefault();
+  const addLabel = async () => {
     if (inputRef.current.value !== '' && selection !== '') {
+      let labelStr;
+      if (defaultLabel) {
+        labelStr = defaultLabel;
+      } else {
+        labelStr = inputRef.current.value;
+      }
       await HTTPLauncher.sendCreateSequenceLabel(
         dataPointId,
-        inputRef.current.value,
+        labelStr,
         startIndex,
         endIndex,
         generateRandomColor()
@@ -65,6 +70,13 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
     setEndIndex('');
   }, [dataPointId]);
 
+  useEffect(() => {
+    if (defaultLabel !== '' && selection !== '') {
+      addLabel();
+      setLabel('');
+    }
+  }, [defaultLabel]);
+
   // Functions for handeling selection evvent listener
   useEffect(() => {
     const wordList = data.trim().split(' ');
@@ -106,9 +118,9 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
       return labeledText;
     };
 
-    /* 
-    Function handeling selection event listener. Makes sure 
-    only text data and complete unlabeled words can be selected. 
+    /*
+    Function handeling selection event listener. Makes sure
+    only text data and complete unlabeled words can be selected.
     */
     const handleSelection = () => {
       const selectedText = window.getSelection();
@@ -189,6 +201,8 @@ Sequence.propTypes = {
       user_id: PropTypes.number.isRequired,
     }).isRequired
   ).isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default Sequence;

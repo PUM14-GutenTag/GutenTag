@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 import ImportForm from '../components/ImportForm';
 import ExportButton from '../components/ExportButton';
 import ManageProjectUsers from '../components/ManageProjectUsers';
+import ManageDefaultLabels from '../components/ManageDefaultLabels';
 
 import '../css/editProject.css';
 
@@ -30,6 +31,7 @@ const EditProject = ({ location }) => {
           <ExportButton projectID={id} projectType={projectType} fileName={name} />
         </Col>
       </Row>
+      {projectType !== 3 && <ManageDefaultLabels projectID={id} />}
       <ManageProjectUsers projectID={id} />
     </Layout>
   );
