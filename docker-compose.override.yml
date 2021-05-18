@@ -28,7 +28,8 @@ services:
         REACT_APP_SERVER_NAME: ${SERVER_NAME}
         REACT_APP_MODE: "dev"
     command: npm run start
-    depends_on: backend
+    depends_on:
+      - backend
     ports:
       - 3000:3000
     volumes:
