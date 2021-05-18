@@ -124,7 +124,6 @@ const Labeling = ({ location }) => {
     }
   };
 
-
   const handleUserKeyPress = (e) => {
     const { key } = e;
     if (key === 'ArrowRight') {

@@ -620,7 +620,7 @@ class CreateDocumentClassificationLabel(Resource):
                 # Only update statistic once per data
                 if not data.has_labeled(user.id):
                     LabelingStatistic.update(user.id)
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label, args.color)
                 )), 200)
