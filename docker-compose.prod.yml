@@ -25,6 +25,7 @@ services:
         REACT_APP_SERVER_NAME: ${SERVER_NAME}
         REACT_APP_MODE: "prod"
     command: npm run build
+    depends_on: backend
     expose:
       - 3000
     volumes:
