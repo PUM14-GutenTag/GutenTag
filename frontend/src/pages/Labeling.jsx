@@ -27,7 +27,7 @@ const Labeling = ({ location }) => {
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
   const [progress, setProgress] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
-  const [label, setLabel] = useState('');
+  const [defaultLabel, setLabel] = useState('');
   const CURRENT_DATA = 5;
 
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
@@ -150,7 +150,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
-            label={label}
+            defaultLabel={defaultLabel}
             setLabel={setLabel}
           />
         );
@@ -162,7 +162,7 @@ const Labeling = ({ location }) => {
             getSetLabels={getSetLabels}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             labels={labels}
-            defaultLabel={label}
+            defaultLabel={defaultLabel}
             setLabel={setLabel}
           />
         );
@@ -172,7 +172,7 @@ const Labeling = ({ location }) => {
           <ImageLabeling
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
-            label={label}
+            defaultLabel={defaultLabel}
             setLabel={setLabel}
           />
         );

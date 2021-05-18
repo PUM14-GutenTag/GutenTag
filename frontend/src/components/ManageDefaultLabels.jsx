@@ -42,7 +42,7 @@ const ManageDefaultLabels = ({ projectID }) => {
       <h1>Default labels</h1>
       <Form onSubmit={submitHandler}>
         <Form.Row>
-          <Col style={{ justifyContent: 'center', paddingLeft: '0px' }}>
+          <Col id="col-cen-pad">
             <Form.Control
               className="text"
               type="text"

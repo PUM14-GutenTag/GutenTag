@@ -66,10 +66,8 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLa
   }, [dataPointId]);
 
   useEffect(() => {
-    console.log('hej');
     if (defaultLabel !== '' && selection !== '') {
       (async () => {
-        console.log(defaultLabel);
         await HTTPLauncher.sendCreateSequenceLabel(
           dataPointId,
           defaultLabel,
@@ -81,6 +79,8 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLa
       })();
       setLabel('');
       setSelection('');
+      inputRef.current.value = '';
+      inputRef.current.focus();
     }
   }, [defaultLabel]);
 

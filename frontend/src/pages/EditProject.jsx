@@ -31,7 +31,7 @@ const EditProject = ({ location }) => {
           <ExportButton projectID={id} projectType={projectType} fileName={name} />
         </Col>
       </Row>
-      <ManageDefaultLabels projectID={id} />
+      {projectType !== 3 && <ManageDefaultLabels projectID={id} />}
       <ManageProjectUsers projectID={id} />
     </Layout>
   );
