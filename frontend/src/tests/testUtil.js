@@ -39,8 +39,8 @@ const createUser = async (admin = true) => {
 };
 
 // Create a project of a given type and name.
-const createProject = async (type, name = 'Test Project') => {
-  const response = await HTTPLauncher.sendCreateProject(name, type);
+const createProject = async (type, name = 'Test Project', labelsPerDatapoint = '5') => {
+  const response = await HTTPLauncher.sendCreateProject(name, type, labelsPerDatapoint);
   return response.data.id;
 };
 

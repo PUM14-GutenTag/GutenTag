@@ -66,16 +66,15 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel, labe
     }
   };
 
-  // Sends a request to the database for the img source and sets it in a state
-  const getImage = async (id) => {
-    const response = await HTTPLauncher.sendGetImageData(id);
-    const source = URL.createObjectURL(response.data);
-    if (imgSource != null) URL.revokeObjectURL(imgSource);
-    setImageSource(source);
-  };
-
   // What to happen when we change datapoint to label
   useEffect(() => {
+    // Sends a request to the database for the img source and sets it in a state
+    const getImage = async (id) => {
+      const response = await HTTPLauncher.sendGetImageData(id);
+      const source = URL.createObjectURL(response.data);
+      if (imgSource != null) URL.revokeObjectURL(imgSource);
+      setImageSource(source);
+    };
     inputRef.current.value = '';
     inputRef.current.focus();
     getImage(dataPointId);
