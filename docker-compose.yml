@@ -9,9 +9,3 @@ services:
     build: ./backend
     depends_on:
       - db
-
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        REACT_APP_SERVER_NAME: ${SERVER_NAME}
