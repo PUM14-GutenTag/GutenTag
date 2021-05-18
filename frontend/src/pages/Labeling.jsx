@@ -14,7 +14,7 @@ import Layout from '../components/Layout';
 import Label from '../components/Label';
 import ProjectType from '../ProjectType';
 
-/* 
+/*
 Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
