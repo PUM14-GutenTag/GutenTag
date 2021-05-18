@@ -46,7 +46,7 @@ All terminal commands are expected to be run from the project's root folder.
 
 11. Restart VSCode.
 
-## Starting the application for debugging
+## Starting the application
 
 ### Installing Docker
 
@@ -54,7 +54,7 @@ Docker is run through Docker Desktop on Windows & MacOS while Linux distribution
 
 **Windows**
 
-1. Follow the instructions for either Windows [Home Edition](https://docs.docker.com/docker-for-windows/install-windows-home/) or [Pro/Educational Edition](https://docs.docker.com/docker-for-windows/install/).
+1. Follow the instructions [here](https://docs.docker.com/docker-for-windows/install-windows-home/).
 2. It is recommended that you run Docker using Windows Subsystem for Linux (WSL). Instructions can be found [here](https://docs.docker.com/docker-for-windows/wsl/).
 
 **MacOS**
@@ -65,7 +65,7 @@ Follow the instructions [here](https://docs.docker.com/docker-for-mac/install/).
 
 Follow the instructions [here](https://docs.docker.com/engine/install/).
 
-### Running the Docker containers
+### Starting in development mode
 
 **Launch Docker Desktop**. Then open the root directory in the terminal and run
 
@@ -74,3 +74,35 @@ Follow the instructions [here](https://docs.docker.com/engine/install/).
 This will launch all of the services in different containers, install their dependencies and configure them to communicate on a local network.
 
 The frontend should now be reachable at [http:localhost:3000/](http:localhost:3000/) and the backend at [http:localhost:5000/](http:localhost:5000/)
+
+### Starting in production mode
+
+Set your database configuration in the /.env.prod file.
+
+Set your serve hostname in the /.env/ file.
+
+**Launch Docker Desktop**. Then open the root directory in the terminal and run
+
+`docker-compose up -f docker-compose.yml -f docker-compose.prod.yml`
+
+This will launch all of the services in different containers, install their dependencies and configure them to communicate on a local network.
+
+The frontend should now be reachable at your configured hostname. The frontend can be reached at ${SERVER_NAME}/ and the backend can be reached at ${SERVER_NAME}/api/
+
+### Logging in
+
+**A default admin user exists with the following credentials:**
+
+email: admin@admin.com
+
+password: password
+
+## Testing
+
+[Frontend testing instructions](frontend/src/tests/README.MD)
+
+[Backend testing instructions](backend/Test/README.MD)
+
+## Contributing
+
+See [CONTRIBUTING.MD](/CONTRIBUTING.MD)

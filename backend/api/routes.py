@@ -8,7 +8,7 @@ from flask_jwt_extended import (
 )
 from enum import IntEnum
 from werkzeug.utils import secure_filename
-from api import rest, IS_DEV_MODE
+from api import rest
 from api.models import (
     AccessLevel,
     Project,
@@ -23,7 +23,6 @@ from api.models import (
 )
 from api.database_handler import (
     reset_db,
-    try_add,
     try_add_response,
     try_delete_response
 )
@@ -56,9 +55,9 @@ class GetDataType(IntEnum):
     GET_EARLIER_VALUE = -1
 
 
-class Index(Resource):
+class Ping(Resource):
     def get(self):
-        return jsonify({"message": "index"})
+        return "ping"
 
 
 class CreateUser(Resource):
@@ -928,11 +927,9 @@ class Reset(Resource):
 
     def get(self):
         reset_db()
-        admin = User("Admin", "Admin", "admin@admin", "password", True)
-        try_add(admin)
 
 
-rest.add_resource(Index, "/")
+rest.add_resource(Ping, "/ping")
 rest.add_resource(CreateUser, "/create-user")
 rest.add_resource(Login, "/login")
 rest.add_resource(ChangePassword, "/change-password")
@@ -958,6 +955,4 @@ rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
 rest.add_resource(GetImageData, "/get-image-data")
-
-if IS_DEV_MODE:
-    rest.add_resource(Reset, "/reset")
+rest.add_resource(Reset, "/reset")

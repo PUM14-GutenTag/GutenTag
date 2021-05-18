@@ -26,7 +26,7 @@ services:
       context: ./frontend
       args:
         REACT_APP_SERVER_NAME: ${SERVER_NAME}
-        REACT_APP_IS_DEV_MODE: 1
+        REACT_APP_MODE: "dev"
     command: npm run start
     ports:
       - 3000:3000

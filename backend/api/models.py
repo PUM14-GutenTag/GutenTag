@@ -4,11 +4,13 @@ This file contains all database models and associated methods.
 import datetime
 import io
 from enum import IntEnum
-from api import db
-from api.database_handler import check_types
+from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
+from api import db
+from api.database_handler import check_types
+
 LIST_SIDE_LENGTH = 5
 LIST_LENGTH = 2 * LIST_SIDE_LENGTH + 1
 
@@ -169,6 +171,16 @@ class User(db.Model):
             f"<User(first_name={self.first_name}, last_name={self.last_name}, "
             f"email={self.email}, access_level={self.access_level}) >"
         )
+
+
+@event.listens_for(User.__table__, 'after_create')
+def create_default_user(*args, **kwargs):
+    """
+    Add default user.
+    """
+    admin = User("Admin", "Admin", "admin@admin.com", "password", True)
+    db.session.add(admin)
+    db.session.commit()
 
 
 class Project(db.Model):
