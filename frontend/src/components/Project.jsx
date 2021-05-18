@@ -42,15 +42,17 @@ const Project = ({
               ) : (
                 <CaretDownFill className="arrow-down" color="#063954" />
               )}
-              <ProgressBar now={progress} striped id="progress-bar-project" />
+              <ProgressBar now={progress} id="progress-bar" />
             </div>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0">
             <Card.Body className="project-info">
               <p className="paragraf-text">Type: {projectTypeNames[projectType - 1]}</p>
-              <p className="paragraf-text">Progress: 1/4 </p>
+              <p className="paragraf-text">
+                Progress: {progress} / {progress * labelsPerDatapoint}{' '}
+              </p>
               <p className="paragraf-text">Started: {created}</p>
-              <p>Labels per datapoint: {labelsPerDatapoint}</p>
+              <p className="paragraf-text">Labels per datapoint: {labelsPerDatapoint}</p>
             </Card.Body>
           </Accordion.Collapse>
         </Card>
