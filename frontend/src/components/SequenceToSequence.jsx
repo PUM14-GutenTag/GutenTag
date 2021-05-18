@@ -6,8 +6,8 @@ import '../css/DocumentClassification.css';
 import '../css/SequenceToSequence.css';
 import { generateRandomColor, textBoxSize } from '../util';
 
-/* 
-Component that shows the specifics for sequence to sequence labeling 
+/*
+Component that shows the specifics for sequence to sequence labeling
 */
 const SequenceToSequence = ({ data, dataPointId, getSetLabels }) => {
   const inputRef = useRef();
@@ -43,10 +43,11 @@ const SequenceToSequence = ({ data, dataPointId, getSetLabels }) => {
               type="text"
               placeholder="Enter a sequence..."
               required
-              className="input-box-seq-seq"
+              id="input-box"
+              className="text"
               ref={inputRef}
             />
-            <button className="btn btn-primary label-btn-seq-seq" type="submit">
+            <button id="submit-label-btn" className="btn dark label-btn" type="submit">
               Label
             </button>
           </Form.Group>

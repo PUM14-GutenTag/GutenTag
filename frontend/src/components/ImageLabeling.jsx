@@ -93,10 +93,11 @@ const ImageLabeling = ({ dataPointId, getSetLabels }) => {
                 type="text"
                 placeholder="Enter label..."
                 required
-                className="input-box"
+                id="input-box"
+                className="text"
                 ref={inputRef}
               />
-              <button className="btn btn-primary label-btn" type="submit">
+              <button id="submit-label-btn" className="btn dark label-btn" type="submit">
                 Label
               </button>
             </Form.Group>

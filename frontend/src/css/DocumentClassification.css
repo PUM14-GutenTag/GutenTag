@@ -25,29 +25,18 @@
 .form-group {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
-.input-box {
-  background-color: white;
+#input-box {
   flex-grow: 3;
-  border-radius: 5px;
-  border: #dfdede solid 1px;
-}
-
-.input-box:focus {
-  outline: none;
-  border: #00c8c8 solid 2px;
+  margin: 1em;
 }
 
 .label-btn {
   margin-left: 1rem;
-  flex-grow: 2;
   background-color: #063954;
   color: black;
-}
-
-.label-btn:hover {
-  border: black solid 2px;
 }
 
 .hr-title {
@@ -71,6 +60,7 @@
   position: absolute;
   width: 100%;
 }
+
 .hr-title:after {
   color: black;
   padding: 0 0.5em;
@@ -87,4 +77,11 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-around;
+}
+
+#submit-label-btn {
+  padding: 0.5em;
+  margin-right: 1em;
+  padding-left: 1.5em;
+  padding-right: 1.5em;
 }

@@ -15,7 +15,7 @@ import Layout from '../components/Layout';
 import Label from '../components/Label';
 import ProjectType from '../ProjectType';
 
-/* 
+/*
 Labeling-page handles labeling functionality
 */
 const Labeling = ({ location }) => {
@@ -199,6 +199,15 @@ const Labeling = ({ location }) => {
 
   return (
     <Layout>
+      <Button
+        className="dark"
+        as={Link}
+        to={{
+          pathname: '/home',
+        }}
+      >
+        Back
+      </Button>
       <div className="content-container">
         <div className="progress-bars">
           {finishedLabel()}
@@ -241,15 +250,6 @@ const Labeling = ({ location }) => {
               onClick={nextData}
             />
           </div>
-          <Button
-            className="btn btn-primary"
-            as={Link}
-            to={{
-              pathname: '/home',
-            }}
-          >
-            Go back
-          </Button>
         </div>
       </div>
     </Layout>

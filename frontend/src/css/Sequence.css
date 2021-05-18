@@ -1,19 +1,21 @@
 .label-container {
   display: flex;
   height: 100%;
+  flex-direction: column;
 }
 
 .selected-text-box {
-  flex: 3;
-  border: 1px solid rgb(216, 216, 216);
   font-size: 20px;
   position: relative;
   display: flex;
   padding-bottom: 0;
   border-radius: 15px;
+  height: 3em;
+  width: 70%;
 }
 
 .selected-text-box .selected-text {
+  display: flex;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -24,6 +26,7 @@
   border-radius: 15px;
   justify-content: center;
   overflow-y: auto;
+  align-content: center;
 }
 
 .sequence-form {
@@ -41,4 +44,8 @@
 
 .add-seq-btn {
   flex: 1;
+}
+
+#center-row {
+  justify-content: center;
 }
