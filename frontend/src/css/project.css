@@ -75,3 +75,9 @@ a.outline-dark:not(:disabled):not(.disabled):active:focus {
   border-color: #063954;
   box-shadow: 0 0 0 0.2rem rgb(6 57 84 / 50%);
 }
+
+svg.arrow-down {
+  margin-left: 10px;
+  margin-right: auto;
+  margin-top: 5px;
+}

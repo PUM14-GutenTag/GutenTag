@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import '../css/project.css';
 import Button from 'react-bootstrap/Button';
 import { Accordion, Card } from 'react-bootstrap';
 import ProgressBar from 'react-bootstrap/ProgressBar';
-import { GearFill } from 'react-bootstrap-icons';
+import { GearFill, CaretDownFill, CaretLeftFill } from 'react-bootstrap-icons';
 
 const Project = ({ id, name, created, projectType, selectedColor, showEditButton }) => {
   const projectTypeNames = [
@@ -14,6 +14,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
     'Sequence to sequence labeling',
     'Image classification',
   ];
+  const [open, setOpen] = useState(false);
 
   return (
     <div>
@@ -23,10 +24,15 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             style={{ backgroundColor: selectedColor }}
             as={Card.Header}
             eventKey="0"
+            onClick={() => setOpen(!open)}
           >
             <div className="title-container" aria-hidden="true">
               <h1>{name}</h1>
-
+              {open ? (
+                <CaretLeftFill className="arrow-down" color="#063954" />
+              ) : (
+                <CaretDownFill className="arrow-down" color="#063954" />
+              )}
               <ProgressBar now={50} striped id="progress-bar-project" />
             </div>
           </Accordion.Toggle>
@@ -43,6 +49,7 @@ const Project = ({ id, name, created, projectType, selectedColor, showEditButton
             style={{ backgroundColor: selectedColor }}
             as={Card.Header}
             eventKey="0"
+            onClick={() => setOpen(!open)}
           >
             <Button
               className="outline-dark"
