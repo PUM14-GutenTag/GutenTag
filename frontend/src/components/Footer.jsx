@@ -33,8 +33,14 @@ const Footer = () => {
 
         <div id="copyright-row" className="row">
           <p className="col-small">
-            &copy; Copyright {new Date().getFullYear()} GutenTag | All rights reserved |{' '}
-            <a href="https://github.com/th3tard1sparadox/GutenTag/blob/main/LICENSE">License</a>
+            &copy; Copyright {new Date().getFullYear()} GutenTag contributors | All rights reserved
+            |{' '}
+            <a
+              style={{ color: '#063954' }}
+              href="https://github.com/th3tard1sparadox/GutenTag/blob/main/LICENSE"
+            >
+              License
+            </a>
           </p>
         </div>
       </div>
