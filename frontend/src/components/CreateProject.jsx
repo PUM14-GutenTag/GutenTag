@@ -1,31 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 import ProjectType from '../ProjectType';
-
+import InputSpinner from './InputSpinner';
 /* Component for creating a project */
 const CreateProject = () => {
   const [projectName, setProjectName] = useState('');
-  const [projectType, setProjectType] = useState(1);
-  const [ID, setID] = useState(null);
-  const [redirect, setRedirect] = useState(false);
+  const [labelsPerDatapoint, setLabelsPerDatapoint] = useState(1);
+  const [projectType, setProjectType] = useState(ProjectType.DOCUMENT_CLASSIFICATION);
+  const [ID, setID] = useState();
   const [error, setError] = useState(false);
-
-  // When we get an ID we redirect to edit that project
-  useEffect(() => {
-    if (ID !== null) setRedirect(true);
-  }, [ID]);
 
   // Creates a project in the backend
   const submitHandler = async (event) => {
     event.preventDefault();
-    const response = await HTTPLauncher.sendCreateProject(projectName, projectType);
+    const response = await HTTPLauncher.sendCreateProject(
+      projectName,
+      projectType,
+      labelsPerDatapoint
+    );
     if (response.data.id === null) {
       setError(true);
     }
     setID(response.data.id);
+  };
+
+  const sendChange = async (amount) => {
+    setLabelsPerDatapoint(amount);
   };
 
   return (
@@ -38,6 +41,7 @@ const CreateProject = () => {
               className="text"
               type="text"
               name="name"
+              value={projectName}
               onChange={(event) => setProjectName(event.target.value)}
               placeholder="Enter project name..."
               required
@@ -46,7 +50,7 @@ const CreateProject = () => {
         </Row>
         {error && (
           <Row>
-            <Form.Label>Project name already exists</Form.Label>
+            <Form.Label className="red-text">Project name already exists</Form.Label>
           </Row>
         )}
         <Row>
@@ -56,7 +60,8 @@ const CreateProject = () => {
               className="text"
               as="select"
               name="type"
-              onChange={(event) => setProjectType(event.target.value)}
+              value={projectType}
+              onChange={(event) => setProjectType(parseInt(event.target.value, 10))}
             >
               <option value={ProjectType.DOCUMENT_CLASSIFICATION}>Document classification</option>
               <option value={ProjectType.SEQUENCE_LABELING}>Sequence labeling</option>
@@ -67,19 +72,25 @@ const CreateProject = () => {
             </Form.Control>
           </Form.Group>
         </Row>
-
+        <Row>
+          <div>
+            <Form.Label className="titleLabel">Labels per datapoint</Form.Label>
+            <InputSpinner amount={labelsPerDatapoint} setAmount={sendChange} />
+          </div>
+        </Row>
         <Row>
           <Button className="dark" variant="primary" type="submit">
             Submit
           </Button>
-          {redirect && (
+          {ID && (
             <Redirect
               to={{
                 pathname: '/edit-project',
                 state: {
                   id: ID,
                   name: projectName,
-                  projectType,
+                  projectType: parseInt(projectType, 10),
+                  labelsPerDatapoint: parseInt(labelsPerDatapoint, 10),
                 },
               }}
             />

@@ -3,6 +3,7 @@ from io import BytesIO
 import zipfile
 import time
 import json
+import random
 from api.database_handler import (db,
                                   commit)
 from api.models import (Project,
@@ -15,6 +16,12 @@ from api.models import (Project,
                         ImageClassificationLabel,
                         SequenceLabel,
                         SequenceToSequenceLabel)
+
+
+def generate_random_color():
+    return 'hsl({hue}, {saturation}%, {lightness}%)'.format(
+        hue=360 * random.random(), saturation=75 + 25 * random.random(),
+        lightness=50 + 15 * random.random())
 
 
 def import_text_data(project_id, json_data):
@@ -82,18 +89,20 @@ def import_text_data(project_id, json_data):
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
                 label_list += [
                     DocumentClassificationLabel(
-                        data.id, None, lab, is_prelabel=True)
-                    for lab in set(labels)
+                        data.id, None, lab, generate_random_color(),
+                        is_prelabel=True)
+                    for lab in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_LABELING:
                 label_list += [
                     SequenceLabel(data.id, None, lab, begin, end,
-                                  is_prelabel=True)
+                                  generate_random_color(), is_prelabel=True)
                     for begin, end, lab in labels
                 ]
             elif project.project_type == ProjectType.SEQUENCE_TO_SEQUENCE:
                 label_list += [
                     SequenceToSequenceLabel(data.id, None, lab,
+                                            generate_random_color(),
                                             is_prelabel=True)
                     for lab in labels
                 ]
@@ -175,7 +184,8 @@ def import_image_data(project_id, json_data, images):
             if project.project_type == ProjectType.DOCUMENT_CLASSIFICATION:
                 label_list += [
                     ImageClassificationLabel(data.id, None, lab,
-                                             tuple(p1), tuple(p2),
+                                             tuple(p1), tuple(
+                                                 p2), generate_random_color(),
                                              is_prelabel=True)
                     for p1, p2, lab in labels
                 ]

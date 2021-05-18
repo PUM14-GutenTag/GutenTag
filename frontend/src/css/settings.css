@@ -102,10 +102,6 @@ button.red:not(:disabled):not(.disabled):active:focus {
   margin-bottom: 0em;
 }
 
-.red-text {
-  color: #f52882;
-}
-
 #button-margin {
   margin-left: 0px;
   margin-right: 2em;
@@ -122,6 +118,22 @@ svg.remove {
   margin-right: 0.2em;
 }
 
+.main-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-container {
+  height: 100%;
+  width: 100%;
+}
+
+.main-col > h2 {
+  margin-top: 1.75rem;
+}
+
 /* Create Project & User Form */
 
 .create-container {
@@ -133,6 +145,12 @@ svg.remove {
   margin: auto;
   white-space: nowrap;
   width: 70%;
+}
+
+.subTitleLabel {
+  font-size: 2rem;
+  width: 100%;
+  white-space: nowrap;
 }
 
 .titleLabel {
@@ -156,4 +174,7 @@ input[type='checkbox'] {
   -webkit-transform: scale(1.5); /* Safari and Chrome */
   -o-transform: scale(1.5); /* Opera */
   padding: 10px;
+}
+#root > article > div > div > div.row-left.row {
+  justify-content: left;
 }
