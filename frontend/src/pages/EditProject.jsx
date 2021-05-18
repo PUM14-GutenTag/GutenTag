@@ -60,16 +60,13 @@ const EditProject = ({ location }) => {
           <ExportButton projectID={id} projectType={projectType} fileName={name} />
         </Col>
       </Row>
-<<<<<<< HEAD
       <Row className="row-left">
         <div>
           <h1>Labels per datapoint</h1>
           <InputSpinner amount={labelsPerDatapoint} setAmount={sendChange} />
         </div>
       </Row>
-=======
       {projectType !== 3 && <ManageDefaultLabels projectID={id} />}
->>>>>>> main
       <ManageProjectUsers projectID={id} />
     </Layout>
   );
