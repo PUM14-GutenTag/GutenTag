@@ -163,3 +163,6 @@ input[type='checkbox'] {
   -o-transform: scale(1.5); /* Opera */
   padding: 10px;
 }
+#root > article > div > div > div.row-left.row {
+  justify-content: left;
+}

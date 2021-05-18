@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 import '../css/FinishedPopUp.css';
 
 /* Pop up for when the user has labeled all datapoints in a project */
-const FinishedPopUp = ({ value }) => {
+const FinishedPopUp = ({ projectDone }) => {
   return (
     <Modal.Dialog>
       <Modal.Header>
-        {value ? (
+        {projectDone ? (
           <Modal.Title>
             Congratulations, all datapoints in this project are now fully labeled!
           </Modal.Title>
@@ -21,7 +21,7 @@ const FinishedPopUp = ({ value }) => {
 };
 
 FinishedPopUp.propTypes = {
-  value: PropTypes.bool.isRequired,
+  projectDone: PropTypes.bool.isRequired,
 };
 
 export default FinishedPopUp;

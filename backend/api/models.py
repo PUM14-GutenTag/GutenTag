@@ -200,6 +200,9 @@ class Project(db.Model):
         self.labels_per_datapoint = labels_per_datapoint
 
     def check_finished(self):
+        """
+        Check if all datapoints in a project have been fully labeled
+        """
         for datapoint in self.data:
             if not datapoint.finished:
                 self.set_finished(False)
@@ -210,10 +213,16 @@ class Project(db.Model):
         db.session.commit()
 
     def set_finished(self, status):
+        """
+        Setter for finished variable
+        """
         self.finished = status
         db.session.commit()
 
     def set_labels_per_datapoint(self, amount):
+        """
+        Setter for labels_per_datapoint
+        """
         self.labels_per_datapoint = amount
         self.check_finished
 
@@ -222,6 +231,16 @@ class Project(db.Model):
         db.session.commit()
 
     def get_progress(self):
+        """
+        Calculate and return progress according to formula
+        a/(b*c) where
+
+        a = Amount of unique users that have labeled each datapoint
+        b = Amount of datapoints in the project
+        c = Variable labels_per_datapoint
+
+        This is multiplied by 100 to return a percentage
+        """
         users = []
         CONVERT_TO_PERCENTAGE = 100
 
@@ -377,10 +396,16 @@ class ProjectData(db.Model):
     }
 
     def set_finished(self, status):
+        """
+        Setter for finished variable
+        """
         self.finished = status
         db.session.commit()
 
     def check_finished(self):
+        """
+        Check if the datapoint is fully labeled
+        """
         users = []
 
         for label in self.labels:

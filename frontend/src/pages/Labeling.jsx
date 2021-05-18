@@ -190,10 +190,10 @@ const Labeling = ({ location }) => {
   };
   const finishedLabel = () => {
     if (progressInvidual === 100 && progressProject !== 100) {
-      return <FinishedPopUp value={false} />;
+      return <FinishedPopUp projectDone={false} />;
     }
     if (progressProject === 100) {
-      return <FinishedPopUp value />;
+      return <FinishedPopUp projectDone />;
     }
     return <ProgressBar striped variant="success" now={progressInvidual} />;
   };

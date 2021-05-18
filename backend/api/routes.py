@@ -934,7 +934,7 @@ class GetExportData(Resource):
                                    required=False,
                                    action="append")
 
-    @ jwt_required()
+    @jwt_required()
     def get(self):
         args = self.reqparse.parse_args()
         user = User.get_by_email(get_jwt_identity())

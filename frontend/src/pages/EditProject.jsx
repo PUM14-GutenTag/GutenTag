@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Button, Col, Row } from 'react-bootstrap';
+import { Form, Col, Row } from 'react-bootstrap';
+
 import Layout from '../components/Layout';
 import ImportForm from '../components/ImportForm';
+import InputSpinner from '../components/InputSpinner';
 import ExportButton from '../components/ExportButton';
 import ManageProjectUsers from '../components/ManageProjectUsers';
-
 import '../css/editProject.css';
 import HTTPLauncher from '../services/HTTPLauncher';
 
@@ -15,11 +16,9 @@ import HTTPLauncher from '../services/HTTPLauncher';
  */
 const EditProject = ({ location }) => {
   const { id, name, projectType, labelsPerDatapoint } = location.state;
-  const [datapointLabels, setDatapointLabels] = useState(1);
 
-  const submitHandler = async (event) => {
-    event.preventDefault();
-    await HTTPLauncher.sendChangeLabelsPerDatapoint(id, datapointLabels);
+  const sendChange = async (amount) => {
+    await HTTPLauncher.sendChangeLabelsPerDatapoint(id, amount);
   };
 
   const getProjectType = (type) => {
@@ -59,28 +58,11 @@ const EditProject = ({ location }) => {
           <ExportButton projectID={id} projectType={projectType} fileName={name} />
         </Col>
       </Row>
-      <Row>
-        <Form onSubmit={submitHandler}>
-          <Form.Group as={Col} controlId="formAmount">
-            <Form.Label className="subTitleLabel">Labels per datapoint</Form.Label>
-            <Form.Control
-              className="text"
-              as="select"
-              name="amount"
-              onChange={(event) => setDatapointLabels(event.target.value)}
-              defaultValue={labelsPerDatapoint}
-            >
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </Form.Control>
-            <Button className="dark editBtn" variant="primary" type="submit">
-              Change
-            </Button>
-          </Form.Group>
-        </Form>
+      <Row className="row-left">
+        <div>
+          <h1>Labels per datapoint</h1>
+          <InputSpinner amount={labelsPerDatapoint} setAmount={sendChange} />
+        </div>
       </Row>
       <ManageProjectUsers projectID={id} />
     </Layout>

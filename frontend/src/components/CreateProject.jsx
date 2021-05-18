@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
+
 import HTTPLauncher from '../services/HTTPLauncher';
 import ProjectType from '../ProjectType';
-
+import InputSpinner from './InputSpinner';
 /* Component for creating a project */
 const CreateProject = () => {
   const [projectName, setProjectName] = useState('');
@@ -30,6 +31,10 @@ const CreateProject = () => {
       setError(true);
     }
     setID(response.data.id);
+  };
+
+  const sendChange = async (amount) => {
+    setLabelsPerDatapoint(amount);
   };
 
   return (
@@ -72,21 +77,10 @@ const CreateProject = () => {
           </Form.Group>
         </Row>
         <Row>
-          <Form.Group as={Col} controlId="formAmount">
-            <Form.Label className="titleLabel">Amount of labels per datapoint</Form.Label>
-            <Form.Control
-              className="text"
-              as="select"
-              name="amount"
-              onChange={(event) => setLabelsPerDatapoint(event.target.value)}
-            >
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </Form.Control>
-          </Form.Group>
+          <div>
+            <Form.Label className="titleLabel">Labels per datapoint</Form.Label>
+            <InputSpinner amount={labelsPerDatapoint} setAmount={sendChange} />
+          </div>
         </Row>
         <Row>
           <Button className="dark" variant="primary" type="submit">
