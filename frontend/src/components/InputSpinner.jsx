@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { ChevronUp, ChevronDown } from 'react-bootstrap-icons';
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 const InputSpinner = ({ amount, setAmount }) => {
   const [counter, setCounter] = useState(0);
@@ -24,8 +24,8 @@ const InputSpinner = ({ amount, setAmount }) => {
 
   return (
     <div className="no-select input-spinner">
-      <ChevronUp onClick={handleUp} className="fa-3x arrow-btn" /> <h1>{counter}</h1>
-      <ChevronDown onClick={handleDown} className="fa-3x arrow-btn" />
+      <ChevronLeft onClick={handleDown} className="fa-3x arrow-btn" /> <h1>{counter}</h1>
+      <ChevronRight onClick={handleUp} className="fa-3x arrow-btn" />
     </div>
   );
 };
