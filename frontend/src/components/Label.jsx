@@ -8,11 +8,12 @@ const Label = ({ labelId, label, deleteLabel, color }) => {
   // Generates random light color
 
   return (
-    <Badge style={{ backgroundColor: color }}>
+    <Badge className="label-badge" style={{ backgroundColor: color }}>
       <div className="label-list">
         <p className="label-text">{label}</p>
         <button
           type="button"
+          id="close-btn"
           className="close"
           aria-label="Close"
           onClick={() => deleteLabel(labelId)}

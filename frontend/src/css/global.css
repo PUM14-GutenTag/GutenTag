@@ -28,6 +28,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+
+button.dark.purple,
+button.dark.purple:hover,
+button.dark.purple:not(:disabled):not(.disabled):active,
+button.dark.purple:focus,
+button.dark.purple:not(:disabled):not(.disabled):active:focus {
+  background-color: #7028B7;
+  border-color: #7028B7;
+}
+
 button.dark,
 a.dark {
   color: #ffffff;
@@ -139,4 +149,14 @@ th.right {
 #col-cen-pad {
   justify-content: center;
   padding-left: 0px;
+}
+
+div.bg-prim {
+  background-color: #00C8C8;
+  color: white;
+}
+
+div.bg-sec {
+  background-color: #FF9800;
+  color: white;
 }
