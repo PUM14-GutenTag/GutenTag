@@ -29,7 +29,7 @@ const DefaultLabels = ({ projectID, setLabel }) => {
   return (
     <div>
       {labels.map((label) => (
-        <Button className="dark btn-margin" onClick={() => pushLabel(label)}>
+        <Button className="dark btn-margin purple" onClick={() => pushLabel(label)}>
           {label}
         </Button>
       ))}

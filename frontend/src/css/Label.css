@@ -1,4 +1,7 @@
 .label-list {
+  padding: 0.2rem;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -6,9 +9,24 @@
 }
 
 .label-text {
+  color: white;
   font-size: 1rem;
   margin: auto;
-  height: 100%;
-  margin-right: 5px;
-  margin-top: 6px;
+  margin-right: 0.5rem;
+}
+
+.label-badge {
+  margin: 0.5rem;
+  box-shadow: 2px 2px 2px rgb(0 0 0 / 25%)
+}
+
+#close-btn {
+  color: white;
+  text-shadow: 0 0px 0 #fff;;
+  opacity: 1;
+  padding-bottom: 0.35rem;
+}
+
+button.close:hover {
+  color: white;
 }
