@@ -42,7 +42,7 @@ const Project = ({
               ) : (
                 <CaretDownFill className="arrow-down" color="#063954" />
               )}
-              <ProgressBar now={progress} id="progress-bar" />
+              <ProgressBar now={progress} id="progress-bar" variant="prim" />
             </div>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0">
