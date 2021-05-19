@@ -37,7 +37,7 @@ const Project = ({
     >
       <div className="title-container" aria-hidden="true">
         <h1>{name}</h1>
-        <ProgressBar now={progress} striped id="progress-bar-project" />
+        <ProgressBar now={progress} variant="prim" id="progress-bar-project" />
       </div>
       {showInfo ? (
         <div className="projectInfo">

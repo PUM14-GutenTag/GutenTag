@@ -34,7 +34,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLa
 
   // Highlightes word in if it has been labeled
   const highLightWord = (startingIndex) => {
-    let highLightColor = 'black';
+    let highLightColor = '#063954';
 
     // check if word is labeled
     labels.forEach((label) => {
@@ -172,23 +172,38 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLa
 
   return (
     <div className="sequence-container">
-      <hr className="hr-title" data-content="Text data" />
       <div id="text-box-container" style={{ fontSize: textBoxSize(data) }}>
         {wrapWordsInSpan(data)}
       </div>
       <hr className="hr-title" data-content="Add new sequence label" />
       <div className="label-container">
-        <div className="selected-text-box">
-          <p className="selected-text">{selection}</p>
-        </div>
-        <Form onSubmit={addLabel} className="sequence-form">
-          <Form.Group className="group-seq">
-            <input type="text" placeholder="Enter label..." required ref={inputRef} />
-          </Form.Group>
-        </Form>
-        <button className="btn btn-primary add-seq-btn" type="button" onClick={addLabel}>
-          Add new label
-        </button>
+        <Form.Row id="center-row">
+          <div className="selected-text-box">
+            <p className="selected-text">{selection}</p>
+          </div>
+        </Form.Row>
+        <Form.Row>
+          <Form onSubmit={addLabel} className="sequence-form">
+            <Form.Group className="group-seq">
+              <input
+                type="text"
+                placeholder="Enter label..."
+                id="input-box"
+                className="text"
+                required
+                ref={inputRef}
+              />
+            </Form.Group>
+          </Form>
+          <button
+            id="submit-label-btn"
+            className="btn dark label-btn"
+            type="button"
+            onClick={addLabel}
+          >
+            Label
+          </button>
+        </Form.Row>
       </div>
     </div>
   );
