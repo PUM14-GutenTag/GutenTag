@@ -73,6 +73,8 @@ Follow the instructions [here](https://docs.docker.com/engine/install/).
 
 This will launch all of the services in different containers, install their dependencies and configure them to communicate on a local network.
 
+If you get an error saying that the database does not exist. Try running `docker-compose down -v` and then starting docker-compose again.
+
 The frontend should now be reachable at [http:localhost:3000/](http:localhost:3000/) and the backend at [http:localhost:5000/](http:localhost:5000/)
 
 ### Starting in production mode
@@ -83,9 +85,11 @@ Set your serve hostname in the /.env/ file.
 
 **Launch Docker Desktop**. Then open the root directory in the terminal and run
 
-`docker-compose up -f docker-compose.yml -f docker-compose.prod.yml`
+`docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`
 
 This will launch all of the services in different containers, install their dependencies and configure them to communicate on a local network.
+
+If you get an error saying that the database does not exist. Try running `docker-compose down -v` and then starting docker-compose again.
 
 The frontend should now be reachable at your configured hostname. The frontend can be reached at ${SERVER_NAME}/ and the backend can be reached at ${SERVER_NAME}/api/
 
