@@ -17,28 +17,32 @@ const ManageProjectUsers = ({ projectID }) => {
   // Fetches all users authorized to the project.
   const fetchProjectUsersData = async () => {
     const result = await HTTPLauncher.sendGetProjectUsers(projectID);
-    const dataArray = Object.values(result.data.users);
-    setProjectUsers(dataArray);
+    if (result.status === 200) {
+      const dataArray = Object.values(result.data.users);
+      setProjectUsers(dataArray);
+    }
   };
 
   // Fetches all users.
   const fetchUserData = async () => {
     const result = await HTTPLauncher.sendGetUsers();
-    const dataArray = Object.values(result.data.users);
-    const mappedDataArray = dataArray.map((userObject) => Object.values(userObject));
-    mappedDataArray.sort((a, b) => {
-      const nameA = a[2].toUpperCase();
-      const nameB = b[2].toUpperCase();
-      if (nameA < nameB) {
-        return -1;
-      }
-      if (nameA > nameB) {
-        return 1;
-      }
-      return 0;
-    });
-    setUsers(mappedDataArray);
-    fetchProjectUsersData();
+    if (result.status === 200) {
+      const dataArray = Object.values(result.data.users);
+      const mappedDataArray = dataArray.map((userObject) => Object.values(userObject));
+      mappedDataArray.sort((a, b) => {
+        const nameA = a[2].toUpperCase();
+        const nameB = b[2].toUpperCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+      });
+      setUsers(mappedDataArray);
+      fetchProjectUsersData();
+    }
   };
 
   // Filters users based on name, email and accesslevel.

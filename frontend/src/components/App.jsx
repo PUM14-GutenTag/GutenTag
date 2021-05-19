@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, Redirect, useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 
 import HTTPLauncher from '../services/HTTPLauncher';
 import userAuth from '../services/userAuth';
@@ -40,14 +40,16 @@ const achievementURLs = [
 // App content.
 const App = () => {
   const [newAchievements, setNewAchievements] = useState([]);
-  const history = useHistory();
 
   // Display popup for each new achievement.
   const displayAchievements = async (response) => {
     if (achievementURLs.includes(response.config.url)) {
       const achieveResponse = await HTTPLauncher.sendGetUnnotifiedAchievements();
-      // Merge arrays rather than overwriting.
-      setNewAchievements((previousAch) => [...previousAch, ...achieveResponse.data]);
+
+      if (response.status === 200) {
+        // Merge arrays rather than overwriting.
+        setNewAchievements((previousAch) => [...previousAch, ...achieveResponse.data]);
+      }
     }
   };
 
@@ -70,9 +72,19 @@ const App = () => {
         return response;
       },
       async (error) => {
-        const { config, response } = error;
+        if (typeof error.response === 'undefined') {
+          return error;
+        }
 
+        const { config, response } = error;
         const originalRequest = config;
+
+        if (response.status === 422) {
+          userAuth.clearTokens();
+          window.location.reload();
+          return response;
+        }
+
         if (response.status === 401 && !originalRequest.url.includes('refresh-token')) {
           const tokenResponse = await HTTPLauncher.sendRefreshToken();
           if (tokenResponse.status === 200) {
@@ -81,12 +93,6 @@ const App = () => {
             return axios.request(originalRequest);
           }
           userAuth.clearTokens();
-        }
-
-        if (response.status === 422) {
-          userAuth.clearTokens();
-          // history.push('/');
-          window.location.reload(true);
         }
 
         return error;

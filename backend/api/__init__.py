@@ -9,7 +9,8 @@ from flask_cors import CORS
 from flask_restful import Api
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
-import secrets, string
+import secrets
+import string
 
 app = Flask(__name__)
 app.config.from_object("api.config.Config")
@@ -27,16 +28,18 @@ jwt = JWTManager(app)
 # https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 import api.routes  # noqa
 
+
 def generate_secret_key():
     n = 40
     res = ''.join(secrets.choice(string.ascii_letters + string.digits)
-                                                for i in range(n))
+                  for i in range(n))
 
     app.config['JWT_SECRET_KEY'] = res
 
-if app.debug:
-    generate_secret_key()
-    print("")
-else:
-    app.config['JWT_SECRET_KEY'] = '7JVcd7f8CVdCcqrTyNLNoBWVUt5U00jrJSCkm3tu'
 
+if not app.debug:
+    generate_secret_key()
+else:
+    # Set default secret key to use while debugging
+    # Do NOT use this in production
+    app.config['JWT_SECRET_KEY'] = '7JVcd7f8CVdCcqrTyNLNoBWVUt5U00jrJSCkm3tu'

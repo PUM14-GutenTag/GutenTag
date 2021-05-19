@@ -37,7 +37,9 @@ const Labeling = ({ location }) => {
   // fetch progress
   const fetchProgress = async () => {
     const response = await HTTPLauncher.sendGetProjectProgress(id);
-    setProgressProject(response.data.progress);
+    if (response.status === 200) {
+      setProgressProject(response.data.progress);
+    }
   };
 
   // fetch all labels for a given datapoint
@@ -45,12 +47,14 @@ const Labeling = ({ location }) => {
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
       const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[CURRENT_DATA].id);
 
-      if (Object.keys(response.data.labels).length !== 0) {
-        setLabels(Object.values(response.data.labels));
-      } else {
-        setLabels([]);
+      if (response.status === 200) {
+        if (Object.keys(response.data.labels).length !== 0) {
+          setLabels(Object.values(response.data.labels));
+        } else {
+          setLabels([]);
+        }
+        fetchProgress();
       }
-      fetchProgress();
     }
   };
 
@@ -63,21 +67,26 @@ const Labeling = ({ location }) => {
   // Get a list of new datapoints from database, runs when entering a project
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
-    setListOfDataPoints(response.data.list);
-    setIndex(response.data.index);
-    getSetLabels(response.data.list);
+
+    if (response.status === 200) {
+      setListOfDataPoints(response.data.list);
+      setIndex(response.data.index);
+      getSetLabels(response.data.list);
+    }
   };
 
   useEffect(() => {
     // Gets amount of data in project and individual progress in percent
     const getAmountOfData = async () => {
       const response = await HTTPLauncher.sendGetAmountOfData(projectId);
-      setDataAmount(response.data.dataAmount);
-      const labeledByUser = response.data.labeledByUser;
-      if (response.data.dataAmount === 0) {
-        setProgressInvidual(0);
-      } else {
-        setProgressInvidual((labeledByUser / response.data.dataAmount) * 100);
+      if (response.status === 200) {
+        setDataAmount(response.data.dataAmount);
+        const labeledByUser = response.data.labeledByUser;
+        if (response.data.dataAmount === 0) {
+          setProgressInvidual(0);
+        } else {
+          setProgressInvidual((labeledByUser / response.data.dataAmount) * 100);
+        }
       }
     };
     getAmountOfData();
@@ -103,9 +112,12 @@ const Labeling = ({ location }) => {
         getDataTypeEnum.earlier_value,
         tempIndex
       );
-      tempListOfDataPoints.unshift(response.data);
-      setListOfDataPoints(tempListOfDataPoints);
-      getSetLabels(tempListOfDataPoints);
+
+      if (response.status === 200) {
+        tempListOfDataPoints.unshift(response.data);
+        setListOfDataPoints(tempListOfDataPoints);
+        getSetLabels(tempListOfDataPoints);
+      }
     }
   };
 
@@ -122,9 +134,12 @@ const Labeling = ({ location }) => {
         getDataTypeEnum.next_value,
         tempIndex
       );
-      tempListOfDataPoints.push(response.data);
-      setListOfDataPoints(tempListOfDataPoints);
-      getSetLabels(tempListOfDataPoints);
+
+      if (response.status === 200) {
+        tempListOfDataPoints.push(response.data);
+        setListOfDataPoints(tempListOfDataPoints);
+        getSetLabels(tempListOfDataPoints);
+      }
     }
   };
 

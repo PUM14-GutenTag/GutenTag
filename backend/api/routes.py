@@ -1016,7 +1016,6 @@ class FetchUserProjects(Resource):
     @jwt_required()
     def get(self):
         current_user = User.get_by_email(get_jwt_identity())
-        print("curr user", current_user)
         user_projects = {}
         projects = []
         msg = "No projects found"

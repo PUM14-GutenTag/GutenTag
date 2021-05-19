@@ -15,15 +15,18 @@ const getUserInfo = async (dispatch, history) => {
       history.push('/login');
     }
   });
-  if (Object.prototype.hasOwnProperty.call(response, 'data')) {
-    dispatch({
-      type: 'SET_USER_INFO',
-      value: {
-        name: response.data.name,
-        email: response.data.email,
-        isAdmin: response.data.access_level >= 5,
-      },
-    });
+
+  if (response) {
+    if (Object.prototype.hasOwnProperty.call(response, 'data')) {
+      dispatch({
+        type: 'SET_USER_INFO',
+        value: {
+          name: response.data.name,
+          email: response.data.email,
+          isAdmin: response.data.access_level >= 5,
+        },
+      });
+    }
   }
 };
 

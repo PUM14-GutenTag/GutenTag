@@ -28,20 +28,22 @@ const ManageUsers = ({ toggleCallback }) => {
   // Fetches all users from beckend and sorts them in an array.
   const fetchData = async () => {
     const result = await HTTPLauncher.sendGetUsers();
-    const dataArray = Object.values(result.data.users);
-    // const mapedDataArray = dataArray.map((userObject) => Object.values(userObject));
-    dataArray.sort((a, b) => {
-      const nameA = a.name.toUpperCase();
-      const nameB = b.name.toUpperCase();
-      if (nameA < nameB) {
-        return -1;
-      }
-      if (nameA > nameB) {
-        return 1;
-      }
-      return 0;
-    });
-    setUsers(dataArray);
+    if (result.status === 200) {
+      const dataArray = Object.values(result.data.users);
+      // const mapedDataArray = dataArray.map((userObject) => Object.values(userObject));
+      dataArray.sort((a, b) => {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+      });
+      setUsers(dataArray);
+    }
   };
 
   useEffect(() => {
