@@ -158,6 +158,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
             defaultLabel={defaultLabel}
             setLabel={setLabel}
           />
@@ -180,6 +181,7 @@ const Labeling = ({ location }) => {
           <ImageLabeling
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
             defaultLabel={defaultLabel}
             setLabel={setLabel}
           />
@@ -191,6 +193,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
           />
         );
       }

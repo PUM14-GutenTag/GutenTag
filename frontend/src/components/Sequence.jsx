@@ -15,8 +15,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLa
   const [selection, setSelection] = useState('');
 
   // Adds a sequnece label and resets values in input and selection box
-  const addLabel = async (event) => {
-    event.preventDefault();
+  const addLabel = async () => {
     if (inputRef.current.value !== '' && selection !== '') {
       await HTTPLauncher.sendCreateSequenceLabel(
         dataPointId,
