@@ -56,14 +56,14 @@ const EditProject = ({ location }) => {
           <ExportButton projectID={id} projectType={projectType} fileName={name} />
         </Col>
         <Col>
-          <h1>Labels per datapoint</h1>
-          <InputSpinner amount={labelsPerDatapoint} setAmount={sendChange} />
+          <h1>Import</h1>
+          <ImportForm projectID={id} projectType={projectType} />
         </Col>
       </Row>
       <Row>
         <Col>
-          <h1>Import</h1>
-          <ImportForm projectID={id} projectType={projectType} />
+          <h1>Labels per datapoint</h1>
+          <InputSpinner amount={labelsPerDatapoint} setAmount={sendChange} />
         </Col>
         <Col>{projectType !== 3 && <ManageDefaultLabels projectID={id} />}</Col>
       </Row>

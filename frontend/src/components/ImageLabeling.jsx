@@ -101,7 +101,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel }) =>
           onInitialized={(instance) => {
             setCropper(instance);
           }}
-          viewMode={3}
+          viewMode={1}
         />
         <hr className="hr-title" data-content="Add new label" />
         <div className="form-container">
