@@ -529,7 +529,8 @@ class Label(db.Model):
     __tablename__ = "label"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id',
+                                                  ondelete="CASCADE"))
     data_id = db.Column(db.Integer, db.ForeignKey('project_data.id',
                                                   ondelete="CASCADE"))
     data = db.relationship("ProjectData", back_populates="labels")
