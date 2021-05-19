@@ -224,7 +224,11 @@ const Labeling = ({ location }) => {
         <div style={{ color: 'black', opacity: '0.5', paddingLeft: '0.2em' }}>
           Individual progression
         </div>
-        <ProgressBar variant="sec" now={progressInvidual} label={`${progressInvidual.toFixed(2)}%`} />
+        <ProgressBar
+          variant="sec"
+          now={progressInvidual}
+          label={`${progressInvidual.toFixed(2)}%`}
+        />
       </div>
     );
   };
