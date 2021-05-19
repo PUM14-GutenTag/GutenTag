@@ -56,6 +56,7 @@ const Labeling = ({ location }) => {
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
     setListOfDataPoints(response.data.list);
+    console.log(response.data.index);
     setIndex(response.data.index);
     getSetLabels(response.data.list);
   };
@@ -84,12 +85,15 @@ const Labeling = ({ location }) => {
   const getLastData = async () => {
     const tempLocalIndex = CURRENT_DATA - 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
-
+    console.log(gettingLast);
+    console.log(listOfDataPoints);
+    console.log(index);
     if (
       !(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0) &&
       index > 0 &&
       !gettingLast
     ) {
+      console.log('in');
       setGettingLast(true);
       const tempIndex = index - 1;
       setIndex(tempIndex);
@@ -113,7 +117,7 @@ const Labeling = ({ location }) => {
   const nextData = async () => {
     const tempLocalIndex = CURRENT_DATA + 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
-
+    console.log(gettingNext);
     if (
       !(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0) &&
       index < dataAmount - 1 &&
@@ -138,7 +142,9 @@ const Labeling = ({ location }) => {
 
   const handleUserKeyPress = (e) => {
     const { key } = e;
+    console.log(key);
     if (key === 'ArrowRight') {
+      console.log('hej');
       nextData();
     } else if (key === 'ArrowLeft') {
       getLastData();
@@ -151,7 +157,7 @@ const Labeling = ({ location }) => {
     return () => {
       window.removeEventListener('keydown', handleUserKeyPress);
     };
-  }, [listOfDataPoints]);
+  }, [listOfDataPoints, gettingNext, gettingLast, index]);
 
   // select what project type showed be displayed bases on project type
   const selectProjectComponent = (typeOfProject) => {
