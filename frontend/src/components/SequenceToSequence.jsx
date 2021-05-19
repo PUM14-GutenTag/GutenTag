@@ -13,7 +13,8 @@ const SequenceToSequence = ({ data, dataPointId, getSetLabels, labels }) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
-  const addLabel = async () => {
+  const addLabel = async (event) => {
+    event.preventDefault();
     let uniqueLabel = true;
     labels.forEach((label) => {
       if (label.label === inputRef.current.value) {
