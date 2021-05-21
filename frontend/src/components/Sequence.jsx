@@ -5,10 +5,10 @@ import '../css/Sequence.css';
 import HTTPLauncher from '../services/HTTPLauncher';
 import { generateRandomColor, textBoxSize } from '../util';
 
-/* 
-Component that shows the specifics for sequence labeling 
+/*
+Component that shows the specifics for sequence labeling
 */
-const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
+const Sequence = ({ data, dataPointId, getSetLabels, labels, defaultLabel, setLabel }) => {
   const [startIndex, setStartIndex] = useState('');
   const [endIndex, setEndIndex] = useState('');
   const inputRef = useRef();
@@ -34,7 +34,7 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
 
   // Highlightes word in if it has been labeled
   const highLightWord = (startingIndex) => {
-    let highLightColor = 'black';
+    let highLightColor = '#063954';
 
     // check if word is labeled
     labels.forEach((label) => {
@@ -64,6 +64,25 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
     setStartIndex('');
     setEndIndex('');
   }, [dataPointId]);
+
+  useEffect(() => {
+    if (defaultLabel !== '' && selection !== '') {
+      (async () => {
+        await HTTPLauncher.sendCreateSequenceLabel(
+          dataPointId,
+          defaultLabel,
+          startIndex,
+          endIndex,
+          generateRandomColor()
+        );
+        getSetLabels();
+      })();
+      setLabel('');
+      setSelection('');
+      inputRef.current.value = '';
+      inputRef.current.focus();
+    }
+  }, [defaultLabel]);
 
   // Functions for handeling selection evvent listener
   useEffect(() => {
@@ -106,9 +125,9 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
       return labeledText;
     };
 
-    /* 
-    Function handeling selection event listener. Makes sure 
-    only text data and complete unlabeled words can be selected. 
+    /*
+    Function handeling selection event listener. Makes sure
+    only text data and complete unlabeled words can be selected.
     */
     const handleSelection = () => {
       const selectedText = window.getSelection();
@@ -153,23 +172,38 @@ const Sequence = ({ data, dataPointId, getSetLabels, labels }) => {
 
   return (
     <div className="sequence-container">
-      <hr className="hr-title" data-content="Text data" />
       <div id="text-box-container" style={{ fontSize: textBoxSize(data) }}>
         {wrapWordsInSpan(data)}
       </div>
       <hr className="hr-title" data-content="Add new sequence label" />
       <div className="label-container">
-        <div className="selected-text-box">
-          <p className="selected-text">{selection}</p>
-        </div>
-        <Form onSubmit={addLabel} className="sequence-form">
-          <Form.Group className="group-seq">
-            <input type="text" placeholder="Enter label..." required ref={inputRef} />
-          </Form.Group>
-        </Form>
-        <button className="btn btn-primary add-seq-btn" type="button" onClick={addLabel}>
-          Add new label
-        </button>
+        <Form.Row id="center-row">
+          <div className="selected-text-box">
+            <p className="selected-text">{selection}</p>
+          </div>
+        </Form.Row>
+        <Form.Row>
+          <Form onSubmit={addLabel} className="sequence-form">
+            <Form.Group className="group-seq">
+              <input
+                type="text"
+                placeholder="Enter label..."
+                id="input-box"
+                className="text"
+                required
+                ref={inputRef}
+              />
+            </Form.Group>
+          </Form>
+          <button
+            id="submit-label-btn"
+            className="btn dark label-btn"
+            type="button"
+            onClick={addLabel}
+          >
+            Label
+          </button>
+        </Form.Row>
       </div>
     </div>
   );
@@ -189,6 +223,8 @@ Sequence.propTypes = {
       user_id: PropTypes.number.isRequired,
     }).isRequired
   ).isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default Sequence;

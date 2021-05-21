@@ -14,6 +14,7 @@ import '../css/Labeling.css';
 import Layout from '../components/Layout';
 import Label from '../components/Label';
 import ProjectType from '../ProjectType';
+import DefaultLabels from '../components/DefaultLabels';
 
 /*
 Labeling-page handles labeling functionality
@@ -24,15 +25,23 @@ const Labeling = ({ location }) => {
   const [labels, setLabels] = useState([]);
   const [index, setIndex] = useState(0);
   const [listOfDataPoints, setListOfDataPoints] = useState([]);
-  const [progress, setProgress] = useState(0);
+  const [progressInvidual, setProgressInvidual] = useState(0);
+  const [progressProject, setProgressProject] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
   const [gettingLast, setGettingLast] = useState(false);
   const [gettingNext, setGettingNext] = useState(false);
+  const [defaultLabel, setLabel] = useState('');
   const CURRENT_DATA = 5;
 
   const getDataTypeEnum = Object.freeze({ whole_list: 0, earlier_value: -1, next_value: 1 });
   const type = projectType;
   const projectId = id;
+  // fetch progress
+  const fetchProgress = async () => {
+    const response = await HTTPLauncher.sendGetProjectProgress(id);
+    setProgressProject(response.data.progress);
+  };
+
   // fetch all labels for a given datapoint
   const getSetLabels = async (dataPoints = listOfDataPoints) => {
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
@@ -43,6 +52,7 @@ const Labeling = ({ location }) => {
       } else {
         setLabels([]);
       }
+      fetchProgress();
     }
   };
 
@@ -67,9 +77,9 @@ const Labeling = ({ location }) => {
       setDataAmount(response.data.dataAmount);
       const labeledByUser = response.data.labeledByUser;
       if (response.data.dataAmount === 0) {
-        setProgress(0);
+        setProgressInvidual(0);
       } else {
-        setProgress((labeledByUser / response.data.dataAmount) * 100);
+        setProgressInvidual((labeledByUser / response.data.dataAmount) * 100);
       }
     };
     getAmountOfData();
@@ -77,7 +87,9 @@ const Labeling = ({ location }) => {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line
+    if (listOfDataPoints.length > 0) {
+      getSetLabels(listOfDataPoints);
+    }
   }, []);
 
   // Get earlier datapoint, and delete data point out of scope from list
@@ -164,6 +176,9 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
+            defaultLabel={defaultLabel}
+            setLabel={setLabel}
           />
         );
       }
@@ -174,6 +189,8 @@ const Labeling = ({ location }) => {
             getSetLabels={getSetLabels}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             labels={labels}
+            defaultLabel={defaultLabel}
+            setLabel={setLabel}
           />
         );
       }
@@ -182,6 +199,9 @@ const Labeling = ({ location }) => {
           <ImageLabeling
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
+            defaultLabel={defaultLabel}
+            setLabel={setLabel}
           />
         );
       }
@@ -191,6 +211,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
           />
         );
       }
@@ -203,30 +224,65 @@ const Labeling = ({ location }) => {
   const suggestionLabels = (typeOfProject) => {
     // Seq to Seq should not display suggestions
     if (typeOfProject !== ProjectType.SEQUENCE_TO_SEQUENCE) {
-      return <hr className="hr-title" data-content="Suggestions" />;
+      return (
+        <div>
+          <hr className="hr-title" data-content="Suggestions" />
+          <DefaultLabels projectID={projectId} setLabel={setLabel} />
+        </div>
+      );
     }
     return <></>;
   };
   const finishedLabel = () => {
-    if (progress === 100) {
-      return <FinishedPopUp />;
+    if (progressInvidual === 100 && progressProject !== 100) {
+      return <FinishedPopUp projectDone={false} />;
     }
-    return <ProgressBar striped variant="success" now={progress} />;
+    if (progressProject === 100) {
+      return <FinishedPopUp projectDone />;
+    }
+    return (
+      <div>
+        <div style={{ color: 'black', opacity: '0.5', paddingLeft: '0.2em' }}>
+          Individual progression
+        </div>
+        <ProgressBar
+          variant="sec"
+          now={progressInvidual}
+          label={`${progressInvidual.toFixed(2)}%`}
+        />
+      </div>
+    );
   };
 
   return (
     <Layout>
+      <Button
+        className="dark"
+        as={Link}
+        to={{
+          pathname: '/home',
+        }}
+      >
+        Back
+      </Button>
       <div className="content-container">
         <div className="progress-bars">
           {finishedLabel()}
           <br />
-          <ProgressBar striped variant="warning" now={25} />
+          <div style={{ color: 'black', opacity: '0.5', paddingLeft: '0.2em' }}>
+            Project progression
+          </div>
+          <ProgressBar
+            variant="prim"
+            now={progressProject}
+            label={`${progressProject.toFixed(2)}%`}
+          />
         </div>
         <br />
         <div>
           <div className="main-content">
             <ChevronLeft
-              className="right-left-arrow  make-large fa-10x arrow-btn"
+              className="right-left-arrow  make-large fa-7x arrow-btn"
               onClick={getLastData}
             />
 
@@ -254,19 +310,10 @@ const Labeling = ({ location }) => {
             </div>
 
             <ChevronRight
-              className="right-left-arrow  make-large fa-10x arrow-btn"
+              className="right-left-arrow  make-large fa-7x arrow-btn"
               onClick={nextData}
             />
           </div>
-          <Button
-            className="btn btn-primary"
-            as={Link}
-            to={{
-              pathname: '/home',
-            }}
-          >
-            Go back
-          </Button>
         </div>
       </div>
     </Layout>

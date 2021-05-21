@@ -5,29 +5,66 @@ import HTTPLauncher from '../services/HTTPLauncher';
 import '../css/DocumentClassification.css';
 import { generateRandomColor, textBoxSize } from '../util';
 
-/* 
-Component that shows the specifics for document classification 
+/*
+Component that shows the specifics for document classification
 */
-const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
+const DocumentClassification = ({
+  data,
+  dataPointId,
+  getSetLabels,
+  defaultLabel,
+  setLabel,
+  labels,
+}) => {
   const inputRef = useRef();
 
   /* Adds label to a datapoint and and updates what labels are being displayed to the user */
   const addLabel = async (event) => {
     event.preventDefault();
-    await HTTPLauncher.sendCreateDocumentClassificationLabel(
-      dataPointId,
-      inputRef.current.value,
-      generateRandomColor()
-    );
-    getSetLabels();
-    inputRef.current.value = '';
-    inputRef.current.focus();
+    let uniqueLabel = true;
+    labels.forEach((label) => {
+      if (label.label === inputRef.current.value) {
+        uniqueLabel = false;
+      }
+    });
+    if (uniqueLabel) {
+      await HTTPLauncher.sendCreateDocumentClassificationLabel(
+        dataPointId,
+        inputRef.current.value,
+        generateRandomColor()
+      );
+      getSetLabels();
+      inputRef.current.value = '';
+      inputRef.current.focus();
+    }
   };
 
   useEffect(() => {
     inputRef.current.value = '';
     inputRef.current.focus();
   }, [dataPointId]);
+
+  useEffect(() => {
+    if (defaultLabel !== '') {
+      (async () => {
+        let uniqueLabel = true;
+        labels.forEach((label) => {
+          if (label.label === defaultLabel) {
+            uniqueLabel = false;
+          }
+        });
+        if (uniqueLabel) {
+          await HTTPLauncher.sendCreateDocumentClassificationLabel(
+            dataPointId,
+            defaultLabel,
+            generateRandomColor()
+          );
+          getSetLabels();
+        }
+      })();
+      setLabel('');
+    }
+  }, [defaultLabel]);
 
   return (
     <div className="classification-container">
@@ -42,10 +79,11 @@ const DocumentClassification = ({ data, dataPointId, getSetLabels }) => {
               type="text"
               placeholder="Enter label..."
               required
-              className="input-box"
+              id="input-box"
+              className="text"
               ref={inputRef}
             />
-            <button className="btn btn-primary label-btn" type="submit">
+            <button id="submit-label-btn" className="btn dark label-btn" type="submit">
               Label
             </button>
           </Form.Group>
@@ -59,6 +97,17 @@ DocumentClassification.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
+  labels: PropTypes.arrayOf(
+    PropTypes.shape({
+      color: PropTypes.string.isRequired,
+      data_id: PropTypes.number.isRequired,
+      label: PropTypes.string.isRequired,
+      label_id: PropTypes.number.isRequired,
+      user_id: PropTypes.number.isRequired,
+    }).isRequired
+  ).isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  setLabel: PropTypes.func.isRequired,
 };
 
 export default DocumentClassification;

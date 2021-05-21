@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 from api import rest
 from api.models import (
     AccessLevel,
+    DefaultLabel,
     Project,
     ProjectData,
     ProjectType,
@@ -263,6 +264,37 @@ class Deauthorize(Resource):
         return make_response(jsonify({"message": msg}), status)
 
 
+class NewDefaultLabel(Resource):
+    """
+    Endpoint for adding a new default label.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("label_name", type=str, required=True)
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+
+        if user.access_level >= AccessLevel.ADMIN:
+            try:
+                project = Project.query.filter_by(id=args.project_id).first()
+                return make_response(jsonify(try_add_response(
+                    DefaultLabel(project, args.label_name)
+                )), 200)
+            except Exception as e:
+                msg = f"Could not create default label: {e}"
+                status = 404
+        else:
+            msg = "User is not authorized to create default labels."
+            status = 401
+
+        return make_response(jsonify({"message": msg}), status)
+
+
 class NewProject(Resource):
     """
     Endpoint for creating a project.
@@ -272,6 +304,8 @@ class NewProject(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("project_name", type=str, required=True)
         self.reqparse.add_argument("project_type", type=int, required=True)
+        self.reqparse.add_argument(
+            "labels_per_datapoint", type=int, required=True)
 
     @jwt_required()
     def post(self):
@@ -282,13 +316,50 @@ class NewProject(Resource):
             try:
                 ProjectStatistic.update(user.id)
                 return make_response(jsonify(try_add_response(
-                    Project(args.project_name, args.project_type)
+                    Project(args.project_name, args.project_type,
+                            args.labels_per_datapoint)
                 )), 200)
             except Exception as e:
                 msg = f"Could not create project: {e}"
                 status = 404
         else:
             msg = "User is not authorized to create projects."
+            status = 401
+
+        return make_response(jsonify({"message": msg}), status)
+
+
+class RemoveDefaultLabel(Resource):
+    """
+    Endpoint for removing a default label.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+        self.reqparse.add_argument("label_name", type=str, required=True)
+
+    @jwt_required()
+    def delete(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+
+        if user.access_level >= AccessLevel.ADMIN:
+            try:
+                labels = project.default_labels
+                for label in labels:
+                    if label.name == args.label_name:
+                        return make_response(jsonify(try_delete_response(
+                            label)), 200)
+
+                msg = f"Label {args.label_name} does not exist"
+                status = 404
+            except Exception as e:
+                msg = f"Could not remove default label: {e}"
+                status = 404
+        else:
+            msg = "User is not authorized to remove default labels."
             status = 401
 
         return make_response(jsonify({"message": msg}), status)
@@ -319,6 +390,36 @@ class RemoveProject(Resource):
         else:
             msg = "User is not authorized to remove projects."
             status = 401
+
+        return make_response(jsonify({"message": msg}), status)
+
+
+class ChangeLabelsPerDatapoint(Resource):
+    """
+    Endpoint for changing labels per datapoint before
+    a project is finished.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+        self.reqparse.add_argument(
+            "labels_per_datapoint", type=int, required=True)
+
+    @jwt_required()
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+        status = 401
+        msg = "You are not authorized to change this parameter"
+
+        if user.access_level >= AccessLevel.ADMIN:
+            project.set_labels_per_datapoint(args.labels_per_datapoint)
+            status = 200
+            msg = "Labels per datapoint changed"
+
+        project.check_finished()
 
         return make_response(jsonify({"message": msg}), status)
 
@@ -444,6 +545,49 @@ class AddNewImageData(Resource):
             except Exception as e:
                 msg = f"Could not add data: {e}"
                 status = 404
+
+        return make_response(jsonify({"message": msg}), status)
+
+
+class GetDefaultLabels(Resource):
+    """
+    Endpoint to retrieve default labels.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        user = User.get_by_email(get_jwt_identity())
+        project = Project.query.get(args.project_id)
+
+        if not project:
+            return make_response(jsonify({"message": "Invalid project id"}),
+                                 404)
+
+        if project in user.projects or user.access_level >= AccessLevel.ADMIN:
+            status = 200
+            try:
+                labels = []
+                label_info = {}
+
+                labels = project.default_labels
+                for label in labels:
+                    label_info[label.id] = {
+                        "name": label.name,
+                    }
+
+                print(project.default_labels)
+                return make_response(jsonify(label_info), status)
+            except Exception as e:
+                msg = f"Could not get data: {e}"
+                status = 404
+        else:
+            msg = "User is not authorized to get data."
+            status = 401
 
         return make_response(jsonify({"message": msg}), status)
 
@@ -587,10 +731,13 @@ class CreateDocumentClassificationLabel(Resource):
                 # Only update statistic once per data
                 if not data.has_labeled(user.id):
                     LabelingStatistic.update(user.id)
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     DocumentClassificationLabel(
                         args.data_id, user.id, args.label, args.color)
                 )), 200)
+
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -629,9 +776,11 @@ class CreateSequenceLabel(Resource):
                 # Only update statistic once per data
                 if not data.has_labeled(user.id):
                     LabelingStatistic.update(user.id)
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     SequenceLabel(args.data_id, user.id, args.label,
                                   args.begin, args.end, args.color))), 200)
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -668,10 +817,13 @@ class CreateSequenceToSequenceLabel(Resource):
                 # Only update statistic once per data
                 if not data.has_labeled(user.id):
                     LabelingStatistic.update(user.id)
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     SequenceToSequenceLabel(
                         args.data_id, user.id, args.label, args.color)
                 )), 200)
+
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -712,11 +864,14 @@ class CreateImageClassificationLabel(Resource):
                 # Only update statistic once per data
                 if not data.has_labeled(user.id):
                     LabelingStatistic.update(user.id)
-                return make_response(jsonify(try_add_response(
+                response = make_response(jsonify(try_add_response(
                     ImageClassificationLabel(
                         args.data_id, user.id, args.label,
                         (args.x1, args.y1), (args.x2, args.y2), args.color)
                 )), 200)
+
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not create label: {e}"
                 status = 404
@@ -749,7 +904,11 @@ class DeleteLabel(Resource):
         if (label.user_id == user.id
                 or (user.access_level >= AccessLevel.ADMIN)):
             try:
-                return make_response(jsonify(try_delete_response(label)), 200)
+                response = make_response(
+                    jsonify(try_delete_response(label)), 200)
+                data = ProjectData.query.get(label.data_id)
+                data.check_finished()
+                return response
             except Exception as e:
                 msg = f"Could not remove label: {e}"
                 status = 404
@@ -872,7 +1031,10 @@ class FetchUserProjects(Resource):
                     "id": project.id,
                     "name": project.name,
                     "type": project.project_type,
-                    "created": project.created
+                    "created": project.created,
+                    "labels_per_datapoint": project.labels_per_datapoint,
+                    "finished": project.finished,
+                    "progress": project.get_progress()
                 }
             msg = "Retrieved user projects"
             status = 200
@@ -882,6 +1044,32 @@ class FetchUserProjects(Resource):
             status = 200
         return make_response(jsonify({"msg": msg,
                                       "projects": user_projects}), status)
+
+
+class GetProjectProgress(Resource):
+    """
+    Endpoint for retrieving progress in a project
+    as a percentage.
+    """
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("project_id", type=int, required=True)
+
+    @jwt_required()
+    def get(self):
+        args = self.reqparse.parse_args()
+        project = Project.query.get(args.project_id)
+
+        if not project:
+            return make_response(
+                jsonify({"message": "Invalid project id"}), 404)
+
+        return make_response(
+            jsonify({
+                "message": "Progress retrieved",
+                "progress": project.get_progress()
+            }), 200)
 
 
 class GetExportData(Resource):
@@ -1014,11 +1202,15 @@ rest.add_resource(ChangePassword, "/change-password")
 rest.add_resource(RefreshToken, "/refresh-token")
 rest.add_resource(Authorize, "/authorize-user")
 rest.add_resource(Deauthorize, "/deauthorize-user")
+rest.add_resource(NewDefaultLabel, "/create-default-label")
 rest.add_resource(NewProject, "/create-project")
+rest.add_resource(RemoveDefaultLabel, "/delete-default-label")
 rest.add_resource(RemoveProject, "/delete-project")
+rest.add_resource(ChangeLabelsPerDatapoint, "/labels-per-data")
 rest.add_resource(RemoveUser, "/delete-user")
 rest.add_resource(AddNewTextData, "/add-text-data")
 rest.add_resource(AddNewImageData, "/add-image-data")
+rest.add_resource(GetDefaultLabels, "/get-default-labels")
 rest.add_resource(GetNewData, "/get-data")
 rest.add_resource(GetAmountOfData, "/get-data-amount")
 rest.add_resource(GetLabel, "/get-label")
@@ -1029,6 +1221,7 @@ rest.add_resource(CreateImageClassificationLabel, "/label-image")
 rest.add_resource(DeleteLabel, "/remove-label")
 rest.add_resource(FetchUserInfo, '/get-user-info')
 rest.add_resource(FetchUsers, '/get-users')
+rest.add_resource(GetProjectProgress, '/get-project-progress')
 rest.add_resource(FetchProjectUsers, '/get-project-users')
 rest.add_resource(FetchUserProjects, '/get-user-projects')
 rest.add_resource(GetExportData, "/get-export-data")
