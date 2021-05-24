@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row, Form, Button, Table } from 'react-bootstrap/';
+import { Col, Form, Button, Table } from 'react-bootstrap/';
 import { Trash } from 'react-bootstrap-icons';
 
 import HTTPLauncher from '../services/HTTPLauncher';
