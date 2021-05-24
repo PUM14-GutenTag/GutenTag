@@ -11,7 +11,7 @@ import userAuth from '../services/userAuth';
 // Redirects user to login if not logged in.
 const getUserInfo = async (dispatch, history) => {
   const response = await HTTPLauncher.sendGetUserInfo().catch((e) => {
-    if (e.response.status === 401) {
+    if (typeof e.response.status === 'undefined' || e.response.status === 401) {
       history.push('/login');
     }
   });
