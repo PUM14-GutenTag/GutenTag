@@ -31,10 +31,18 @@ in test.js module.exports.
 All terminal commands are expected to be run from the project's root folder.
 
 1. Make sure that you are running the Docker containers beforehand.
-2. Run `docker-compose run frontend npm test -- --testPathIgnorePatterns performance.test.js` in your terminal. The additional argument skips running of time intensive performance tests. If you want to run the performance tests, simply run `docker-compose run frontend npm test performance.test.js`
+2. Run `docker-compose run frontend npm test -- --testPathIgnorePatterns performance.test.js` in your terminal. The additional argument skips running of time intensive performance tests.
 
 It will run all tests meeting the following [filename conventions](https://create-react-app.dev/docs/running-tests/#filename-conventions):
 
 - Files with .js suffix in \_\_tests\_\_ folders.
 - Files with .test.js suffix.
 - Files with .spec.js suffix.
+
+## Run performance tests
+
+These are very time intensive and should not be run on CI.
+
+1. Create a directory test_resources/extra and copy the text and image dataset into it.
+2. Navigate to the test_resources directory and run `python generate_datasets.py`
+3. Navigate back to root and run `docker-compose run frontend npm test performance.test.js`

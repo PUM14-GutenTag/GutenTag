@@ -5,12 +5,11 @@ import datetime
 import io
 from math import ceil
 from enum import IntEnum
-from api import db
-from api.database_handler import check_types
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
-
+from api import db
+from api.database_handler import check_types
 
 LIST_SIDE_LENGTH = 5
 LIST_LENGTH = 2 * LIST_SIDE_LENGTH + 1

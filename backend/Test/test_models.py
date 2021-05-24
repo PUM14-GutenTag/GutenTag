@@ -72,7 +72,8 @@ def test_create_default_labels():
     reset_db()
 
     # Test correctly creating a project.
-    project = try_add(Project("Project", ProjectType.DOCUMENT_CLASSIFICATION))
+    project = try_add(
+        Project("Project", ProjectType.DOCUMENT_CLASSIFICATION, 5))
     assert project is not None
 
     default_label = try_add(DefaultLabel(project, "negative"))
