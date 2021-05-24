@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
+import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 const InputSpinner = ({ amount, setAmount }) => {
   const [counter, setCounter] = useState(0);
