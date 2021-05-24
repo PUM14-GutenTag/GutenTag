@@ -2,11 +2,17 @@ import authHeader from './authHeader';
 
 const axios = require('axios');
 
-axios.defaults.baseURL = 'http://localhost:5000/';
+axios.defaults.baseURL =
+  process.env.REACT_APP_MODE === 'prod' ? 'http://localhost/api/' : 'http://localhost:5000/';
 class HTTPLauncher {
   // Sets the base URL for all requests.
   static setBaseURL(URL) {
     axios.defaults.baseURL = URL;
+  }
+
+  // Send ping.
+  static sendPing() {
+    return axios.get('ping');
   }
 
   // Send HTTP-request to create a user

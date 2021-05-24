@@ -69,6 +69,11 @@ class GetDataType(IntEnum):
     GET_EARLIER_VALUE = -1
 
 
+class Ping(Resource):
+    def get(self):
+        return "ping"
+
+
 class CreateUser(Resource):
     """
     Endpoint for creating a user.
@@ -1191,12 +1196,13 @@ class Reset(Resource):
 
     def get(self):
         reset_db()
-        admin = User("Admin", "Admin", "admin@admin", "password", True)
+        admin = User("Admin", "Admin", "admin@admin.com", "password", True)
         add_flush(admin)
         add_stats_to_new_user(admin.id)
         commit()
 
 
+rest.add_resource(Ping, "/ping")
 rest.add_resource(CreateUser, "/create-user")
 rest.add_resource(LoginUser, "/login")
 rest.add_resource(ChangePassword, "/change-password")

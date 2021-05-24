@@ -62,7 +62,6 @@ const App = () => {
     axios.interceptors.response.use(
       (response) => {
         if (response.config.url.includes('login')) {
-          console.log('RESPONSE:', response);
           const { access_token: accessToken, refresh_token: refreshToken } = response.data;
           userAuth.setAccessToken(accessToken);
           userAuth.setRefreshToken(refreshToken);
