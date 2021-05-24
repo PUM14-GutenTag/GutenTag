@@ -69,7 +69,6 @@ const EditProject = ({ location }) => {
           {projectType !== 3 && <ManageDefaultLabels projectID={id} />}
         </Col>
       </Row>
-
       <ManageProjectUsers projectID={id} />
     </Layout>
   );

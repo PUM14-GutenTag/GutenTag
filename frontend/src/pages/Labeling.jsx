@@ -158,6 +158,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
             defaultLabel={defaultLabel}
             setLabel={setLabel}
           />
@@ -180,6 +181,7 @@ const Labeling = ({ location }) => {
           <ImageLabeling
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
             defaultLabel={defaultLabel}
             setLabel={setLabel}
           />
@@ -191,6 +193,7 @@ const Labeling = ({ location }) => {
             data={listOfDataPoints[CURRENT_DATA].data}
             dataPointId={parseInt(listOfDataPoints[CURRENT_DATA].id, 10)}
             getSetLabels={getSetLabels}
+            labels={labels}
           />
         );
       }
@@ -219,22 +222,49 @@ const Labeling = ({ location }) => {
     if (progressProject === 100) {
       return <FinishedPopUp projectDone />;
     }
-    return <ProgressBar striped variant="success" now={progressInvidual} />;
+    return (
+      <div>
+        <div style={{ color: 'black', opacity: '0.5', paddingLeft: '0.2em' }}>
+          Individual progression
+        </div>
+        <ProgressBar
+          variant="sec"
+          now={progressInvidual}
+          label={`${progressInvidual.toFixed(2)}%`}
+        />
+      </div>
+    );
   };
 
   return (
     <Layout>
+      <Button
+        className="dark"
+        as={Link}
+        to={{
+          pathname: '/home',
+        }}
+      >
+        Back
+      </Button>
       <div className="content-container">
         <div className="progress-bars">
           {finishedLabel()}
           <br />
-          <ProgressBar striped variant="warning" now={progressProject} />
+          <div style={{ color: 'black', opacity: '0.5', paddingLeft: '0.2em' }}>
+            Project progression
+          </div>
+          <ProgressBar
+            variant="prim"
+            now={progressProject}
+            label={`${progressProject.toFixed(2)}%`}
+          />
         </div>
         <br />
         <div>
           <div className="main-content">
             <ChevronLeft
-              className="right-left-arrow  make-large fa-10x arrow-btn"
+              className="right-left-arrow  make-large fa-7x arrow-btn"
               onClick={getLastData}
             />
 
@@ -262,19 +292,10 @@ const Labeling = ({ location }) => {
             </div>
 
             <ChevronRight
-              className="right-left-arrow  make-large fa-10x arrow-btn"
+              className="right-left-arrow  make-large fa-7x arrow-btn"
               onClick={nextData}
             />
           </div>
-          <Button
-            className="btn btn-primary"
-            as={Link}
-            to={{
-              pathname: '/home',
-            }}
-          >
-            Go back
-          </Button>
         </div>
       </div>
     </Layout>

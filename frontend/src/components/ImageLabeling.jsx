@@ -10,7 +10,7 @@ import { generateRandomColor } from '../util';
 /*
 Component that shows a image, you are able to crop the img with a label
 */
-const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel }) => {
+const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel, labels }) => {
   const inputRef = useRef();
   const cropperRef = useRef();
 
@@ -33,18 +33,32 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel }) =>
   const addLabel = async (event) => {
     event.preventDefault();
     const cropData = getCropData();
-    await HTTPLauncher.sendCreateImageClassificationLabel(
-      dataPointId,
-      inputRef.current.value,
-      cropData[0],
-      cropData[1],
-      cropData[2],
-      cropData[3],
-      generateRandomColor()
-    );
-    getSetLabels();
-    inputRef.current.value = '';
-    inputRef.current.focus();
+    let uniqueLabel = true;
+    labels.forEach((label) => {
+      if (
+        label.label === inputRef.current.value &&
+        label.coordinates.x1 === Math.floor(cropData[0]) &&
+        label.coordinates.y1 === Math.floor(cropData[1]) &&
+        label.coordinates.x2 === Math.floor(cropData[2]) &&
+        label.coordinates.y2 === Math.floor(cropData[3])
+      ) {
+        uniqueLabel = false;
+      }
+    });
+    if (uniqueLabel) {
+      await HTTPLauncher.sendCreateImageClassificationLabel(
+        dataPointId,
+        inputRef.current.value,
+        cropData[0],
+        cropData[1],
+        cropData[2],
+        cropData[3],
+        generateRandomColor()
+      );
+      getSetLabels();
+      inputRef.current.value = '';
+      inputRef.current.focus();
+    }
   };
 
   // What to happen when we change datapoint to label
@@ -66,16 +80,30 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel }) =>
     if (defaultLabel !== '') {
       (async () => {
         const cropData = getCropData();
-        await HTTPLauncher.sendCreateImageClassificationLabel(
-          dataPointId,
-          defaultLabel,
-          cropData[0],
-          cropData[1],
-          cropData[2],
-          cropData[3],
-          generateRandomColor()
-        );
-        getSetLabels();
+        let uniqueLabel = true;
+        labels.forEach((label) => {
+          if (
+            label.label === defaultLabel &&
+            label.coordinates.x1 === Math.floor(cropData[0]) &&
+            label.coordinates.y1 === Math.floor(cropData[1]) &&
+            label.coordinates.x2 === Math.floor(cropData[2]) &&
+            label.coordinates.y2 === Math.floor(cropData[3])
+          ) {
+            uniqueLabel = false;
+          }
+        });
+        if (uniqueLabel) {
+          await HTTPLauncher.sendCreateImageClassificationLabel(
+            dataPointId,
+            defaultLabel,
+            cropData[0],
+            cropData[1],
+            cropData[2],
+            cropData[3],
+            generateRandomColor()
+          );
+          getSetLabels();
+        }
       })();
       setLabel('');
     }
@@ -111,10 +139,11 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel }) =>
                 type="text"
                 placeholder="Enter label..."
                 required
-                className="input-box"
+                id="input-box"
+                className="text"
                 ref={inputRef}
               />
-              <button className="btn btn-primary label-btn" type="submit">
+              <button id="submit-label-btn" className="btn dark label-btn" type="submit">
                 Label
               </button>
             </Form.Group>
@@ -128,6 +157,21 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel }) =>
 ImageLabeling.propTypes = {
   dataPointId: PropTypes.number.isRequired,
   getSetLabels: PropTypes.func.isRequired,
+  labels: PropTypes.arrayOf(
+    PropTypes.shape({
+      color: PropTypes.string.isRequired,
+      coordinates: PropTypes.shape({
+        x1: PropTypes.number.isRequired,
+        x2: PropTypes.number.isRequired,
+        y1: PropTypes.number.isRequired,
+        y2: PropTypes.number.isRequired,
+      }).isRequired,
+      data_id: PropTypes.number.isRequired,
+      label: PropTypes.string.isRequired,
+      label_id: PropTypes.number.isRequired,
+      user_id: PropTypes.number.isRequired,
+    }).isRequired
+  ).isRequired,
   defaultLabel: PropTypes.string.isRequired,
   setLabel: PropTypes.func.isRequired,
 };
