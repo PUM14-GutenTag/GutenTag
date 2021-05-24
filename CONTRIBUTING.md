@@ -14,8 +14,6 @@ These are enforced using the Flake8 linter and autopep8 formatter. Install instr
 
 ## CSS
 
-CSS selectors shall adhere to the [BEM naming convention](http://getbem.com/naming/).
-
 Commonly used styles can be put in the global stylesheet. Page specific styles are to be put in their own stylesheet.
 
 ## General documentation guidelines

@@ -1,0 +1,43 @@
+# Override file for development use.
+# Based on docker-compose.yml but overrides specific settings.
+version: "3.8"
+
+services:
+  db:
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    restart: unless-stopped
+    env_file:
+      - ./.env.dev
+
+  backend:
+    command: python run.py run -h 0.0.0.0 -p 5000
+    ports:
+      - 5000:5000
+    volumes:
+      - ./backend:/usr/src/backend
+      - ./test_resources:/usr/src/backend/Test/res
+    restart: unless-stopped
+    env_file:
+      - ./.env.dev
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_SERVER_NAME: ${SERVER_NAME}
+        REACT_APP_MODE: "dev"
+    command: npm run start
+    depends_on:
+      - backend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/usr/src/frontend/src
+      - ./test_resources:/usr/src/frontend/src/tests/res
+    restart: unless-stopped
+    env_file:
+      - ./.env.dev
+
+volumes:
+  postgres_data_dev:

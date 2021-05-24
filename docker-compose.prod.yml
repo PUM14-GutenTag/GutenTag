@@ -1,0 +1,52 @@
+# Override file for production use.
+# Based on docker-compose.yml but overrides specific settings.
+version: "3.8"
+
+services:
+  db:
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    restart: always
+    env_file:
+      - ./.env.prod
+
+  backend:
+    command: gunicorn --bind 0.0.0.0:5000 run:app --worker-class gthread --workers 5
+    expose:
+      - 5000
+    restart: always
+    env_file:
+      - ./.env.prod
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_SERVER_NAME: ${SERVER_NAME}
+        REACT_APP_MODE: "prod"
+    command: npm run build
+    depends_on:
+      - backend
+    expose:
+      - 3000
+    volumes:
+      - static_data:/usr/src/frontend/build
+    env_file:
+      - ./.env.prod
+
+  reverseproxy:
+    build: ./nginx
+    ports:
+      - 80:80
+    volumes:
+      - static_data:/build
+    restart: always
+    depends_on:
+      - backend
+      - frontend
+    env_file:
+      - ./.env.prod
+
+volumes:
+  postgres_data_prod:
+  static_data:

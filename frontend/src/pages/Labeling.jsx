@@ -28,6 +28,8 @@ const Labeling = ({ location }) => {
   const [progressInvidual, setProgressInvidual] = useState(0);
   const [progressProject, setProgressProject] = useState(0);
   const [dataAmount, setDataAmount] = useState(0);
+  const [gettingLast, setGettingLast] = useState(false);
+  const [gettingNext, setGettingNext] = useState(false);
   const [defaultLabel, setLabel] = useState('');
   const CURRENT_DATA = 5;
 
@@ -94,18 +96,27 @@ const Labeling = ({ location }) => {
   const getLastData = async () => {
     const tempLocalIndex = CURRENT_DATA - 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
-    if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
+    if (
+      !(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0) &&
+      index > 0 &&
+      !gettingLast
+    ) {
+      setGettingLast(true);
       const tempIndex = index - 1;
       setIndex(tempIndex);
       tempListOfDataPoints.pop();
+      tempListOfDataPoints.unshift({});
+      setListOfDataPoints(tempListOfDataPoints);
       const response = await HTTPLauncher.sendGetData(
         projectId,
         getDataTypeEnum.earlier_value,
         tempIndex
       );
+      tempListOfDataPoints.shift();
       tempListOfDataPoints.unshift(response.data);
       setListOfDataPoints(tempListOfDataPoints);
       getSetLabels(tempListOfDataPoints);
+      setGettingLast(false);
     }
   };
 
@@ -113,10 +124,16 @@ const Labeling = ({ location }) => {
   const nextData = async () => {
     const tempLocalIndex = CURRENT_DATA + 1;
     const tempListOfDataPoints = listOfDataPoints.slice();
-    if (!(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0)) {
+    if (
+      !(Object.keys(listOfDataPoints[tempLocalIndex]).length === 0) &&
+      index < dataAmount - 1 &&
+      !gettingNext
+    ) {
+      setGettingNext(true);
       const tempIndex = index + 1;
       setIndex(tempIndex);
       tempListOfDataPoints.shift();
+      setListOfDataPoints(tempListOfDataPoints);
       const response = await HTTPLauncher.sendGetData(
         projectId,
         getDataTypeEnum.next_value,
@@ -125,6 +142,7 @@ const Labeling = ({ location }) => {
       tempListOfDataPoints.push(response.data);
       setListOfDataPoints(tempListOfDataPoints);
       getSetLabels(tempListOfDataPoints);
+      setGettingNext(false);
     }
   };
 
@@ -143,7 +161,7 @@ const Labeling = ({ location }) => {
     return () => {
       window.removeEventListener('keydown', handleUserKeyPress);
     };
-  }, [listOfDataPoints]);
+  }, [listOfDataPoints, gettingNext, gettingLast, index]);
 
   // select what project type showed be displayed bases on project type
   const selectProjectComponent = (typeOfProject) => {

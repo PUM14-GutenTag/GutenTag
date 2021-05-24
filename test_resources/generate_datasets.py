@@ -61,7 +61,7 @@ def sequence_labeling_dataset(input_path, output_path):
     print("Indexing input...")
     data_list = []
     with open(input_path, "r", encoding="utf-8") as input_file:
-        lines = cut_list(input_file.read().splitlines(), 0.01)  # 0.33
+        lines = cut_list(input_file.read().splitlines(), 0.33)  # 0.33
     for i, line in enumerate(lines):
         data_list.append({
             "text": line,
