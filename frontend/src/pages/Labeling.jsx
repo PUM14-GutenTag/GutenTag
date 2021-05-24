@@ -151,19 +151,13 @@ const Labeling = ({ location }) => {
         getDataTypeEnum.next_value,
         tempIndex
       );
-<<<<<<< HEAD
 
       if (typeof response.status !== 'undefined' && response.status === 200) {
         tempListOfDataPoints.push(response.data);
         setListOfDataPoints(tempListOfDataPoints);
         getSetLabels(tempListOfDataPoints);
+        setGettingNext(false);
       }
-=======
-      tempListOfDataPoints.push(response.data);
-      setListOfDataPoints(tempListOfDataPoints);
-      getSetLabels(tempListOfDataPoints);
-      setGettingNext(false);
->>>>>>> main
     }
   };
 
