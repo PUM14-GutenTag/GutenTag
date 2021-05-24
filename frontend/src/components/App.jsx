@@ -45,8 +45,11 @@ const App = () => {
   const displayAchievements = async (response) => {
     if (achievementURLs.includes(response.config.url)) {
       const achieveResponse = await HTTPLauncher.sendGetUnnotifiedAchievements();
-      // Merge arrays rather than overwriting.
-      setNewAchievements((previousAch) => [...previousAch, ...achieveResponse.data]);
+
+      if (typeof response.status !== 'undefined' && response.status === 200) {
+        // Merge arrays rather than overwriting.
+        setNewAchievements((previousAch) => [...previousAch, ...achieveResponse.data]);
+      }
     }
   };
 
@@ -69,9 +72,19 @@ const App = () => {
         return response;
       },
       async (error) => {
-        const { config, response } = error;
+        if (typeof error.response === 'undefined') {
+          return error;
+        }
 
+        const { config, response } = error;
         const originalRequest = config;
+
+        if (response.status === 422) {
+          userAuth.clearTokens();
+          window.location.reload();
+          return response;
+        }
+
         if (response.status === 401 && !originalRequest.url.includes('refresh-token')) {
           const tokenResponse = await HTTPLauncher.sendRefreshToken();
           if (tokenResponse.status === 200) {

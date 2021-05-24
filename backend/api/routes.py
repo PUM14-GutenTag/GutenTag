@@ -492,6 +492,7 @@ class AddNewTextData(Resource):
                 status = 200
             except Exception as e:
                 msg = f"Could not add data: {e}"
+                status = 404
 
         return make_response(jsonify({"message": msg}), status)
 

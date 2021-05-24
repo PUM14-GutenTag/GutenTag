@@ -66,14 +66,15 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel, labe
     // Sends a request to the database for the img source and sets it in a state
     const getImage = async (id) => {
       const response = await HTTPLauncher.sendGetImageData(id);
-      const source = URL.createObjectURL(response.data);
-      if (imgSource != null) URL.revokeObjectURL(imgSource);
-      setImageSource(source);
+      if (typeof response.status !== 'undefined' && response.status === 200) {
+        const source = URL.createObjectURL(response.data);
+        if (imgSource != null) URL.revokeObjectURL(imgSource);
+        setImageSource(source);
+      }
     };
     inputRef.current.value = '';
     inputRef.current.focus();
     getImage(dataPointId);
-    // eslint-disable-next-line
   }, [dataPointId]);
 
   useEffect(() => {
@@ -129,7 +130,7 @@ const ImageLabeling = ({ dataPointId, getSetLabels, defaultLabel, setLabel, labe
           onInitialized={(instance) => {
             setCropper(instance);
           }}
-          viewMode={3}
+          viewMode={1}
         />
         <hr className="hr-title" data-content="Add new label" />
         <div className="form-container">

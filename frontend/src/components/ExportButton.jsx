@@ -28,8 +28,10 @@ const ExportButton = ({ projectID, projectType, fileName, className }) => {
     setStatus('Preparing download. This may take a while...');
     setExportEnabled(false);
     const response = await HTTPLauncher.sendGetExportData(projectID, handleDownloadProgress);
-    const ext = projectType === ProjectType.IMAGE_CLASSIFICATION ? 'zip' : 'json';
-    saveAs(new Blob([response.data], { type: `application/${ext}` }), `${fileName}.${ext}`);
+    if (typeof response.status !== 'undefined' && response.status === 200) {
+      const ext = projectType === ProjectType.IMAGE_CLASSIFICATION ? 'zip' : 'json';
+      saveAs(new Blob([response.data], { type: `application/${ext}` }), `${fileName}.${ext}`);
+    }
   };
 
   return (

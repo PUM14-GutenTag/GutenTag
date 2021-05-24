@@ -11,19 +11,22 @@ import userAuth from '../services/userAuth';
 // Redirects user to login if not logged in.
 const getUserInfo = async (dispatch, history) => {
   const response = await HTTPLauncher.sendGetUserInfo().catch((e) => {
-    if (e.response.status === 401) {
+    if (typeof e.response.status === 'undefined' || e.response.status === 401) {
       history.push('/login');
     }
   });
-  if (Object.prototype.hasOwnProperty.call(response, 'data')) {
-    dispatch({
-      type: 'SET_USER_INFO',
-      value: {
-        name: response.data.name,
-        email: response.data.email,
-        isAdmin: response.data.access_level >= 5,
-      },
-    });
+
+  if (response) {
+    if (Object.prototype.hasOwnProperty.call(response, 'data')) {
+      dispatch({
+        type: 'SET_USER_INFO',
+        value: {
+          name: response.data.name,
+          email: response.data.email,
+          isAdmin: response.data.access_level >= 5,
+        },
+      });
+    }
   }
 };
 
