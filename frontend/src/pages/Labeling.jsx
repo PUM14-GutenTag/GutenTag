@@ -37,7 +37,7 @@ const Labeling = ({ location }) => {
   // fetch progress
   const fetchProgress = async () => {
     const response = await HTTPLauncher.sendGetProjectProgress(id);
-    if (response.status === 200) {
+    if (typeof response.status !== 'undefined' && response.status === 200) {
       setProgressProject(response.data.progress);
     }
   };
@@ -47,7 +47,7 @@ const Labeling = ({ location }) => {
     if (Object.keys(dataPoints[CURRENT_DATA]).length !== 0) {
       const response = await HTTPLauncher.sendGetLabel(projectId, dataPoints[CURRENT_DATA].id);
 
-      if (response.status === 200) {
+      if (typeof response.status !== 'undefined' && response.status === 200) {
         if (Object.keys(response.data.labels).length !== 0) {
           setLabels(Object.values(response.data.labels));
         } else {
@@ -68,7 +68,7 @@ const Labeling = ({ location }) => {
   const fetchData = async () => {
     const response = await HTTPLauncher.sendGetData(projectId, getDataTypeEnum.whole_list);
 
-    if (response.status === 200) {
+    if (typeof response.status !== 'undefined' && response.status === 200) {
       setListOfDataPoints(response.data.list);
       setIndex(response.data.index);
       getSetLabels(response.data.list);
@@ -79,7 +79,7 @@ const Labeling = ({ location }) => {
     // Gets amount of data in project and individual progress in percent
     const getAmountOfData = async () => {
       const response = await HTTPLauncher.sendGetAmountOfData(projectId);
-      if (response.status === 200) {
+      if (typeof response.status !== 'undefined' && response.status === 200) {
         setDataAmount(response.data.dataAmount);
         const labeledByUser = response.data.labeledByUser;
         if (response.data.dataAmount === 0) {
@@ -113,7 +113,7 @@ const Labeling = ({ location }) => {
         tempIndex
       );
 
-      if (response.status === 200) {
+      if (typeof response.status !== 'undefined' && response.status === 200) {
         tempListOfDataPoints.unshift(response.data);
         setListOfDataPoints(tempListOfDataPoints);
         getSetLabels(tempListOfDataPoints);
@@ -135,7 +135,7 @@ const Labeling = ({ location }) => {
         tempIndex
       );
 
-      if (response.status === 200) {
+      if (typeof response.status !== 'undefined' && response.status === 200) {
         tempListOfDataPoints.push(response.data);
         setListOfDataPoints(tempListOfDataPoints);
         getSetLabels(tempListOfDataPoints);

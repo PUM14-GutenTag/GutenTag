@@ -31,7 +31,7 @@ const AchievementCarousel = ({ containerClass }) => {
   const getAchievements = async () => {
     const response = await HTTPLauncher.sendGetAchievements();
 
-    if (response.status === 200) {
+    if (typeof response.status !== 'undefined' && response.status === 200) {
       const sorted = response.data.sort((a, b) => {
         if (a.earned == null && b.earned != null) return 1;
         if (a.earned != null && b.earned == null) return -1;

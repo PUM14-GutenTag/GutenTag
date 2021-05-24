@@ -46,7 +46,7 @@ const App = () => {
     if (achievementURLs.includes(response.config.url)) {
       const achieveResponse = await HTTPLauncher.sendGetUnnotifiedAchievements();
 
-      if (response.status === 200) {
+      if (typeof response.status !== 'undefined' && response.status === 200) {
         // Merge arrays rather than overwriting.
         setNewAchievements((previousAch) => [...previousAch, ...achieveResponse.data]);
       }
@@ -62,6 +62,7 @@ const App = () => {
     axios.interceptors.response.use(
       (response) => {
         if (response.config.url.includes('login')) {
+          console.log('RESPONSE:', response);
           const { access_token: accessToken, refresh_token: refreshToken } = response.data;
           userAuth.setAccessToken(accessToken);
           userAuth.setRefreshToken(refreshToken);

@@ -16,7 +16,7 @@ const ManageDefaultLabels = ({ projectID }) => {
   // Fetch all default labels.
   const fetchDefaultLabels = async () => {
     const result = await HTTPLauncher.sendGetDefaultLabel(projectID);
-    if (result.status === 200) {
+    if (typeof result.status !== 'undefined' && result.status === 200) {
       const list = Object.keys(result.data).map((key) => result.data[key].name);
       setLabels(list);
     }

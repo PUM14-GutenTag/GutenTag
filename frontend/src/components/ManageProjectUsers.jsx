@@ -17,7 +17,7 @@ const ManageProjectUsers = ({ projectID }) => {
   // Fetches all users authorized to the project.
   const fetchProjectUsersData = async () => {
     const result = await HTTPLauncher.sendGetProjectUsers(projectID);
-    if (result.status === 200) {
+    if (typeof result.status !== 'undefined' && result.status === 200) {
       const dataArray = Object.values(result.data.users);
       setProjectUsers(dataArray);
     }
@@ -26,7 +26,7 @@ const ManageProjectUsers = ({ projectID }) => {
   // Fetches all users.
   const fetchUserData = async () => {
     const result = await HTTPLauncher.sendGetUsers();
-    if (result.status === 200) {
+    if (typeof result.status !== 'undefined' && result.status === 200) {
       const dataArray = Object.values(result.data.users);
       const mappedDataArray = dataArray.map((userObject) => Object.values(userObject));
       mappedDataArray.sort((a, b) => {
