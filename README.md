@@ -103,10 +103,10 @@ password: password
 
 ## Testing
 
-[Frontend testing instructions](frontend/src/tests/README.MD)
+[Frontend testing instructions](frontend/src/tests/README.md)
 
-[Backend testing instructions](backend/Test/README.MD)
+[Backend testing instructions](backend/Test/README.md)
 
 ## Contributing
 
-See [CONTRIBUTING.MD](/CONTRIBUTING.MD)
+See [CONTRIBUTING.MD](/CONTRIBUTING.md)
