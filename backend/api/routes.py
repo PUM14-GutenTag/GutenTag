@@ -8,7 +8,7 @@ from flask_jwt_extended import (
 )
 from enum import IntEnum
 from werkzeug.utils import secure_filename
-from api import rest
+from api import rest, IS_DEV_MODE
 from api.models import (
     AccessLevel,
     DefaultLabel,
@@ -1236,4 +1236,6 @@ rest.add_resource(GetImageData, "/get-image-data")
 rest.add_resource(GetUnnotifiedAchievements, "/get-unnotified-achievements")
 rest.add_resource(GetAchievements, "/get-achievements")
 rest.add_resource(GetStatistics, "/get-statistics")
-rest.add_resource(Reset, "/reset")
+
+if IS_DEV_MODE:
+    rest.add_resource(Reset, "/reset")
