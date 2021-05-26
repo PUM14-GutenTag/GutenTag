@@ -1,6 +1,6 @@
 # GutenTag
 
-This is a bachelors project which goal is to create a data labeling product. The students developong this are students at Linköpings universitet in Sweden.
+This is a bachelor's project with the goal to create a data labeling web app. The students developing this are students at Linköpings universitet in Sweden.
 
 ## Configuring your development environment
 
@@ -69,11 +69,13 @@ Follow the instructions [here](https://docs.docker.com/engine/install/).
 
 **Launch Docker Desktop**. Then open the root directory in the terminal and run
 
-`docker-compose up`
+`docker-compose up`.
+
+To rebuild the containers and then start, run
+
+`docker-compose up --build`
 
 This will launch all of the services in different containers, install their dependencies and configure them to communicate on a local network.
-
-If you get an error saying that the database does not exist. Try running `docker-compose down -v` and then starting docker-compose again.
 
 The frontend should now be reachable at [http:localhost:3000/](http:localhost:3000/) and the backend at [http:localhost:5000/](http:localhost:5000/)
 
@@ -85,13 +87,23 @@ Set your serve hostname in the /.env/ file.
 
 **Launch Docker Desktop**. Then open the root directory in the terminal and run
 
-`docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`
+`docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`.
+
+To rebuild the containers and then start, run
+
+`docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build`
 
 This will launch all of the services in different containers, install their dependencies and configure them to communicate on a local network.
 
-If you get an error saying that the database does not exist. Try running `docker-compose down -v` and then starting docker-compose again.
-
 The frontend should now be reachable at your configured hostname. The frontend can be reached at ${SERVER_NAME}/ and the backend can be reached at ${SERVER_NAME}/api/
+
+### Common errors
+
+if you get an error when upping the containers saying that the database does not exist. Try running `docker-compose down -v` and then starting docker-compose again.
+
+If you've changed some database models, make sure to reset the database by accessing [http:localhost:5000/reset/](http:localhost:5000/reset/). Keep in mind that the reset endpoint is not reachable in production mode.
+
+When running production, your code changes are not automatically applied, meaning you need to rebuild the docker images.
 
 ### Logging in
 
@@ -110,3 +122,152 @@ password: password
 ## Contributing
 
 See [CONTRIBUTING.MD](/CONTRIBUTING.md)
+
+## File upload formats
+
+When uploading data, you need to provide JSON files with the following shape, where labels may be omitted.
+
+### Document classification
+
+```
+[
+   {
+      "text": "Excellent customer service.",
+      "labels": ["positive", "negative"]
+   },
+   ...
+]
+```
+
+### Sequence labeling
+
+```
+[
+   {
+      "text": "Alex is going to Los Angeles in California",
+      "labels": [
+            [0, 3, "PER"],
+            [16, 27, "LOC"],
+            [31, 41, "LOC"]
+            ]
+   },
+   ...
+]
+```
+
+### Sequence to sequence labeling
+
+```
+[
+   {
+      "text": "John saw the man on the mountain with a telescope.",
+      "labels": [
+            "John såg mannen på berget med hjälp av ett teleskop.",
+            "John såg mannen med ett teleskop på berget."
+      ]
+   },
+   ...
+]
+```
+
+### Image classification
+
+Image projects expect a number of pictures along with a JSON that list the filenames and potential pre-labels.
+
+```
+[
+   {
+      "file_name": "image_name.jpeg",
+      "labels": [
+            [[442, 420], [530, 540], "car"],
+            [[700, 520], [800, 640], "bus"]
+      ]
+   },
+   ...
+]
+```
+
+## File export formats
+
+When exporting data, a JSON is provided in the following shapes.
+
+### Document classification
+
+```
+{
+   project_id: 0,
+   project_name: "name",
+   project_type: 1,
+   data: [
+      {
+            "text": "Excellent customer service.",
+            "labels": ["positive"]
+      },
+      ...
+   ]
+}
+```
+
+### Sequence labeling
+
+```
+{
+   project_id: 0,
+   project_name: "name",
+   project_type: 2,
+   data: [
+      {
+            "text": "Alex is going to Los Angeles in California",
+            "labels": [
+               [0, 3, PER],
+               [16, 27, LOC],
+               [31, 41, LOC]
+            ]
+      },
+      ...
+   ]
+}
+```
+
+### Sequence to sequence labeling
+
+```
+{
+   project_id: 0,
+   project_name: "name",
+   project_type: 3,
+   data: [
+      {
+            "text": "John saw the man on the mountain with a telescope.",
+            "labels": [
+               "John såg mannen på berget med hjälp av ett teleskop.",
+               "John såg mannen med ett teleskop på berget."
+            ]
+      },
+      ...
+   ]
+}
+```
+
+### Image classification
+
+When exporting image projects, a .zip file is provided containing all the images along with the JSON.
+
+```
+{
+   project_id: 0,
+   project_name: "project name",
+   project_type: 4,
+   data: [
+      {
+            "file_name": "image.jpg",
+            "id": 101,
+            "labels": [
+               [[442, 420], [530, 540], "car"],
+               [[700, 520], [800, 640], "bus"]
+            ]
+      },
+      ...
+   ]
+}
+```
