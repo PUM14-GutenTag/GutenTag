@@ -85,6 +85,8 @@ Set your database configuration in the /.env.prod file.
 
 Set your serve hostname in the /.env/ file.
 
+Set the JWT_SECRET_KEY variable in /backend/api/**init**.py. This should be a long, random string with no special characters.
+
 **Launch Docker Desktop**. Then open the root directory in the terminal and run
 
 `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`.
