@@ -34,7 +34,7 @@ db = SQLAlchemy(app)
 enable_batch_inserting(SignallingSession)
 bcrypt = Bcrypt(app)
 if not app.debug:
-    if JWT_SECRET_KEY is not "":
+    if JWT_SECRET_KEY != "":
         app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
         jwt = JWTManager(app)
     else:
