@@ -14,7 +14,7 @@ div.col,
 
 div.row {
   flex-wrap: nowrap;
-  align-items: center;
+  align-items: flex-start;
 }
 
 #row-align,
