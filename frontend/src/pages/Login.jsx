@@ -34,7 +34,7 @@ function Login() {
     event.preventDefault();
 
     const responseLogin = await HTTPLauncher.sendLogin(email, password);
-    if (responseLogin.data !== undefined) {
+    if (typeof responseLogin.status !== 'undefined' && responseLogin.status === 200) {
       history.push('/home');
     } else if (responseLogin.response.status === 404) {
       setValidEmail(false);

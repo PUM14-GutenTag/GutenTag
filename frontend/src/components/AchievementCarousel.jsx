@@ -30,12 +30,15 @@ const AchievementCarousel = ({ containerClass }) => {
 
   const getAchievements = async () => {
     const response = await HTTPLauncher.sendGetAchievements();
-    const sorted = response.data.sort((a, b) => {
-      if (a.earned == null && b.earned != null) return 1;
-      if (a.earned != null && b.earned == null) return -1;
-      return 0;
-    });
-    setAchievements(sorted);
+
+    if (typeof response.status !== 'undefined' && response.status === 200) {
+      const sorted = response.data.sort((a, b) => {
+        if (a.earned == null && b.earned != null) return 1;
+        if (a.earned != null && b.earned == null) return -1;
+        return 0;
+      });
+      setAchievements(sorted);
+    }
   };
 
   useEffect(() => getAchievements(), []);

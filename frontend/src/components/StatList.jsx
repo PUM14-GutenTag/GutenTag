@@ -11,8 +11,10 @@ const StatList = ({ className }) => {
   // Get all user stats to display
   const getStats = async () => {
     const response = await HTTPLauncher.sendGetStatistics();
-    const sorted = response.data.sort((a, b) => (a.name > b.name ? 1 : -1));
-    setStats(sorted);
+    if (typeof response.status !== 'undefined' && response.status === 200) {
+      const sorted = response.data.sort((a, b) => (a.name > b.name ? 1 : -1));
+      setStats(sorted);
+    }
   };
 
   useEffect(() => getStats(), []);
