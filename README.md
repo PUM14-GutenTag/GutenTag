@@ -81,11 +81,9 @@ The frontend should now be reachable at [http:localhost:3000/](http:localhost:30
 
 ### Starting in production mode
 
-Set your database configuration in the /.env.prod file.
+Set your database configuration and JWT_SECRET_KEY in the /.env.prod file. The secret should be a long, random string with no special characters.
 
-Set your serve hostname in the /.env/ file.
-
-Set the JWT_SECRET_KEY variable in /backend/api/**init**.py. This should be a long, random string with no special characters.
+Set your server hostname in the /.env/ file.
 
 **Launch Docker Desktop**. Then open the root directory in the terminal and run
 

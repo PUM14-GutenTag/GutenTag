@@ -16,7 +16,8 @@ import string
 # THIS NEEDS TO BE SET TO A RANDOM STRING
 # EXAMPLE JWT: 7JVcd7f8CVdCcqrTyNLNoBWVUt5U00jrJSCkm3tu
 # DO NOT USE THIS IN PRODUCTION
-JWT_SECRET_KEY = ""
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "")
+IS_DEV_MODE = os.environ.get("FLASK_ENV", "development") == "development"
 
 
 class SecretKeyNotSetException(Exception):
@@ -39,14 +40,13 @@ if not app.debug:
         jwt = JWTManager(app)
     else:
         raise SecretKeyNotSetException(
-            "JWT Secret Key is not set in backend/api/__init__.py")
+            "JWT Secret Key is not set in environment.")
 else:
     # FOR DEVELOPMENT ONLY
     # DO NOT USE THIS KEY IN PRODUCTION
     app.config['JWT_SECRET_KEY'] = "7JVcd7f8CVdCcqrTyNLNoBWVUt5U00jrJSCkm3tu"
     jwt = JWTManager(app)
 
-IS_DEV_MODE = os.environ.get("FLASK_ENV", "development") == "development"
 
 # This should NOT be at the top of the file. Build will fail. See
 # https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
