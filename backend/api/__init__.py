@@ -13,6 +13,18 @@ from flask_jwt_extended import JWTManager
 import secrets
 import string
 
+# THIS NEEDS TO BE SET TO A RANDOM STRING
+# EXAMPLE JWT: 7JVcd7f8CVdCcqrTyNLNoBWVUt5U00jrJSCkm3tu
+# DO NOT USE THIS IN PRODUCTION
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "")
+IS_DEV_MODE = os.environ.get("FLASK_ENV", "development") == "development"
+
+
+class SecretKeyNotSetException(Exception):
+    """ Explanatory exception in case JWT_SECRET_KEY is not set.  """
+    pass
+
+
 app = Flask(__name__)
 app.config.from_object("api.config.Config")
 app.config['CORS_HEADERS'] = 'Authorization, Content-Type'
@@ -22,26 +34,20 @@ rest = Api(app)
 db = SQLAlchemy(app)
 enable_batch_inserting(SignallingSession)
 bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
+if not app.debug:
+    if JWT_SECRET_KEY != "":
+        app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
+        jwt = JWTManager(app)
+    else:
+        raise SecretKeyNotSetException(
+            "JWT Secret Key is not set in environment.")
+else:
+    # FOR DEVELOPMENT ONLY
+    # DO NOT USE THIS KEY IN PRODUCTION
+    app.config['JWT_SECRET_KEY'] = "7JVcd7f8CVdCcqrTyNLNoBWVUt5U00jrJSCkm3tu"
+    jwt = JWTManager(app)
 
-IS_DEV_MODE = os.environ.get("FLASK_ENV", "development") == "development"
 
 # This should NOT be at the top of the file. Build will fail. See
 # https://flask.palletsprojects.com/en/1.1.x/patterns/packages/
 import api.routes  # noqa
-
-
-def generate_secret_key():
-    n = 40
-    res = ''.join(secrets.choice(string.ascii_letters + string.digits)
-                  for i in range(n))
-
-    app.config['JWT_SECRET_KEY'] = res
-
-
-if not app.debug:
-    generate_secret_key()
-else:
-    # Set default secret key to use while debugging
-    # Do NOT use this in production
-    app.config['JWT_SECRET_KEY'] = '7JVcd7f8CVdCcqrTyNLNoBWVUt5U00jrJSCkm3tu'
