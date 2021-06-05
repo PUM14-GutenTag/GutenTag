@@ -586,7 +586,6 @@ class GetDefaultLabels(Resource):
                         "name": label.name,
                     }
 
-                print(project.default_labels)
                 return make_response(jsonify(label_info), status)
             except Exception as e:
                 msg = f"Could not get data: {e}"
