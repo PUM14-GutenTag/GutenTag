@@ -51,22 +51,24 @@ const EditProject = ({ location }) => {
       <h2>Project Type: {getProjectType(projectType)}</h2>
       <br />
       <Row>
-        <Col id="center">
-          <h2>Import</h2>
-          <ImportForm projectID={id} projectType={projectType} />
-        </Col>
-        <Col id="center">
-          <h2>Export</h2>
+        <Col style={{ minHeight: '25vh' }}>
+          <h1>Export</h1>
           <ExportButton projectID={id} projectType={projectType} fileName={name} />
         </Col>
+        <Col style={{ minHeight: '25vh' }}>
+          <h1>Import</h1>
+          <ImportForm projectID={id} projectType={projectType} />
+        </Col>
       </Row>
-      <Row className="row-left">
-        <div>
+      <Row>
+        <Col style={{ minHeight: '25vh' }}>
           <h1>Labels per datapoint</h1>
           <InputSpinner amount={labelsPerDatapoint} setAmount={sendChange} />
-        </div>
+        </Col>
+        <Col style={{ minHeight: '25vh' }}>
+          {projectType !== 3 && <ManageDefaultLabels projectID={id} />}
+        </Col>
       </Row>
-      {projectType !== 3 && <ManageDefaultLabels projectID={id} />}
       <ManageProjectUsers projectID={id} />
     </Layout>
   );
